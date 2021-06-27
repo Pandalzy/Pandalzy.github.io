@@ -1,0 +1,726 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/assets/avatar_16x16.jpg?v=2.1.1" type="image/png" sizes="16x16"><link rel="icon" href="/assets/avatar_32x32.jpg?v=2.1.1" type="image/png" sizes="32x32"><meta name="description" content="绪论                           研究背景及意义       随着网络技术的发展, 网络购物已经成为人们的第二大购物体验。而对于用户来讲, 自动售货机既具备传统实体店的即视选择优点, 又由于其分布零散、范围广阔、支付方便等特点可与网店购物媲美, 而在全世界范围内得到了广泛应用。自动售货机是商业自动化的常用设备，它不受时间、地点的限制，能节省人力、方便交">
+<meta property="og:type" content="article">
+<meta property="og:title" content="硬件课程设计——自动售货机（汇编）">
+<meta property="og:url" content="https://blog.zyuanlee.cn/2019/12/11/%E7%A1%AC%E4%BB%B6%E8%AF%BE%E7%A8%8B%E8%AE%BE%E8%AE%A1-%E8%87%AA%E5%8A%A8%E5%94%AE%E8%B4%A7%E6%9C%BA/index.html">
+<meta property="og:site_name" content="Pandalzy&#39;s Blog">
+<meta property="og:description" content="绪论                           研究背景及意义       随着网络技术的发展, 网络购物已经成为人们的第二大购物体验。而对于用户来讲, 自动售货机既具备传统实体店的即视选择优点, 又由于其分布零散、范围广阔、支付方便等特点可与网店购物媲美, 而在全世界范围内得到了广泛应用。自动售货机是商业自动化的常用设备，它不受时间、地点的限制，能节省人力、方便交">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200246.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200307.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200414.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200433.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200449.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200504.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200524.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200535.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200547.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200604.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200624.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200641.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200702.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213201034.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213201045.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213201055.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213201104.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213201120.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213201138.png">
+<meta property="article:published_time" content="2019-12-11T14:31:03.000Z">
+<meta property="article:modified_time" content="2021-06-27T00:34:28.400Z">
+<meta property="article:author" content="Pandalzy">
+<meta property="article:tag" content="硬件课程设计">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200246.png"><title>硬件课程设计——自动售货机（汇编） | Pandalzy's Blog</title><link ref="canonical" href="https://blog.zyuanlee.cn/2019/12/11/%E7%A1%AC%E4%BB%B6%E8%AF%BE%E7%A8%8B%E8%AE%BE%E8%AE%A1-%E8%87%AA%E5%8A%A8%E5%94%AE%E8%B4%A7%E6%9C%BA/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.1.1"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":true},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"carbon","highlight":"light","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: undefined,
+  lazyload: false,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.4.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/about/"><span class="header-nav-menu-item__icon"><i class="fas fa-address-card"></i></span><span class="header-nav-menu-item__text">关于</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/friends/"><span class="header-nav-menu-item__icon"><i class="fas fa-user-friends"></i></span><span class="header-nav-menu-item__text">友链</span></a></div></div><div class="header-nav-search"><span class="header-nav-search__icon"><i class="fas fa-search"></i></span><span class="header-nav-search__text">搜索</span></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">Pandalzy's Blog</div><div class="header-banner-info__subtitle">Stay hungry, stay foolish.</div></div><div class="header-banner-arrow"><div class="header-banner-arrow__icon"><i class="fas fa-angle-down"></i></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">硬件课程设计——自动售货机（汇编）</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2019-12-11</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-06-27</span></span></div></header><div class="post-body">
+        <h2 id="绪论"   >
+          <a href="#绪论" class="heading-link"><i class="fas fa-link"></i></a>绪论</h2>
+      
+        <h3 id="研究背景及意义"   >
+          <a href="#研究背景及意义" class="heading-link"><i class="fas fa-link"></i></a>研究背景及意义</h3>
+      <p>随着网络技术的发展, 网络购物已经成为人们的第二大购物体验。而对于用户来讲, 自动售货机既具备传统实体店的即视选择优点, 又由于其分布零散、范围广阔、支付方便等特点可与网店购物媲美, 而在全世界范围内得到了广泛应用。自动售货机是商业自动化的常用设备，它不受时间、地点的限制，能节省人力、方便交易。</p>
+<p>随着信息科技时代的到来，人们的生活与消费方式发生重大改变。自动售货机的发展要把人们因工作生活方式改变产生的需求，通过科学技术提升进行解决。不仅仅只提升自动售货机在市场的占有率，重要的是从自动售货机用户体验出发，提高自动售货机的质量及功能，抢占新零售时代新的消费方式的机遇。使自动售货机成为人们工作、生活服务功能单元的一部分，清晰自动售货机在新零售时代的定位，成为一个时代及相应群体的生活标志，这样自动售货机时代才是真正来临。</p>
+<span id="more"></span>
+
+
+        <h3 id="设计任务及要求"   >
+          <a href="#设计任务及要求" class="heading-link"><i class="fas fa-link"></i></a>设计任务及要求</h3>
+      
+        <h4 id="设计任务"   >
+          <a href="#设计任务" class="heading-link"><i class="fas fa-link"></i></a>设计任务</h4>
+      <p>自动售货机系统基本功能和扩展功能如下表所示</p>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">基本功能</th>
+<th align="center">扩展功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">LCD 显示商品</td>
+<td align="center">LCD 屏显示商品名称及余量</td>
+</tr>
+<tr>
+<td align="center">K1、K2 键模拟选择 4 种商品</td>
+<td align="center">中断检测键盘按键</td>
+</tr>
+<tr>
+<td align="center">K3 键为确认选择商品</td>
+<td align="center">商品价格显示</td>
+</tr>
+<tr>
+<td align="center">电机转动模拟出货</td>
+<td align="center">用户扫描二维码付款</td>
+</tr>
+<tr>
+<td align="center">电机硬延时转动 1 秒</td>
+<td align="center">商品无货，提示用户</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">管理员输入密码上货</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">管理员查看收益</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">商品保温，数码管显示</td>
+</tr>
+</tbody></table></div>
+<p>利用 8255、8253、0832、LED 屏显示模拟自动售货机，设定 K1、K2 键模拟 4 种商品 K3 键为确认购买。当选择好购买种商品由 LCD 屏显示后，0832 控制电机转动 1 秒（1 秒时间由 8253 提供）。</p>
+
+        <h4 id="设计要求"   >
+          <a href="#设计要求" class="heading-link"><i class="fas fa-link"></i></a>设计要求</h4>
+      <ul>
+<li>使用汇编语言，利用宏（macro）和子程序（proc）优化代码</li>
+<li>设计系统电路图</li>
+<li>绘制系统各功能流程图</li>
+<li>学习 LCD 屏的使用方法，显示字符与绘制图像</li>
+<li>学习 8259 芯片，使用中断控制</li>
+<li>使用两个数码管，分别表示温度的十位与个位</li>
+<li>使用 8253 芯片，使电机转动 1 秒</li>
+<li>密码匹配检测输入密码是否正确</li>
+</ul>
+
+        <h2 id="系统设计需求分析"   >
+          <a href="#系统设计需求分析" class="heading-link"><i class="fas fa-link"></i></a>系统设计需求分析</h2>
+      
+        <h3 id="开发环境及开发平台"   >
+          <a href="#开发环境及开发平台" class="heading-link"><i class="fas fa-link"></i></a>开发环境及开发平台</h3>
+      <blockquote>
+<p>开发环境：HQFC-A 实验箱及 HQFC-A 微机接口软件</p>
+<p>开发语言：汇编</p>
+<p>开发平台：Windows 7 操作系统</p>
+</blockquote>
+
+        <h3 id="设计的主要算法及分析"   >
+          <a href="#设计的主要算法及分析" class="heading-link"><i class="fas fa-link"></i></a>设计的主要算法及分析</h3>
+      <ul>
+<li>LCD 屏字符显示<ul>
+<li>首先确定输出位置，LCD 可以显示四行中文，起始地址分别为：80H、90H、88H 和 98H，每行可以显示八个汉字，显示地址为前一个汉字地址加一。先设定 DDRAM 地址，输出显示起始地址，然后将 D/I 端置 0，为数据端，R/W 置为 0，为写入端，使能信号置 1，再置为 0。因为汉字占用 16 位两个字节，需要依次输出汉字编码高字节和低字节，需要将 D/I 端置 1，才能输出汉字。</li>
+</ul>
+</li>
+<li>货物余量计算<ul>
+<li>在数据段设置物品余量的变量，当用户购选择相应货物时，首先判断余量个位是否为 0，若不为 0，则显示货物价格和付款二维码，待用户付款后，个位数字减 1，否则再判断十位是否为 0，若为 0，则输出“库存不足”，否则显示货物价格和付款二维码，待用户付款后，十位数字减 1，个位数字变为 9。</li>
+</ul>
+</li>
+<li>密码匹配<ul>
+<li>当管理员按下补货按钮时，提示输入口令，管理员输入的密码实时显示在 LCD 上，每输入一位，后台就将临时地址相应位置的值改为输入值，等输入 4 位密码后，自动检查密码是否与预设密码匹配，若匹配，则打开货仓，进行补货，否则输出“密码错误”。</li>
+</ul>
+</li>
+<li>按键确定<ul>
+<li>首先向键盘每一行都输入 0，然后检查键盘列值是否有 0 输出，且持续 20ms 以上，若无，则继续检测是否有按键按下，否则，依次向每行输出 0，然后检测每一行的另一端是否均为 1，若不是则转去编码。</li>
+</ul>
+</li>
+<li>收益计算<ul>
+<li>每当用户成功购买商品，则收益加上相应的值。查看时，首先将收益值赋值给 AX，除以 64H（十进制 100），商在 AL，余数在 AH，继续对余数除 0AH（十进制 10），得到商和余数，就可以获得整个收益的百位、个位和十位值。</li>
+</ul>
+</li>
+<li>LCD 显示图像<ul>
+<li>首先关闭 LCD 的绘图显示功能（34H），然后将水平的位元祖坐标（X）写入 RAM 地址，再将垂直的坐标（Y）写入绘图 RAM 地址，之后连续向 RAM 写入两个 8 位的图片编码，循环直到图片编码全部写完，最后打开绘图功能显示功能，图片就可以显示完全。</li>
+</ul>
+</li>
+</ul>
+
+        <h3 id="系统的组成及工作原理"   >
+          <a href="#系统的组成及工作原理" class="heading-link"><i class="fas fa-link"></i></a>系统的组成及工作原理</h3>
+      <ul>
+<li>8255 芯片<ul>
+<li>8255 是可编程并行 I/O 接口芯片，有 3 个 8 位并行 I/O 口。具有 3 个通道 3 种工作方式的可编程并行接口芯片（40 引脚）。通过向 8255 的控制字寄存器写入方式选择字，就可以规定 3 个口的工作方式。</li>
+</ul>
+</li>
+<li>8259A 芯片<ul>
+<li>8258A 芯片是可编程中断控制器，通过对它进行编程，写入初始化命令字 ICW 和控制命令字 OCW。中断的来源除了来自于硬件自身的 NMI 中断和来自于软件的 INT n 指令造成的软件中断之外，还有来自于外部硬件设备的中断，这些中断是可屏蔽的。这些中断也都通过可编程中断控制器 PIC 进行控制，并传递给 CPU。</li>
+</ul>
+</li>
+<li>DAC0832 芯片<ul>
+<li>DAC0832 是 8 位的 D/A 转换集成芯片。D/A 转换器由 8 位输入锁存器、8 位 DAC 寄存器、8 位 D/A 转换电路及转换控制电路构成。可以把从 CPU 送来的数据先打入输入寄存器，在需要进行 D/A 转换时，再选通 DAC 寄存器，实现 D/A 转换，本次实验所用芯片为单缓冲。</li>
+</ul>
+</li>
+<li>ADC0809<ul>
+<li>ADC0809 是 8 位的 A/D 转换集成芯片。使用 CBA 引脚确认转换通道，在 START 和 ALE 脚上加一个正脉冲，将通道选择码锁存并启动 A/D 转。转换开始后，EOC 变低，经过 64 个时钟周期后，转换结束，EOC 变高。转换结束后，通过 IN 指令，设法在 OE 脚上形成一个高电平脉冲，打开输出缓冲的三态门，让转换后的数字量出现在数据总线上，并被读入累加器中。</li>
+</ul>
+</li>
+<li>LCD 屏<ul>
+<li>液晶显示模块是 128×64 点阵的汉字图形型液晶显示模块，可显示汉字及图形，内置 8192 个中文汉字（16X16 点阵）、128 个字符（8X16 点阵）及 64X256 点阵显示 RAM（GDRAM）。可与 CPU 直接接口，提供两种界面来连接微处理机：8-位并行及串行两种连接方式。具有多种功能：光标显示、画面移位、睡眠模式等。使用不同的指令可以使用相应的功能，比如：清除、写字符、绘图等。</li>
+</ul>
+</li>
+<li>数码管<ul>
+<li>由多个发光二极管封装在一起组成“8”字型的器件，引线已在内部连接完成。每个数码管加上小数点，由八个 LED 灯组成，用 a、b、c、d、e、f、g 和 dp 来表示各个 LED 灯，向八个引脚输出不同的电平可以显示不同的字符。</li>
+</ul>
+</li>
+</ul>
+
+        <h2 id="系统的总体设计"   >
+          <a href="#系统的总体设计" class="heading-link"><i class="fas fa-link"></i></a>系统的总体设计</h2>
+      
+        <h3 id="系统功能层次图"   >
+          <a href="#系统功能层次图" class="heading-link"><i class="fas fa-link"></i></a>系统功能层次图</h3>
+      <p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200246.png" alt="层次图"></p>
+
+        <h3 id="系统功能设计"   >
+          <a href="#系统功能设计" class="heading-link"><i class="fas fa-link"></i></a>系统功能设计</h3>
+      <ul>
+<li><p><strong>商品购买</strong></p>
+<ul>
+<li>利用键盘选择商品编号和确认选择商品，LCD 屏展示商品列表、付款二维码和商品购买结果。</li>
+</ul>
+</li>
+<li><p><strong>商品出货：</strong></p>
+<ul>
+<li>利用 8253 硬件延时 1 秒，控制电机转动的时间，LCD 屏显示出货结果。</li>
+</ul>
+</li>
+<li><p><strong>收益查询：</strong></p>
+<ul>
+<li>利用数据段一个数据保存自动售货机的收益金额，键盘控制选择查询收益，LCD 屏用于展示收益金额。</li>
+</ul>
+</li>
+<li><p><strong>补货模块：</strong></p>
+<ul>
+<li>利用键盘控制补货选择和密码的输入，数据段保存输入密码和预密码，LCD 屏显示密码的正确与否，进而可以控制货仓能否打开。</li>
+</ul>
+</li>
+<li><p><strong>商品保温模块：</strong></p>
+<ul>
+<li>利用温度扩展版获取当前温度的模拟量，用 ADC0809 芯片将模拟量转为数字量，进行标准化，进而在两个七位数码管显示当前的温度。</li>
+</ul>
+</li>
+</ul>
+
+        <h3 id="系统电路图"   >
+          <a href="#系统电路图" class="heading-link"><i class="fas fa-link"></i></a>系统电路图</h3>
+      <p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200307.png" alt="系统电路图"></p>
+
+        <h2 id="系统的详细设计"   >
+          <a href="#系统的详细设计" class="heading-link"><i class="fas fa-link"></i></a>系统的详细设计</h2>
+      
+        <h3 id="商品购买模块设计"   >
+          <a href="#商品购买模块设计" class="heading-link"><i class="fas fa-link"></i></a>商品购买模块设计</h3>
+      
+        <h4 id="程序流程图或算法流程图"   >
+          <a href="#程序流程图或算法流程图" class="heading-link"><i class="fas fa-link"></i></a>程序流程图或算法流程图</h4>
+      <p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200414.png" alt="购买商品模块流程图"></p>
+
+        <h4 id="系统功能实现"   >
+          <a href="#系统功能实现" class="heading-link"><i class="fas fa-link"></i></a>系统功能实现</h4>
+      <p>首先 LCD 屏会展示当前自动售货机的商品和其余量，当用户选择一个有余量的商品，按下相应编号的按键，LCD 显示屏会展示商品的价格和二维码，用户扫码后，按下确认键，电机就会转动，进行出货。</p>
+
+        <h4 id="运行界面截图"   >
+          <a href="#运行界面截图" class="heading-link"><i class="fas fa-link"></i></a>运行界面截图</h4>
+      <p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200433.jpg" alt="商品购买运行截图1"></p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200449.jpg" alt="商品购买运行截图1"></p>
+
+        <h3 id="出货模块设计"   >
+          <a href="#出货模块设计" class="heading-link"><i class="fas fa-link"></i></a>出货模块设计</h3>
+      
+        <h4 id="程序流程图或算法流程图-1"   >
+          <a href="#程序流程图或算法流程图-1" class="heading-link"><i class="fas fa-link"></i></a>程序流程图或算法流程图</h4>
+      <p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200504.png" alt="出货模块流程图"></p>
+
+        <h4 id="系统功能实现-1"   >
+          <a href="#系统功能实现-1" class="heading-link"><i class="fas fa-link"></i></a>系统功能实现</h4>
+      <p>用户成功购买商品后，会执行两段不同操。一是，8253 初始化，延时 1s，然后向 0832 输出高电平，电机转动，模拟商品出货，LCD 屏显示正在出货，当 1s 结束后，电机停止转动，LCD 屏显示出货成功。二是，当物品出货完成后，需要修改库存和增加收益。首先判断相应商品的余量个位是否为 0，若为 0，继续判断十位是否为 1，若为 1，则十位置为 0，个位置为 9，若个位不为 0，则置个位为原来值减 1。然后，库存余量存储增加相应的收益。</p>
+
+        <h4 id="运行界面截图-1"   >
+          <a href="#运行界面截图-1" class="heading-link"><i class="fas fa-link"></i></a>运行界面截图</h4>
+      <p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200524.jpg" alt="出货运行截图1"></p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200535.png" alt="出货运行截图2"></p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200547.png" alt="出货运行截图3"></p>
+
+        <h3 id="收益查询模块模块设计"   >
+          <a href="#收益查询模块模块设计" class="heading-link"><i class="fas fa-link"></i></a>收益查询模块模块设计</h3>
+      
+        <h4 id="程序流程图或算法流程图-2"   >
+          <a href="#程序流程图或算法流程图-2" class="heading-link"><i class="fas fa-link"></i></a>程序流程图或算法流程图</h4>
+      <p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200604.png" alt="收益查询流程图"></p>
+
+        <h4 id="系统功能实现-2"   >
+          <a href="#系统功能实现-2" class="heading-link"><i class="fas fa-link"></i></a>系统功能实现</h4>
+      <p>当管理员按下收益查询按钮后，系统会获取当前的收益，由于是 16 进制储，并且需要展示在 LCD 屏上，所以需要进行计算。首先将收益值赋值给 AX，除以 64H（十进制 100），商在 AL，余数在 AH，继续对余数除 0AH（十进制 10），得到商和余数，就可以获得整个收益的百位、个位和十位，在 LCD 屏上显示即可。</p>
+
+        <h4 id="运行界面截图-2"   >
+          <a href="#运行界面截图-2" class="heading-link"><i class="fas fa-link"></i></a>运行界面截图</h4>
+      <p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200624.png" alt="收益查询运行截图1"></p>
+
+        <h3 id="收益查询模块设计"   >
+          <a href="#收益查询模块设计" class="heading-link"><i class="fas fa-link"></i></a>收益查询模块设计</h3>
+      
+        <h4 id="程序流程图或算法流程图-3"   >
+          <a href="#程序流程图或算法流程图-3" class="heading-link"><i class="fas fa-link"></i></a>程序流程图或算法流程图</h4>
+      <p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200641.png" alt="补货模块流程图"></p>
+
+        <h4 id="系统功能实现-3"   >
+          <a href="#系统功能实现-3" class="heading-link"><i class="fas fa-link"></i></a>系统功能实现</h4>
+      <p>当管理员按下补货按钮时，LCD 屏提示输入口令打开货箱，输入四位密码，若密码正确，则打开货箱，进行补货，否则提示密码错误。最后每件商品的余量都恢复至 10 个。</p>
+
+        <h4 id="运行界面截图-3"   >
+          <a href="#运行界面截图-3" class="heading-link"><i class="fas fa-link"></i></a>运行界面截图</h4>
+      <p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200702.png" alt="补货模块运行截图1"></p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213201034.png" alt="补货模块运行截图2"></p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213201045.jpg" alt="补货模块运行截图3"></p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213201055.png" alt="补货模块运行截图4"></p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213201104.png" alt="补货模块运行截图5"></p>
+
+        <h3 id="商品保温模块设计"   >
+          <a href="#商品保温模块设计" class="heading-link"><i class="fas fa-link"></i></a>商品保温模块设计</h3>
+      
+        <h4 id="程序流程图或算法流程图-4"   >
+          <a href="#程序流程图或算法流程图-4" class="heading-link"><i class="fas fa-link"></i></a>程序流程图或算法流程图</h4>
+      <p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213201120.png" alt="商品保温流程图"></p>
+
+        <h4 id="系统功能实现-4"   >
+          <a href="#系统功能实现-4" class="heading-link"><i class="fas fa-link"></i></a>系统功能实现</h4>
+      <p>使用查询，来检测 0809 是否转换完成，若转换完成，则读取结果到 AL，并进行相应的计算（除 256 乘最高温度），得到相应的温度值，再转换为数码管的编码，进行双位显示，延时 1s 后继续检测温度，一直循环保温。</p>
+
+        <h4 id="运行界面截图-4"   >
+          <a href="#运行界面截图-4" class="heading-link"><i class="fas fa-link"></i></a>运行界面截图</h4>
+      <p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213201138.png" alt="商品保温运行截图1"></p>
+
+        <h2 id="系统测试"   >
+          <a href="#系统测试" class="heading-link"><i class="fas fa-link"></i></a>系统测试</h2>
+      
+        <h3 id="遇到问题及解决办法"   >
+          <a href="#遇到问题及解决办法" class="heading-link"><i class="fas fa-link"></i></a>遇到问题及解决办法</h3>
+      <ul>
+<li><p><strong>JE、JNZ 跳转不能过长</strong></p>
+<ul>
+<li>这些指令属于条件转移指令，在 8086 系统中属于短转移，转移范围在-127 到+127 字节之间。可以通过一个中间标签进行跳转来解决，如：“JNZ TEMP1 TEMP1:JMP G1”。</li>
+</ul>
+</li>
+<li><p><strong>LCD 屏绘图，图片不显示</strong></p>
+<ul>
+<li>LCD 屏绘图需要先关闭绘图显示功能，然后写入 X 和 Y 值，再继续写入图像的编码值，最后再打开绘图功能。LCD 屏是 128<em>64 的点阵，但是在绘图中，就为 8</em>32 的坐标点，原点坐标值为（80H,80H），了解到了这些，绘图显示才真正的会使用了。</li>
+</ul>
+</li>
+<li><p><strong>LCD 屏绘制一半图，另一半写字符异常</strong></p>
+<ul>
+<li>在实验箱上的 LCD 屏中，如果写入右侧的图像，但是不写入左侧的图像，左侧图像默认会与右侧图像一致，所以也需要向左侧 LCD 屏写入空白图像（00H），类似于清除 GDRAM，在写入字符的时候，就不会出现图像和字符一起显示的异常了，在下次写入整屏字符时，需要先清屏才能正确显示字符。</li>
+</ul>
+</li>
+<li><p><strong>键盘中断检测不可用：</strong></p>
+<ul>
+<li>虽然书上的 8259 芯片的使用方法已经掌握了，但是由于没有仔细看试验箱的构造，导致将从片误认为主片，一直出不来实验结果。之后了解构造后，在使用主片时又出现了问题，因为系统已经默认给主片进行了初始化，并且是系统中断，在键盘检测的过程中，屏蔽中断不可用，会导致一直发生中断，进而系统异常，达到不了预期效果。</li>
+</ul>
+</li>
+<li><p><strong>INC [BX]错误</strong></p>
+<ul>
+<li>INC 是加 1 指令，INC 后面放的是操作数，这个操作数可以是通用寄存器或是存储器。但是当为存储器时就不能直接写 INC [BX]，[BX]是一个存储器的地址，必须用 PTR 指令指明这个地址的类型,可以写 INC BYTE PTR [BX],这样就表示[BX]这个地址指示的是一个字节,这样就可使[BX]中的内容加 1。如果不指明类型，计算机不确定是[BX]所指字节加 1，还是[BX]和[BX+1]所指的字进行加 1。</li>
+</ul>
+</li>
+<li><p><strong>代码冗余：</strong></p>
+<ul>
+<li>使用宏和子程序优化代码。宏可以加参数，类似 C 语言中宏定义所写的函数，但是注意标签不能重复，因为宏代码段是在编译的过程中是直接替换原来的宏调用的，会造成标签重复定义。子程序类似 C 语言中的函数用“CALL 子程序名”来调用，其中若定义标签可以在子程序开始写“LOCAL 标签名”来声明，这样就不会报重复定义的异常。</li>
+</ul>
+</li>
+<li><p><strong>MOV AX,CS 与 MOV AX,DATA</strong></p>
+<ul>
+<li><p>“MOV AX,CS MOV DS,AX”作用是让数据段和代码段是同一个段，能让编译出来的程序节省几个字节的大小。</p>
+</li>
+<li><p>“MOV AX,DATA MOV DS,AX”，DATA 为数据段的段地址，执行这两段代码后，数据段的段地址被送入 DS 寄存器，这样对数据段中所有数据进行存取时，就不用再考虑这些数据所在位置的段地址。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>使用 DOS 设置中断，造成数据段获取异常</strong></p>
+<ul>
+<li>在程序“ASSUME CS:CODE,DS:DATA”中，已经将数据段的段地址放入段地址，在设置中断向量的时候，DS 寄存器的值又会被重新覆盖，造成无法正确取得数据段相应的值，所以需要先执行“PUSH DS”，将 DS 压入栈再设置中断向量，设置完成后，再执行“POP DS”，将数据段的段地址恢复，这样，在使用数据段的时候就不会发生异常了。</li>
+</ul>
+</li>
+</ul>
+
+        <h3 id="测试结果"   >
+          <a href="#测试结果" class="heading-link"><i class="fas fa-link"></i></a>测试结果</h3>
+      <div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">测试项</th>
+<th align="center">说明</th>
+<th align="center">结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">LCD 屏显示商品名称及余量</td>
+<td align="center">根据数据段数据显示。</td>
+<td align="center">√</td>
+</tr>
+<tr>
+<td align="center">中断检测键盘按键</td>
+<td align="center">由于系统已初始化 8259 主片，改为由脉冲触发中断，再检测键盘。</td>
+<td align="center">√</td>
+</tr>
+<tr>
+<td align="center">商品价格显示</td>
+<td align="center">根据所选商品的编号来显示。</td>
+<td align="center">√</td>
+</tr>
+<tr>
+<td align="center">确认选择商品</td>
+<td align="center">检测键盘确认键。</td>
+<td align="center">√</td>
+</tr>
+<tr>
+<td align="center">用户二维码付款</td>
+<td align="center">掌握绘图要领，并且对图片编码达到效果</td>
+<td align="center">√</td>
+</tr>
+<tr>
+<td align="center">电机模拟出货 1 秒</td>
+<td align="center">用两个 8253 通道累加延时</td>
+<td align="center">√</td>
+</tr>
+<tr>
+<td align="center">管理员输入密码上货</td>
+<td align="center">根据输入密码与预设密码匹配</td>
+<td align="center">√</td>
+</tr>
+<tr>
+<td align="center">管理员查看收益</td>
+<td align="center">设计算法取得收益百位、十位与个位</td>
+<td align="center">√</td>
+</tr>
+<tr>
+<td align="center">商品保温，数码管显示</td>
+<td align="center">由扩展版获得的温度，设置上下限，硬延时获取</td>
+<td align="center">√</td>
+</tr>
+</tbody></table></div>
+
+        <h2 id="系统设计结果分析及结论"   >
+          <a href="#系统设计结果分析及结论" class="heading-link"><i class="fas fa-link"></i></a>系统设计结果分析及结论</h2>
+      <p>整个系统的设计的花费了两周的时间，主要时间花费在 LCD 屏扩展功能的学习和 8259 芯片的学习中，这也让我的系统功能更加趋于生活。总得来说系统的设计结果达到了预想的效果。通过 8255 芯片和简单输入输出芯片的输入输出控制，结合 8086 CPU，8253 芯片和 8259 芯片等，使输出结果显示在 LCD 屏和数码管上。经过同学的测试使用和反馈，自动收货机系统逐渐完善。</p>
+<p>但是系统也是存在一些不足，比如说，由于 LCD 显示区域的限制，不能将商品的全部信息全部显示出来，价格显示就放在了商品详情栏里面；还有，预期设想的是键盘按键直接触发中断，这样就不占用系统 CPU，系统利用率就会提高，但实际操作做了折中，这里也可以改进。</p>
+<p>当然系统也是有一些优点，比如说，将操作员钥匙打开货箱改为输入密码验证；由于移动支付的普及，校内很少有硬币的自动售货机，所以就在系统上面加上了二维码扫码支付的功能；12 月的天气比较冷，大家当然想喝热的饮料或者奶茶，所以系统就增加了保温的功能，等等。这些功能都是设计的系统逐渐贴近生活，贴近现实的写照。</p>
+
+        <h2 id="设计心得"   >
+          <a href="#设计心得" class="heading-link"><i class="fas fa-link"></i></a>设计心得</h2>
+      <p>经过自动售货机系统的设计，我对微型计算机原理和接口的整体理解更加加深，在上学期微机接口的学习过程中，主要是理解和使用一些常用的芯片，很少很多芯片结合来使用。</p>
+<p>这次硬件课程设计不仅锻炼了我对硬件系统的整体设计能力，代码编写能力，更重要的是提高了自我学习的能力。对于系统中的 LCD 屏，8259 芯片，课堂没有讲解过，主要通过我们互相讨论与查看有关资料。在做 LCD 屏绘图的功能时，由于对绘图功能了解很浅，芯片资料讲解的也是很少，很难理解，所以就在网上查阅资料，经过多次查找和总结终于明白了绘图的详细思路，有一种茅塞顿开的感觉，编写代码，实际测试又出现了问题，但是也解决了。还有，在学习 8259 芯片做中断的过程中，书上讲解的原理都掌握了，在使用模拟软件测试的过程中，键盘的检测一直循环触发中断，和同学讨论，发现了一个问题，就是启动了 IR0 中断，它不会自动屏蔽再次触发 IR0 中断，需要在调用中断子程序的时候屏蔽自己，这样循环中断的问题就解决了，但是实际操作又是不一样，捣鼓了几节课还是不出来结果，询问老师，才发现试验箱上的 8259 芯片为从片，不是主片，一语中的，最后问题也到了解决。</p>
+<p>在代码编写的过程中，有一些指令以前没有使用过，所以也进行了相应的学习，期间也发现了汇编语言中可以使用宏来编写代码，这样就可以加上参数，这大大的减少了代码的长度，代码可读性也得到了提高，通过这些代码的编写，我对于更接近底层的汇编语言理解更加透彻。</p>
+<p>总体来说，这次硬件课程设计的过程中，我收获的很多，让我真正的从理论转到了实践。在这里要感谢老师和同学的帮助，如果不是他们的帮助，我的硬件课程设计可能也达到不了现在的效果，也要感谢老师的鼓励，使我这个系统的功能更加完善，更加贴近实际生活。虽然可能以后汇编语言的使用可能会很少，但是学习到的原理知识是相通的，我会在学习的路上一直前进。</p>
+
+        <h2 id="代码"   >
+          <a href="#代码" class="heading-link"><i class="fas fa-link"></i></a>代码</h2>
+      <p><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://github.com/Pandalzy/Vending-Machine-Compilation" >Vending-Machine-Compilation</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></p>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://blog.zyuanlee.cn">Pandalzy</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://blog.zyuanlee.cn/2019/12/11/%E7%A1%AC%E4%BB%B6%E8%AF%BE%E7%A8%8B%E8%AE%BE%E8%AE%A1-%E8%87%AA%E5%8A%A8%E5%94%AE%E8%B4%A7%E6%9C%BA/">https://blog.zyuanlee.cn/2019/12/11/%E7%A1%AC%E4%BB%B6%E8%AF%BE%E7%A8%8B%E8%AE%BE%E8%AE%A1-%E8%87%AA%E5%8A%A8%E5%94%AE%E8%B4%A7%E6%9C%BA/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://blog.zyuanlee.cn/tags/%E7%A1%AC%E4%BB%B6%E8%AF%BE%E7%A8%8B%E8%AE%BE%E8%AE%A1/">硬件课程设计</a></span></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2019/12/24/java%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">java期末复习</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2019/12/10/%E8%A7%A3%E5%86%B3hexo%E5%8D%9A%E5%AE%A2%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F%E9%97%AE%E9%A2%98/"><span class="paginator-prev__text">解决hexo博客数学公式问题</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%AA%E8%AE%BA"><span class="toc-number">1.</span> <span class="toc-text">
+          绪论</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A0%94%E7%A9%B6%E8%83%8C%E6%99%AF%E5%8F%8A%E6%84%8F%E4%B9%89"><span class="toc-number">1.1.</span> <span class="toc-text">
+          研究背景及意义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E4%BB%BB%E5%8A%A1%E5%8F%8A%E8%A6%81%E6%B1%82"><span class="toc-number">1.2.</span> <span class="toc-text">
+          设计任务及要求</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E4%BB%BB%E5%8A%A1"><span class="toc-number">1.2.1.</span> <span class="toc-text">
+          设计任务</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E8%A6%81%E6%B1%82"><span class="toc-number">1.2.2.</span> <span class="toc-text">
+          设计要求</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90"><span class="toc-number">2.</span> <span class="toc-text">
+          系统设计需求分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E5%8F%8A%E5%BC%80%E5%8F%91%E5%B9%B3%E5%8F%B0"><span class="toc-number">2.1.</span> <span class="toc-text">
+          开发环境及开发平台</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%BB%E8%A6%81%E7%AE%97%E6%B3%95%E5%8F%8A%E5%88%86%E6%9E%90"><span class="toc-number">2.2.</span> <span class="toc-text">
+          设计的主要算法及分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E7%9A%84%E7%BB%84%E6%88%90%E5%8F%8A%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="toc-number">2.3.</span> <span class="toc-text">
+          系统的组成及工作原理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%80%BB%E4%BD%93%E8%AE%BE%E8%AE%A1"><span class="toc-number">3.</span> <span class="toc-text">
+          系统的总体设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD%E5%B1%82%E6%AC%A1%E5%9B%BE"><span class="toc-number">3.1.</span> <span class="toc-text">
+          系统功能层次图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD%E8%AE%BE%E8%AE%A1"><span class="toc-number">3.2.</span> <span class="toc-text">
+          系统功能设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E7%94%B5%E8%B7%AF%E5%9B%BE"><span class="toc-number">3.3.</span> <span class="toc-text">
+          系统电路图</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E7%9A%84%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1"><span class="toc-number">4.</span> <span class="toc-text">
+          系统的详细设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%95%86%E5%93%81%E8%B4%AD%E4%B9%B0%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1"><span class="toc-number">4.1.</span> <span class="toc-text">
+          商品购买模块设计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E6%B5%81%E7%A8%8B%E5%9B%BE%E6%88%96%E7%AE%97%E6%B3%95%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="toc-number">4.1.1.</span> <span class="toc-text">
+          程序流程图或算法流程图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD%E5%AE%9E%E7%8E%B0"><span class="toc-number">4.1.2.</span> <span class="toc-text">
+          系统功能实现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E7%95%8C%E9%9D%A2%E6%88%AA%E5%9B%BE"><span class="toc-number">4.1.3.</span> <span class="toc-text">
+          运行界面截图</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%BA%E8%B4%A7%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1"><span class="toc-number">4.2.</span> <span class="toc-text">
+          出货模块设计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E6%B5%81%E7%A8%8B%E5%9B%BE%E6%88%96%E7%AE%97%E6%B3%95%E6%B5%81%E7%A8%8B%E5%9B%BE-1"><span class="toc-number">4.2.1.</span> <span class="toc-text">
+          程序流程图或算法流程图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD%E5%AE%9E%E7%8E%B0-1"><span class="toc-number">4.2.2.</span> <span class="toc-text">
+          系统功能实现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E7%95%8C%E9%9D%A2%E6%88%AA%E5%9B%BE-1"><span class="toc-number">4.2.3.</span> <span class="toc-text">
+          运行界面截图</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%B6%E7%9B%8A%E6%9F%A5%E8%AF%A2%E6%A8%A1%E5%9D%97%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1"><span class="toc-number">4.3.</span> <span class="toc-text">
+          收益查询模块模块设计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E6%B5%81%E7%A8%8B%E5%9B%BE%E6%88%96%E7%AE%97%E6%B3%95%E6%B5%81%E7%A8%8B%E5%9B%BE-2"><span class="toc-number">4.3.1.</span> <span class="toc-text">
+          程序流程图或算法流程图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD%E5%AE%9E%E7%8E%B0-2"><span class="toc-number">4.3.2.</span> <span class="toc-text">
+          系统功能实现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E7%95%8C%E9%9D%A2%E6%88%AA%E5%9B%BE-2"><span class="toc-number">4.3.3.</span> <span class="toc-text">
+          运行界面截图</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%B6%E7%9B%8A%E6%9F%A5%E8%AF%A2%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1"><span class="toc-number">4.4.</span> <span class="toc-text">
+          收益查询模块设计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E6%B5%81%E7%A8%8B%E5%9B%BE%E6%88%96%E7%AE%97%E6%B3%95%E6%B5%81%E7%A8%8B%E5%9B%BE-3"><span class="toc-number">4.4.1.</span> <span class="toc-text">
+          程序流程图或算法流程图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD%E5%AE%9E%E7%8E%B0-3"><span class="toc-number">4.4.2.</span> <span class="toc-text">
+          系统功能实现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E7%95%8C%E9%9D%A2%E6%88%AA%E5%9B%BE-3"><span class="toc-number">4.4.3.</span> <span class="toc-text">
+          运行界面截图</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%95%86%E5%93%81%E4%BF%9D%E6%B8%A9%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1"><span class="toc-number">4.5.</span> <span class="toc-text">
+          商品保温模块设计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E6%B5%81%E7%A8%8B%E5%9B%BE%E6%88%96%E7%AE%97%E6%B3%95%E6%B5%81%E7%A8%8B%E5%9B%BE-4"><span class="toc-number">4.5.1.</span> <span class="toc-text">
+          程序流程图或算法流程图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD%E5%AE%9E%E7%8E%B0-4"><span class="toc-number">4.5.2.</span> <span class="toc-text">
+          系统功能实现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E7%95%8C%E9%9D%A2%E6%88%AA%E5%9B%BE-4"><span class="toc-number">4.5.3.</span> <span class="toc-text">
+          运行界面截图</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E6%B5%8B%E8%AF%95"><span class="toc-number">5.</span> <span class="toc-text">
+          系统测试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%81%87%E5%88%B0%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95"><span class="toc-number">5.1.</span> <span class="toc-text">
+          遇到问题及解决办法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C"><span class="toc-number">5.2.</span> <span class="toc-text">
+          测试结果</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1%E7%BB%93%E6%9E%9C%E5%88%86%E6%9E%90%E5%8F%8A%E7%BB%93%E8%AE%BA"><span class="toc-number">6.</span> <span class="toc-text">
+          系统设计结果分析及结论</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E5%BF%83%E5%BE%97"><span class="toc-number">7.</span> <span class="toc-text">
+          设计心得</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81"><span class="toc-number">8.</span> <span class="toc-text">
+          代码</span></a></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/assets/avatar.jpg" alt="avatar"></div><p class="sidebar-ov-author__text">Stay hungry, stay foolish.</p></div><div class="sidebar-ov-social"></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">45</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">7</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">31</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2021</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>Pandalzy</span></div><div><span>由 <a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> 强力驱动</span><span> v5.4.0</span><span class="footer__devider">|</span><span>主题 - <a href="https://github.com/liuyib/hexo-theme-stun/" title="Stun" target="_blank" rel="noopener">Stun</a></span><span> v2.1.1</span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><div class="search-mask"></div><div class="search-popup"><span class="search-close"></span><div class="search-input"><input placeholder="搜索文章（支持多关键词，请用空格分隔）"></div><div class="search-results"></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script>function initSearch() {
+  var isXML = true;
+  var search_path = 'search.xml';
+
+  if (!search_path) {
+    search_path = 'search.xml';
+  } else if (/json$/i.test(search_path)) {
+    isXML = false;
+  }
+
+  var path = '/' + search_path;
+  $.ajax({
+    url: path,
+    dataType: isXML ? 'xml' : 'json',
+    async: true,
+    success: function (res) {
+      var datas = isXML ? $('entry', res).map(function () {
+        // 将 XML 转为 JSON
+        return {
+          title: $('title', this).text(),
+          content: $('content', this).text(),
+          url: $('url', this).text()
+        };
+      }).get() : res;
+      var $input = $('.search-input input');
+      var $result = $('.search-results');
+      // 搜索对象（标题、内容）的权重，影响显示顺序
+      var WEIGHT = { title: 100, content: 1 };
+      var searchPost = function () {
+        var searchText = $input.val().toLowerCase().trim();
+        // 根据空白字符分隔关键字
+        var keywords = searchText.split(/[\s]+/);
+        // 搜索结果
+        var matchPosts = [];
+
+        // 有多个关键字时，将原文字整个保存下来
+        if (keywords.length > 1) {
+          keywords.push(searchText);
+        }
+        // 防止未输入字符时搜索
+        if (searchText.length > 0) {
+          datas.forEach(function (data) {
+            var isMatch  = false;
+            // 没有标题的文章使用预设的 i18n 变量代替
+            var title = (data.title && data.title.trim()) || '[ 文章无标题 ]';
+            var titleLower = title && title.toLowerCase();
+            // 删除 HTML 标签 和 所有空白字符
+            var content = data.content && data.content.replace(/<[^>]+>/g, '');
+            var contentLower = content && content.toLowerCase();
+            // 删除重复的 /
+            var postURL = data.url && decodeURI(data.url).replace(/\/{2,}/g, '/');
+            // 标题中匹配到的关键词
+            var titleHitSlice = [];
+            // 内容中匹配到的关键词
+            var contentHitSlice = [];
+
+            keywords.forEach(function (keyword) {
+              /**
+              * 获取匹配的关键词的索引
+              * @param {String} keyword 要匹配的关键字
+              * @param {String} text 原文字
+              * @param {Boolean} caseSensitive 是否区分大小写
+              * @param {Number} weight 匹配对象的权重。权重大的优先显示
+              * @return {Array}
+              */
+              function getIndexByword (word, text, caseSensitive, weight) {
+                if (!word || !text) {
+                  return [];
+                };
+
+                var startIndex = 0; // 每次匹配的开始索引
+                var index = -1;     // 匹配到的索引值
+                var result = [];    // 匹配结果
+
+                if (!caseSensitive) {
+                  word = word.toLowerCase();
+                  text = text.toLowerCase();
+                }
+
+                while((index = text.indexOf(word, startIndex)) !== -1) {
+                  var hasMatch = false;
+                  // 索引位置相同的关键词，保留长度较长的
+                  titleHitSlice.forEach(function (hit) {
+                    if (hit.index === index && hit.word.length < word.length) {
+                      hit.word = word;
+                      hasMatch = true;
+                    }
+                  });
+                  startIndex = index + word.length;
+                  !hasMatch && result.push({ index: index, word: word, weight: weight });
+                }
+                return result;
+              }
+              titleHitSlice = titleHitSlice.concat(getIndexByword(keyword, titleLower, false, WEIGHT.title));
+              contentHitSlice = contentHitSlice.concat(getIndexByword(keyword, contentLower, false, WEIGHT.content));
+            });
+
+            var hitTitle = titleHitSlice.length;
+            var hitContent = contentHitSlice.length;
+
+            if (hitTitle > 0 || hitContent > 0) {
+              isMatch = true;
+            }
+            if (isMatch) {
+              ;[titleHitSlice, contentHitSlice].forEach(function (hit) {
+                // 按照匹配文字的索引的递增顺序排序
+                hit.sort(function (left, right) {
+                  return left.index - right.index;
+                });
+              });
+              /**
+              * 给文本中匹配到的关键词添加标记，从而进行高亮显示
+              * @param {String} text 原文本
+              * @param {Array} hitSlice 匹配项的索引信息
+              * @param {Number} start 开始索引
+              * @param {Number} end 结束索引
+              * @return {String}
+              */
+              function highlightKeyword (text, hitSlice, start, end) {
+                if (!text || !hitSlice || !hitSlice.length) {
+                  return;
+                }
+
+                var result = '';
+                var startIndex = start;
+                var endIndex = end;
+                hitSlice.forEach(function (hit) {
+                  if (hit.index < startIndex) {
+                    return;
+                  }
+
+                  var hitWordEnd = hit.index + hit.word.length;
+                  result += text.slice(startIndex, hit.index);
+                  result += '<b>' + text.slice(hit.index, hitWordEnd) + '</b>';
+                  startIndex = hitWordEnd;
+                });
+                result += text.slice(startIndex, endIndex);
+                return result;
+              }
+
+              var postData = {};
+              // 文章总的搜索权重
+              var postWeight = titleHitSlice.length * WEIGHT.title + contentHitSlice.length * WEIGHT.content;
+              // 标记匹配关键词后的标题
+              var postTitle = highlightKeyword(title, titleHitSlice, 0, title.length) || title;
+              // 标记匹配关键词后的内容
+              var postContent;
+              // 显示内容的长度
+              var SHOW_WORD_LENGTH = 200;
+              // 命中关键词前的字符显示长度
+              var SHOW_WORD_FRONT_LENGTH = 20;
+              var SHOW_WORD_END_LENGTH = SHOW_WORD_LENGTH - SHOW_WORD_FRONT_LENGTH;
+
+              // 截取匹配的第一个字符，前后共 200 个字符来显示
+              if (contentHitSlice.length > 0) {
+                var firstIndex = contentHitSlice[0].index;
+                var start = firstIndex > SHOW_WORD_FRONT_LENGTH ? firstIndex - SHOW_WORD_FRONT_LENGTH : 0;
+                var end = firstIndex + SHOW_WORD_END_LENGTH;
+                postContent = highlightKeyword(content, contentHitSlice, start, end);
+              } else { // 未匹配到内容，直接截取前 200 个字符来显示
+                postContent = content.slice(0, SHOW_WORD_LENGTH);
+              }
+              postData.title = postTitle;
+              postData.content = postContent;
+              postData.url = postURL;
+              postData.weight = postWeight;
+              matchPosts.push(postData);
+            }
+          });
+        }
+
+        var resultInnerHtml = '';
+        if (matchPosts.length) {
+          // 按权重递增的顺序排序，使权重大的优先显示
+          matchPosts.sort(function (left, right) {
+            return right.weight - left.weight;
+          });
+          resultInnerHtml += '<ul>';
+          matchPosts.forEach(function (post) {
+            resultInnerHtml += '<li><a class="search-results-title" href="' + post.url + '">';
+            resultInnerHtml += post.title;
+            resultInnerHtml += '</a><div class="search-results-content">';
+            resultInnerHtml += post.content;
+            resultInnerHtml += '</div></li>';
+          });
+          resultInnerHtml += '</ul>';
+        } else {
+          resultInnerHtml += '<div class="search-results-none"><i class="far fa-meh"></i></div>';
+        }
+        $result.html(resultInnerHtml);
+      };
+      $input.on('input', searchPost);
+      $input.on('keyup', function (e) {
+        if (e.keyCode === Stun.utils.codeToKeyCode('Enter')) {
+          searchPost();
+        }
+      });
+    }
+  });
+}
+
+function closeSearch () {
+  $('body').css({ overflow: 'auto' });
+  $('.search-popup').css({ display: 'none' });
+  $('.search-mask').css({ display: 'none' });
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+  Stun.utils.pjaxReloadLocalSearch = function () {
+    $('.header-nav-search').on('click', function (e) {
+      e.stopPropagation();
+      $('body').css('overflow', 'hidden');
+      $('.search-popup')
+        .velocity('stop')
+        .velocity('transition.expandIn', {
+          duration: 300,
+          complete: function () {
+            $('.search-popup input').focus();
+          }
+        });
+      $('.search-mask')
+        .velocity('stop')
+        .velocity('transition.fadeIn', {
+          duration: 300
+        });
+
+      initSearch();
+    });
+    $('.search-mask, .search-close').on('click', function () {
+      closeSearch();
+    });
+    $(document).on('keydown', function (e) {
+      // Escape <=> 27
+      if (e.keyCode === Stun.utils.codeToKeyCode('Escape')) {
+        closeSearch();
+      }
+    });
+  };
+
+  Stun.utils.pjaxReloadLocalSearch();
+}, false);</script><script src="/js/utils.js?v=2.1.1"></script><script src="/js/stun-boot.js?v=2.1.1"></script><script src="/js/scroll.js?v=2.1.1"></script><script src="/js/header.js?v=2.1.1"></script><script src="/js/sidebar.js?v=2.1.1"></script><script type="application/json" src="/search.xml"></script></body></html>

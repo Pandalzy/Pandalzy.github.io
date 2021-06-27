@@ -1,0 +1,854 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/assets/avatar_16x16.jpg?v=2.1.1" type="image/png" sizes="16x16"><link rel="icon" href="/assets/avatar_32x32.jpg?v=2.1.1" type="image/png" sizes="32x32"><meta name="description" content="Request 对象        假如请求的 URL 为http:&#x2F;&#x2F;blog.cumtlee.cn&#x2F;hello?name&#x3D;Pandalzy ，下面是 request 的属性获取 URL 情况：     属性 值    path &#x2F;hello   full_path &#x2F;hello?name&#x3D;Pandalzy   host blog.cumtlee.cn   host_url">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flask学习02-Flask与HTTP">
+<meta property="og:url" content="https://blog.zyuanlee.cn/2019/07/14/Flask%E5%AD%A6%E4%B9%A002-Flask%E4%B8%8EHTTP/index.html">
+<meta property="og:site_name" content="Pandalzy&#39;s Blog">
+<meta property="og:description" content="Request 对象        假如请求的 URL 为http:&#x2F;&#x2F;blog.cumtlee.cn&#x2F;hello?name&#x3D;Pandalzy ，下面是 request 的属性获取 URL 情况：     属性 值    path &#x2F;hello   full_path &#x2F;hello?name&#x3D;Pandalzy   host blog.cumtlee.cn   host_url">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-07-14T12:34:19.000Z">
+<meta property="article:modified_time" content="2021-06-27T00:34:28.397Z">
+<meta property="article:author" content="Pandalzy">
+<meta property="article:tag" content="Python3">
+<meta property="article:tag" content="Flask学习">
+<meta name="twitter:card" content="summary"><title>Flask学习02-Flask与HTTP | Pandalzy's Blog</title><link ref="canonical" href="https://blog.zyuanlee.cn/2019/07/14/Flask%E5%AD%A6%E4%B9%A002-Flask%E4%B8%8EHTTP/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.1.1"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":true},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"carbon","highlight":"light","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: undefined,
+  lazyload: false,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.4.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/about/"><span class="header-nav-menu-item__icon"><i class="fas fa-address-card"></i></span><span class="header-nav-menu-item__text">关于</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/friends/"><span class="header-nav-menu-item__icon"><i class="fas fa-user-friends"></i></span><span class="header-nav-menu-item__text">友链</span></a></div></div><div class="header-nav-search"><span class="header-nav-search__icon"><i class="fas fa-search"></i></span><span class="header-nav-search__text">搜索</span></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">Pandalzy's Blog</div><div class="header-banner-info__subtitle">Stay hungry, stay foolish.</div></div><div class="header-banner-arrow"><div class="header-banner-arrow__icon"><i class="fas fa-angle-down"></i></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">Flask学习02-Flask与HTTP</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2019-07-14</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-06-27</span></span></div></header><div class="post-body">
+        <h2 id="Request-对象"   >
+          <a href="#Request-对象" class="heading-link"><i class="fas fa-link"></i></a>Request 对象</h2>
+      <ul>
+<li>假如请求的 URL 为<span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="http://blog.cumtlee.cn/hello?name=Pandalzy" >http://blog.cumtlee.cn/hello?name=Pandalzy</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span> ，下面是 request 的属性获取 URL 情况：</li>
+</ul>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th>属性</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>path</td>
+<td><code>/hello</code></td>
+</tr>
+<tr>
+<td>full_path</td>
+<td><code>/hello?name=Pandalzy</code></td>
+</tr>
+<tr>
+<td>host</td>
+<td><code>blog.cumtlee.cn</code></td>
+</tr>
+<tr>
+<td>host_url</td>
+<td><code>http://blog.cumtlee.cn/</code></td>
+</tr>
+<tr>
+<td>base_url</td>
+<td><code>http://blog.cumtlee.cn/hello</code></td>
+</tr>
+<tr>
+<td>url</td>
+<td><code>http://blog.cumtlee.cn/hello?name=Pandalzy</code></td>
+</tr>
+<tr>
+<td>url_post</td>
+<td><code>http://blog.cumtlee.cn/</code></td>
+</tr>
+</tbody></table></div>
+<span id="more"></span>
+
+<ul>
+<li><strong>request</strong>对象常用的属性和方法</li>
+</ul>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th>属性</th>
+<th>说明</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>data</td>
+<td>记录请求数据,并转化为字符串</td>
+<td>*</td>
+</tr>
+<tr>
+<td>form</td>
+<td>记录表单中的数据</td>
+<td>MultiDict</td>
+</tr>
+<tr>
+<td>args</td>
+<td>记录请求中的查询参数</td>
+<td>MultiDict</td>
+</tr>
+<tr>
+<td>cookies</td>
+<td>记录请求中 cookie 信息</td>
+<td>Dict</td>
+</tr>
+<tr>
+<td>headers</td>
+<td>记录请求中的报文</td>
+<td>EnvironHeaders</td>
+</tr>
+<tr>
+<td>method</td>
+<td>记录请求使用的 HTTP 方法</td>
+<td>GET/POST</td>
+</tr>
+<tr>
+<td>url</td>
+<td>记录请求的 URL 地址</td>
+<td>string</td>
+</tr>
+<tr>
+<td>files</td>
+<td>记录请求上传的文件</td>
+<td>*</td>
+</tr>
+</tbody></table></div>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 获取 URL 中参数</span></span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, request</span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/hello&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span>:</span></span><br><span class="line">    <span class="comment"># 获取参数 name 的值，第二个参数为默认值</span></span><br><span class="line">    name = request.args.get(<span class="string">&#x27;name&#x27;</span>, <span class="string">&#x27;Pandalzy&#x27;</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;&lt;h1&gt;Hello, %s!&lt;/h1&gt;&#x27;</span> % name</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li><code>request.args[&#39;name&#39;]</code> 若不存在对应的键，则返回 400 错误相应（请求无效），不抛出 <strong>KeyError</strong> 异常，若用<code>request.args.get(&#39;name&#39;)</code>方法获取，不存在键则返回 None。</li>
+</ul>
+
+        <h2 id="在-Flask-中处理请求"   >
+          <a href="#在-Flask-中处理请求" class="heading-link"><i class="fas fa-link"></i></a>在 Flask 中处理请求</h2>
+      
+        <h3 id="路由匹配"   >
+          <a href="#路由匹配" class="heading-link"><i class="fas fa-link"></i></a>路由匹配</h3>
+      <ul>
+<li>当请求发来后，Flask 会根据请求中的 URL（path 部分），尝试在路由表（app.url_map）中进行匹配，调用匹配成功的视图函数，否则返回 404 错误相应。</li>
+</ul>
+
+        <h3 id="监听-HTTP-的方法"   >
+          <a href="#监听-HTTP-的方法" class="heading-link"><i class="fas fa-link"></i></a>监听 HTTP 的方法</h3>
+      <figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/hello&#x27;</span>, methods=[<span class="string">&#x27;GET&#x27;</span>, <span class="string">&#x27;POST&#x27;</span>]</span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span>():</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;&lt;h1&gt;Hello, Pandalzy&lt;/h1&gt;&#x27;</span></span><br></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p>若请求方法不符合，则返回 405 错误响应（Method Not Allowed，方法不允许）</p>
+</blockquote>
+
+        <h3 id="URL-处理"   >
+          <a href="#URL-处理" class="heading-link"><i class="fas fa-link"></i></a>URL 处理</h3>
+      <ul>
+<li>通过把 URL 的一部分标记为 <code>&lt;variable_name&gt;</code> 就可以在 URL 中添加变量。标记的部分会作为关键字参数传递给函数。通过使用 <code>&lt;converter:variable_name&gt;</code> ，可以选择性的加上一个转换器，为变量指定规则。</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/user/&lt;username&gt;&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show_user_profile</span>(<span class="params">username</span>):</span></span><br><span class="line">    <span class="comment"># show the user profile for that user</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;User %s&#x27;</span> % username</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/post/&lt;int:post_id&gt;&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show_post</span>(<span class="params">post_id</span>):</span></span><br><span class="line">    <span class="comment"># show the post with the given id, the id is an integer</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;Post %d&#x27;</span> % post_id</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/path/&lt;path:subpath&gt;&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show_subpath</span>(<span class="params">subpath</span>):</span></span><br><span class="line">    <span class="comment"># show the subpath after /path/</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;Subpath %s&#x27;</span> % subpath</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/colors/&lt;any(blue, white, red):color&gt;&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">three_colors</span>(<span class="params">color</span>):</span></span><br><span class="line">    <span class="comment"># only blue, white or red can appends to /colors/</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;&lt;p&gt;Love is patient and kind.&lt;/p&gt;&#x27;</span></span><br></pre></td></tr></table></div></figure>
+
+<div class="table-container"><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>string</td>
+<td>不包含斜线的字符串</td>
+</tr>
+<tr>
+<td>int</td>
+<td>接受正整数</td>
+</tr>
+<tr>
+<td>float</td>
+<td>接受正浮点数</td>
+</tr>
+<tr>
+<td>path</td>
+<td>类似 string ，但可以包含斜杠</td>
+</tr>
+<tr>
+<td>any</td>
+<td>匹配一系列定值中的一个元素</td>
+</tr>
+<tr>
+<td>uuid</td>
+<td>接受 UUID 字符串</td>
+</tr>
+</tbody></table></div>
+
+        <h2 id="请求钩子"   >
+          <a href="#请求钩子" class="heading-link"><i class="fas fa-link"></i></a>请求钩子</h2>
+      <ul>
+<li>有时需要请求预处理或后处理，通过装饰器来实现</li>
+</ul>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th>钩子</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>before_first_request</td>
+<td>注册一个函数，在处理第一个请求前运行</td>
+</tr>
+<tr>
+<td>before_request</td>
+<td>注册一个函数，在每次请求前运行</td>
+</tr>
+<tr>
+<td>after_request</td>
+<td>注册一个函数，如果没有未处理的异常抛出，在每次请求后运行</td>
+</tr>
+<tr>
+<td>teardown_request</td>
+<td>注册一个函数，在每次请求后运行，即使有未处理的异常抛出，如果有异常出现，会将异常对象作为参数到注册的函数中</td>
+</tr>
+<tr>
+<td>after_this_request</td>
+<td>在视图中注册一个函数，请求结束后运行</td>
+</tr>
+</tbody></table></div>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@app.before_request</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">do_something</span>():</span></span><br><span class="line">    <span class="keyword">pass</span> <span class="comment"># 这里的代码会在每个请求处理前执行</span></span><br></pre></td></tr></table></div></figure>
+
+<p>下面是请求钩子的一些常见应用场景：</p>
+<ul>
+<li><strong>before_first_request</strong></li>
+<li>在程序中，运行程序前我们需要进行一些程序的初始化操作，比如创建数据库表，添加管理员用户。这些工作可以放到使用 before_first_request 装饰器注册的函数中。</li>
+<li><strong>before_request</strong></li>
+<li>比如网站上要记录用户最后在线的时间，可以通过用户最后发送的请求时间来实现。为了避免在每个视图函数都添加更新在线时间的代码，我们可以仅在使用 before_request 钩子注册的函数中调用这段代码。</li>
+<li><strong>after_request</strong><ul>
+<li>我们经常在视图函数中进行数据库操作，比如更新、插入等，之后需要将更改提交到数据库中。提交更改的代码就可以放到 after_request 钩子注册的函数中。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><strong>after_request</strong>钩子和<strong>after_this_request</strong>钩子必须接收一个响应类对象作为参数，并且返回同一个或更新后的响应对象。</p>
+</blockquote>
+
+        <h2 id="HTTP-响应"   >
+          <a href="#HTTP-响应" class="heading-link"><i class="fas fa-link"></i></a>HTTP 响应</h2>
+      
+        <h3 id="响应码"   >
+          <a href="#响应码" class="heading-link"><i class="fas fa-link"></i></a>响应码</h3>
+      <div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">类型</th>
+<th align="center">状态码</th>
+<th>短语</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">成功</td>
+<td align="center">200</td>
+<td>OK</td>
+<td>正常处理</td>
+</tr>
+<tr>
+<td align="center">成功</td>
+<td align="center">201</td>
+<td>Created</td>
+<td>请求被处理，并创建了一个新资源</td>
+</tr>
+<tr>
+<td align="center">成功</td>
+<td align="center">204</td>
+<td>No Content</td>
+<td>处理成功，无内容返回</td>
+</tr>
+<tr>
+<td align="center">重定向</td>
+<td align="center">301</td>
+<td>Moved Permanently</td>
+<td>永久重定向</td>
+</tr>
+<tr>
+<td align="center">重定向</td>
+<td align="center">302</td>
+<td>Found</td>
+<td>临时性重定向</td>
+</tr>
+<tr>
+<td align="center">重定向</td>
+<td align="center">304</td>
+<td>Not Modified</td>
+<td>请求的资源未被修改，重定向到缓存的资源</td>
+</tr>
+<tr>
+<td align="center">客户端错误</td>
+<td align="center">400</td>
+<td>Bad Request</td>
+<td>请求无效，请求报文存在错误</td>
+</tr>
+<tr>
+<td align="center">客户端错误</td>
+<td align="center">401</td>
+<td>Unauthorized</td>
+<td>请求的资源需要获取授权信息</td>
+</tr>
+<tr>
+<td align="center">客户端错误</td>
+<td align="center">403</td>
+<td>Forbidden</td>
+<td>请求的资源被服务器拒绝访问</td>
+</tr>
+<tr>
+<td align="center">客户端错误</td>
+<td align="center">404</td>
+<td>Not Found</td>
+<td>无法找到请求的资源或者 URL 无效</td>
+</tr>
+<tr>
+<td align="center">服务器端错误</td>
+<td align="center">500</td>
+<td>Internal Server Error</td>
+<td>服务器内部发生错误</td>
+</tr>
+</tbody></table></div>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/hello&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span>():</span></span><br><span class="line">    <span class="comment"># ...</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;&lt;h1&gt;Hello, Flask!&lt;/h1&gt;&#x27;</span>, <span class="number">201</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/hello&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span>():</span></span><br><span class="line">    <span class="comment"># ...</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;&#x27;</span>, <span class="number">302</span>, &#123;<span class="string">&#x27;Location&#x27;</span>, <span class="string">&#x27;http://www.example.com&#x27;</span>&#125;</span><br></pre></td></tr></table></div></figure>
+
+
+        <h3 id="重定向"   >
+          <a href="#重定向" class="heading-link"><i class="fas fa-link"></i></a>重定向</h3>
+      <figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, redirect</span><br><span class="line"><span class="comment"># ...</span></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/hello&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span>():</span></span><br><span class="line">    <span class="keyword">return</span> redirect(<span class="string">&#x27;http://www.example.com&#x27;</span>)</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>使用<strong>redirect()**函数时，默认的状态码为 302，即临时重定向。如果想修改状态码，可以在</strong>redirect()**函数中作为第二个参数或使用 code 关键字传入。</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, redirect, url_for</span><br><span class="line"><span class="comment"># ...</span></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/hi&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hi</span>():</span></span><br><span class="line">    <span class="comment"># ...</span></span><br><span class="line">    <span class="keyword">return</span> redierct(url_for(<span class="string">&#x27;hello&#x27;</span>))  <span class="comment"># 重定向到/hello</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/hello&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span>():</span></span><br><span class="line">    <span class="comment"># ...</span></span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>手动返回错误响应，更方便的方法是使用 Flask 提供的<strong>abort()**函数，在</strong>abort()**函数中传入状态码即可返回对应的错误响应。</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, abort</span><br><span class="line">...</span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/404&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">not_found</span>():</span></span><br><span class="line">    abort(<span class="number">404</span>)</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li><strong>abort()**函数前不需要使用 return 语句，但一旦</strong>abort()<strong>函数被调用，</strong>abort()**函数之后的代码将不会被执行。</li>
+</ul>
+
+        <h3 id="响应格式"   >
+          <a href="#响应格式" class="heading-link"><i class="fas fa-link"></i></a>响应格式</h3>
+      <ul>
+<li>不同的响应数据格式需要设置不同的 MIME 类型，MIME 类型在首部的 Content-Type 字段中定义</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> falsk <span class="keyword">import</span> make_response</span><br><span class="line">...</span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;hello&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span>():</span></span><br><span class="line">    response = make_response(<span class="string">&#x27;hello world&#x27;</span>)</span><br><span class="line">    response.mimetype = <span class="string">&#x27;text/plain&#x27;</span></span><br><span class="line">    <span class="comment"># response.headers[&#x27;Content-Type&#x27;] = &#x27;text/xml；charset=utf-8&#x27;</span></span><br><span class="line">    <span class="keyword">return</span> response</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li><p>纯文本 text/plain</p>
+<p>I am PandaLzy!</p>
+</li>
+<li><p>HTML 文件 text/html</p>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">head</span>&gt;</span><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">h1</span>&gt;</span>Hello World<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></div></figure>
+</li>
+<li><p>XML application/xml</p>
+<figure class="highlight xml"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">note</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">to</span>&gt;</span>Pnada<span class="tag">&lt;/<span class="name">to</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">from</span>&gt;</span>Lzy<span class="tag">&lt;/<span class="name">from</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">heading</span>&gt;</span>Reminder<span class="tag">&lt;/<span class="name">heading</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">body</span>&gt;</span>Don&#x27;t forget the party!<span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">note</span>&gt;</span></span><br></pre></td></tr></table></div></figure>
+</li>
+<li><p>JSON application/json</p>
+<figure class="highlight json"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;res&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;code&quot;</span>: <span class="string">&quot;200&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;body&quot;</span>: <span class="string">&quot;Hello&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
+
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span>  flask <span class="keyword">import</span> Flask, make_response, json</span><br><span class="line"><span class="comment"># ...</span></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/foo&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span>():</span></span><br><span class="line">    data = &#123;</span><br><span class="line">        <span class="string">&#x27;name&#x27;</span>:<span class="string">&#x27;Grey Li&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;gender&#x27;</span>:<span class="string">&#x27;male&#x27;</span></span><br><span class="line">    &#125;</span><br><span class="line">    response = make_response(json.dumps(data))</span><br><span class="line">    response.mimetype = <span class="string">&#x27;application/json&#x27;</span></span><br><span class="line">    <span class="keyword">return</span> response</span><br><span class="line"><span class="comment"># jsonify简化</span></span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> jsonify</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/foo&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span>():</span></span><br><span class="line">    <span class="keyword">return</span> jsonify(name=<span class="string">&#x27;Grey Li&#x27;</span>, gender=<span class="string">&#x27;male&#x27;</span>), <span class="number">200</span></span><br><span class="line">	<span class="comment"># return jsonify(&#123;&#x27;name&#x27;: &#x27;Grey Li&#x27;, &#x27;gender&#x27;: &#x27;male&#x27;&#125;)</span></span><br></pre></td></tr></table></div></figure>
+
+</li>
+</ul>
+
+        <h3 id="Cookie"   >
+          <a href="#Cookie" class="heading-link"><i class="fas fa-link"></i></a>Cookie</h3>
+      <ul>
+<li>**set_cookie()**方法支持多个参数来设置 Cookie 的选项</li>
+</ul>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th>属性</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>key</td>
+<td>cookie 的键</td>
+</tr>
+<tr>
+<td>value</td>
+<td>cookie 的值</td>
+</tr>
+<tr>
+<td>max_age</td>
+<td>保存的时间，单位秒；默认浏览器关闭过期</td>
+</tr>
+<tr>
+<td>expires</td>
+<td>具体的过期时间，一个 datatime 对象或者时间戳</td>
+</tr>
+<tr>
+<td>path</td>
+<td>限制 cookie 只在给定的路径可用，默认整个域名</td>
+</tr>
+<tr>
+<td>domain</td>
+<td>设置 cookie 可用的域名</td>
+</tr>
+<tr>
+<td>secure</td>
+<td>若为 True ，只有 Https 可用</td>
+</tr>
+<tr>
+<td>httponly</td>
+<td>若为 True ，禁止客户端 JavaScript 获取 cookie</td>
+</tr>
+</tbody></table></div>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, make_response</span><br><span class="line"><span class="comment"># ...</span></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/set/&lt;name&gt;&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">set_cookie</span>(<span class="params">name</span>):</span></span><br><span class="line">    response = make_response(redirect(url_for(<span class="string">&#x27;hello&#x27;</span>)))</span><br><span class="line">    response.set_cookie(<span class="string">&#x27;name&#x27;</span>, name)</span><br><span class="line">    <span class="keyword">return</span> response</span><br></pre></td></tr></table></div></figure>
+
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, request</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/&#x27;</span></span>)</span></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/hello&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span>():</span></span><br><span class="line">    name = request.args.get(<span class="string">&#x27;name&#x27;</span>)</span><br><span class="line">    <span class="keyword">if</span> name <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">        name = request.cookies.get(<span class="string">&#x27;name&#x27;</span>, <span class="string">&#x27;Human&#x27;</span>)  <span class="comment"># 从Cookie中获取name值</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;&lt;h1&gt;Hello, %s&lt;/h1&gt;&#x27;</span> % name</span><br></pre></td></tr></table></div></figure>
+
+
+        <h4 id="设置程序密钥"   >
+          <a href="#设置程序密钥" class="heading-link"><i class="fas fa-link"></i></a>设置程序密钥</h4>
+      <ul>
+<li><p>session 对象用来加密 Cookie，默认情况下，它会把数据存储在浏览器上一个名为 session 的 cookie 里。</p>
+</li>
+<li><p>session 通过密钥对数据进行签名以加密数据，因此，先设置一个密钥。这里的密钥就是一个具有一定复杂度和随机性的字符串，比如“Drmhze6EPcv0fN_81Bj-nA”。</p>
+</li>
+<li><p>程序的密钥可以通过<strong>Flask.secret_key</strong>属性或配置变量<strong>SECRET_KEY</strong>设置，比如：</p>
+</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">app.secret_key = <span class="string">&#x27;secret string&#x27;</span></span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>更安全的做法是把密钥写进系统环境变量（在命令行中使用 export 或 set 命令），或是保存在**.env**文件中：</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SECRET_KEY=secret string</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>然后在程序脚本中使用 os 模块提供的**getenv()**方法获取：</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="comment"># ...</span></span><br><span class="line">app.secret_key = os.getenv(<span class="string">&#x27;SECRET_KEY&#x27;</span>, <span class="string">&#x27;secret string&#x27;</span>)</span><br></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p>可以在**getenv()**方法中添加第二个参数，作为没有获取到对应环境变量时使用的默认值。</p>
+</blockquote>
+
+        <h4 id="模拟用户认证"   >
+          <a href="#模拟用户认证" class="heading-link"><i class="fas fa-link"></i></a>模拟用户认证</h4>
+      <figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> redirect, session, url_for</span><br><span class="line">app = Flask(__name__)</span><br><span class="line">app.secret_key = <span class="string">&#x27;secret string&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/login&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">login</span>():</span></span><br><span class="line">    session[<span class="string">&#x27;logged_in&#x27;</span>] = <span class="literal">True</span>  <span class="comment"># 写入session</span></span><br><span class="line">    <span class="keyword">return</span> redirect(url_for(<span class="string">&#x27;hello&#x27;</span>))</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>当用户登录后，就可以根据用户的认证状态分别显示不同的内容。在 login 视图的最后，我们将程序重定向到 hello 视图，下面是修改后的 hello 视图</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> request, session</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/&#x27;</span></span>)</span></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/hello&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span>():</span></span><br><span class="line">    name = request.args.get(<span class="string">&#x27;name&#x27;</span>)</span><br><span class="line">    <span class="keyword">if</span> name <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">        name = request.cookies.get(<span class="string">&#x27;name&#x27;</span>, <span class="string">&#x27;Human&#x27;</span>)</span><br><span class="line">    response = <span class="string">&#x27;&lt;h1&gt;Hello, %s!&lt;/h1&gt;&#x27;</span> % name</span><br><span class="line">    <span class="comment"># 根据用户认证状态返回不同的内容</span></span><br><span class="line">    <span class="keyword">if</span> <span class="string">&#x27;logged_in&#x27;</span> <span class="keyword">in</span> session:</span><br><span class="line">        response += <span class="string">&#x27;[Authenticated]&#x27;</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        response += <span class="string">&#x27;[Not Authenticated]&#x27;</span></span><br><span class="line">    <span class="keyword">return</span> response</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>模拟管理后台</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> session, abort</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/admin&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">admin</span>():</span></span><br><span class="line">    <span class="keyword">if</span> <span class="string">&#x27;logged_in&#x27;</span> <span class="keyword">not</span> <span class="keyword">in</span> session:</span><br><span class="line">        abort(<span class="number">403</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;Welcome to admin page.&#x27;</span></span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>登出用户</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> session</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/logout&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">logout</span>():</span></span><br><span class="line">    <span class="keyword">if</span> <span class="string">&#x27;logged_in&#x27;</span> <span class="keyword">in</span> session:</span><br><span class="line">        session.pop(<span class="string">&#x27;logged_in&#x27;</span>)</span><br><span class="line">    <span class="keyword">return</span> redirect(url_for(<span class="string">&#x27;hello&#x27;</span>))</span><br></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p>默认情况下，<strong>session cookie</strong>会在用户关闭浏览器时删除。通过将<strong>session.permanent</strong>属性设为 True 可以将 session 的有效期延长为<strong>Flask.permanent_session_lifetime</strong>属性值对应的<strong>datetime.timedelta</strong>对象，也可通过配置变量<strong>PERMANENT_SESSION_LIFETIME</strong>设置，默认为 31 天。</p>
+</blockquote>
+
+        <h2 id="Flask-上下文"   >
+          <a href="#Flask-上下文" class="heading-link"><i class="fas fa-link"></i></a>Flask 上下文</h2>
+      <ul>
+<li>Flask 中有两种上下文，程序上下文（application context）和请求上下文（request context）</li>
+</ul>
+
+        <h3 id="上下文全局变量"   >
+          <a href="#上下文全局变量" class="heading-link"><i class="fas fa-link"></i></a>上下文全局变量</h3>
+      <div class="table-container"><table>
+<thead>
+<tr>
+<th>变量名</th>
+<th>上下文类别</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>current_app</td>
+<td>程序上下文</td>
+<td>指向处理请求的当前程序实例</td>
+</tr>
+<tr>
+<td>g</td>
+<td>程序上下文</td>
+<td>替代 Python 的全局变量用法，确保仅在当前请求中可用。用于储存全局数据，每次请求都会重设</td>
+</tr>
+<tr>
+<td>request</td>
+<td>请求上下文</td>
+<td>封装客户端发出的请求报文数据</td>
+</tr>
+<tr>
+<td>session</td>
+<td>请求上下文</td>
+<td>用于记住请求之间的数据，通过签名的 Cookie 实现</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>在不同的视图函数中，request 对象都表示和视图函数对应的请求，也就是当前请求（current request）。而程序也会有多个程序实例的情况，为了能获取对应的程序实例，而不是固定的某一个程序实例，需要使用<strong>current_app</strong>变量</li>
+<li>因为<strong>g</strong>存储在程序上下文中，而程序上下文会随着每一个请求的进入而激活，随着每一个请求的处理完毕而销毁，所以每次请求都会重设这个值。通常会使用它结合请求钩子来保存每个请求处理前所需要的全局变量，比如当前登入的用户对象，数据库连接等。在 hello 视图中从查询字符串获取 name 的值，如果每一个视图都需要这个值，那么就要在每个视图重复这行代码。借助 g 可以将这个操作移动到<strong>before_request</strong>处理函数中执行，然后保存到 g 的任意属性上：</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> g</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.before_request</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_name</span>():</span></span><br><span class="line">    g.name = request.args.get(<span class="string">&#x27;name&#x27;</span>)</span><br></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p>设置这个函数后，在其他视图中可以直接使用<strong>g.name</strong>获取对应的值。另外，g 也支持使用类似字典的<strong>get()**、</strong>pop()<strong>以及</strong>setdefault()**方法进行操作。</p>
+</blockquote>
+
+        <h3 id="激活上下文"   >
+          <a href="#激活上下文" class="heading-link"><i class="fas fa-link"></i></a>激活上下文</h3>
+      <p>在下面这些情况下，Flask 会自动激活程序上下文：</p>
+<ul>
+<li>当使用 <code>flask run</code> 命令启动程序时。</li>
+<li>使用旧的 <code>app.run()</code> 方法启动程序时。</li>
+<li>执行使用 <code>@app.cli.command()</code> 装饰器注册的 flask 命令时。</li>
+<li>使用 flask shell 命令启动 Python Shell 时。</li>
+</ul>
+<p>当请求进入时，Flask 会自动激活请求上下文，这时我们可以使用 request 和 session 变量。另外，当请求上下文被激活时，程序上下文也被自动激活。当请求处理完毕后，请求上下文和程序上下文也会自动销毁。也就是说，在请求处理时这两者拥有相同的生命周期。</p>
+<p>如果需要在没有激活上下文的情况下使用这些变量，可以手动激活上下文。比如，下面是一个普通的 Python shell，通过 python 命令打开。程序上下文对象使用 <code>app.app_context()</code> 获取，我们可以使用 with 语句执行上下文操作：</p>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> app <span class="keyword">import</span> app</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> flask <span class="keyword">import</span> current_app</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">with</span> app.app_context():</span><br><span class="line">    ... current_app.name</span><br><span class="line"><span class="string">&#x27;app&#x27;</span></span><br></pre></td></tr></table></div></figure>
+
+<p>或是显式地使用 <code>push()</code> 方法推送（激活）上下文，在执行完相关操作时使用 <code>pop()</code> 方法销毁上下文：</p>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> app <span class="keyword">import</span> app</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> flask <span class="keyword">import</span> current_app</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>app_ctx = app.app_context()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>app_ctx.push()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>current_app.name</span><br><span class="line"><span class="string">&#x27;app&#x27;</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>app_ctx.pop()</span><br></pre></td></tr></table></div></figure>
+
+<p>而请求上下文可以通过 <code>test_request_context()</code> 方法临时创建：</p>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> app <span class="keyword">import</span> app</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> flask <span class="keyword">import</span> request</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">with</span> app.test_request_context(<span class="string">&#x27;/hello&#x27;</span>):</span><br><span class="line"><span class="meta">... </span>    request.method</span><br><span class="line"><span class="string">&#x27;GET&#x27;</span></span><br></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p>同样的，这里也可以使用 <code>push()</code> 和 <code>pop()</code> 方法显式地推送和销毁请求上下文。</p>
+</blockquote>
+
+        <h3 id="上下文钩子"   >
+          <a href="#上下文钩子" class="heading-link"><i class="fas fa-link"></i></a>上下文钩子</h3>
+      <ul>
+<li>Flask 也为上下文提供了一个 <code>teardown_appcontext</code> 钩子，使用它注册的回调函数会在程序上下文被销毁时调用，而且通常也会在请求上下文被销毁时调用。比如，需要在每个请求处理结束后销毁数据库连接：</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@app.teardown_appcontext</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">teardown_db</span>(<span class="params">exception</span>):</span></span><br><span class="line">    <span class="comment"># ...</span></span><br><span class="line">    db.close()</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>使用 <code>app.teardown_appcontext</code> 装饰器注册的回调函数需要接收异常对象作为参数，当请求被正常处理时这个参数值将是 None，这个函数的返回值将被忽略。</li>
+</ul>
+
+        <h2 id="HTTP-进阶"   >
+          <a href="#HTTP-进阶" class="heading-link"><i class="fas fa-link"></i></a>HTTP 进阶</h2>
+      
+        <h3 id="获取上一个页面的-URL"   >
+          <a href="#获取上一个页面的-URL" class="heading-link"><i class="fas fa-link"></i></a>获取上一个页面的 URL</h3>
+      <ul>
+<li>HTTP referer</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> redirect(request.referrer)</span><br><span class="line"><span class="comment"># 但是在很多种情况下，referrer字段会是空值，添加备选项</span></span><br><span class="line"><span class="keyword">return</span> redirect(request.referrer <span class="keyword">or</span> url_for(<span class="string">&#x27;hello&#x27;</span>))</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li><p>查询参数</p>
+<ul>
+<li>除了自动从 referrer 获取，另一种更常见的方式是在 URL 中手动加入包含当前页面 URL 的查询参数，这个查询参数一般命名为 next。比如，下面在 foo 和 bar 视图的返回值中的 URL 后添加 next 参数：</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> request</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/foo&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span>():</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;&lt;h1&gt;Foo page&lt;/h1&gt;&lt;a href=&quot;%s&quot;&gt;Do something and redirect&lt;/a&gt;&#x27;</span> % url_for(<span class="string">&#x27;do_something&#x27;</span>, <span class="built_in">next</span>=request.full_path)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/bar&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bar</span>():</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;&lt;h1&gt;Bar page&lt;/h1&gt;&lt;a href=&quot;%s&quot;&gt;Do something and redirect&lt;/a&gt;&#x27;</span> % url_for(<span class="string">&#x27;do_something&#x27;</span>, <span class="built_in">next</span>=request.full_path)</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>在程序内部只需要使用相对 URL，所以这里使用 request.full_path 获取当前页面的完整路径。在 do_something 视图中，我们获取这个 next 值，然后重定向到对应的路径：</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> redirect(request.args.get(<span class="string">&#x27;next&#x27;</span>))</span><br><span class="line"><span class="keyword">return</span> redirect(request.args.get(<span class="string">&#x27;next&#x27;</span>, url_for(<span class="string">&#x27;hello&#x27;</span>)))</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>重定向回上一个页面</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">redirect_back</span>(<span class="params">default=<span class="string">&#x27;hello&#x27;</span>, **kwargs</span>):</span></span><br><span class="line">    <span class="keyword">for</span> target <span class="keyword">in</span> request.args.get(<span class="string">&#x27;next&#x27;</span>), request.referrer:</span><br><span class="line">        <span class="keyword">if</span> target:</span><br><span class="line">            <span class="keyword">return</span> redirect(target)</span><br><span class="line">    <span class="keyword">return</span> redirect(url_for(default, **kwargs))</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>通过设置默认值，可以在 referer 和 next 为空的情况下重定向到默认的视图。在 do_something 视图中使用这个函数的示例如下所示：</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/do_something_and_redirect&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">do_something</span>():</span></span><br><span class="line">    <span class="comment"># do something</span></span><br><span class="line">    <span class="keyword">return</span> redirect_back()</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>对 URL 进行安全验证</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> urllib.parse <span class="keyword">import</span> urlparse, urljoin</span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> request</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">is_safe_url</span>(<span class="params">target</span>):</span></span><br><span class="line">    ref_url = urlparse(request.host_url)</span><br><span class="line">    test_url = urlparse(urljoin(request.host_url, target))</span><br><span class="line">    <span class="keyword">return</span> test_url.scheme <span class="keyword">in</span> (<span class="string">&#x27;http&#x27;</span>, <span class="string">&#x27;https&#x27;</span>) <span class="keyword">and</span> \</span><br><span class="line">           ref_url.netloc == test_url.netloc</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>这个函数接收目标 URL 作为参数，并通过 <code>request.host_url</code> 获取程序内的主机 URL，然后使用 <code>urljoin()</code> 函数将目标 URL 转换为绝对 URL 。接着，分别使用 urlparse 模块提供的 <code>urlparse()</code> 函数解析两个 URL ，最后对目标 URL 的 URL 模式和主机地址进行验证，确保只有属于程序内部的 URL 才会被返回。在执行重定向回上一个页面的 <code>redirect_back()</code> 函数中，我们使用 <code>is_safe_url()</code> 验证 next 和 referer 的值：</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">redirect_back</span>(<span class="params">default=<span class="string">&#x27;hello&#x27;</span>, **kwargs</span>):</span></span><br><span class="line">    <span class="keyword">for</span> target <span class="keyword">in</span> request.args.get(<span class="string">&#x27;next&#x27;</span>), request.referrer:</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> target:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        <span class="keyword">if</span> is_safe_url(target):</span><br><span class="line">            <span class="keyword">return</span> redirect(target)</span><br><span class="line">    <span class="keyword">return</span> redirect(url_for(default, **kwargs))</span><br></pre></td></tr></table></div></figure>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://blog.zyuanlee.cn">Pandalzy</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://blog.zyuanlee.cn/2019/07/14/Flask%E5%AD%A6%E4%B9%A002-Flask%E4%B8%8EHTTP/">https://blog.zyuanlee.cn/2019/07/14/Flask%E5%AD%A6%E4%B9%A002-Flask%E4%B8%8EHTTP/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://blog.zyuanlee.cn/tags/Python3/">Python3</a></span><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://blog.zyuanlee.cn/tags/Flask%E5%AD%A6%E4%B9%A0/">Flask学习</a></span></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2019/07/18/Flask%E5%AD%A6%E4%B9%A003-%E6%A8%A1%E6%9D%BF/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">Flask学习03-模板</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2019/06/28/%E5%BE%AE%E6%9C%BA%E5%8E%9F%E7%90%86%E4%B8%8E%E6%8E%A5%E5%8F%A3%E5%AE%9E%E9%AA%8C/"><span class="paginator-prev__text">微机原理与接口实验</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Request-%E5%AF%B9%E8%B1%A1"><span class="toc-number">1.</span> <span class="toc-text">
+          Request 对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8-Flask-%E4%B8%AD%E5%A4%84%E7%90%86%E8%AF%B7%E6%B1%82"><span class="toc-number">2.</span> <span class="toc-text">
+          在 Flask 中处理请求</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B7%AF%E7%94%B1%E5%8C%B9%E9%85%8D"><span class="toc-number">2.1.</span> <span class="toc-text">
+          路由匹配</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%91%E5%90%AC-HTTP-%E7%9A%84%E6%96%B9%E6%B3%95"><span class="toc-number">2.2.</span> <span class="toc-text">
+          监听 HTTP 的方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#URL-%E5%A4%84%E7%90%86"><span class="toc-number">2.3.</span> <span class="toc-text">
+          URL 处理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%B7%E6%B1%82%E9%92%A9%E5%AD%90"><span class="toc-number">3.</span> <span class="toc-text">
+          请求钩子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HTTP-%E5%93%8D%E5%BA%94"><span class="toc-number">4.</span> <span class="toc-text">
+          HTTP 响应</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%93%8D%E5%BA%94%E7%A0%81"><span class="toc-number">4.1.</span> <span class="toc-text">
+          响应码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%8D%E5%AE%9A%E5%90%91"><span class="toc-number">4.2.</span> <span class="toc-text">
+          重定向</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%93%8D%E5%BA%94%E6%A0%BC%E5%BC%8F"><span class="toc-number">4.3.</span> <span class="toc-text">
+          响应格式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Cookie"><span class="toc-number">4.4.</span> <span class="toc-text">
+          Cookie</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E7%A8%8B%E5%BA%8F%E5%AF%86%E9%92%A5"><span class="toc-number">4.4.1.</span> <span class="toc-text">
+          设置程序密钥</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A8%A1%E6%8B%9F%E7%94%A8%E6%88%B7%E8%AE%A4%E8%AF%81"><span class="toc-number">4.4.2.</span> <span class="toc-text">
+          模拟用户认证</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Flask-%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="toc-number">5.</span> <span class="toc-text">
+          Flask 上下文</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8A%E4%B8%8B%E6%96%87%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F"><span class="toc-number">5.1.</span> <span class="toc-text">
+          上下文全局变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BF%80%E6%B4%BB%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="toc-number">5.2.</span> <span class="toc-text">
+          激活上下文</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8A%E4%B8%8B%E6%96%87%E9%92%A9%E5%AD%90"><span class="toc-number">5.3.</span> <span class="toc-text">
+          上下文钩子</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HTTP-%E8%BF%9B%E9%98%B6"><span class="toc-number">6.</span> <span class="toc-text">
+          HTTP 进阶</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E4%B8%8A%E4%B8%80%E4%B8%AA%E9%A1%B5%E9%9D%A2%E7%9A%84-URL"><span class="toc-number">6.1.</span> <span class="toc-text">
+          获取上一个页面的 URL</span></a></li></ol></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/assets/avatar.jpg" alt="avatar"></div><p class="sidebar-ov-author__text">Stay hungry, stay foolish.</p></div><div class="sidebar-ov-social"></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">45</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">7</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">31</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2021</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>Pandalzy</span></div><div><span>由 <a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> 强力驱动</span><span> v5.4.0</span><span class="footer__devider">|</span><span>主题 - <a href="https://github.com/liuyib/hexo-theme-stun/" title="Stun" target="_blank" rel="noopener">Stun</a></span><span> v2.1.1</span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><div class="search-mask"></div><div class="search-popup"><span class="search-close"></span><div class="search-input"><input placeholder="搜索文章（支持多关键词，请用空格分隔）"></div><div class="search-results"></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script>function initSearch() {
+  var isXML = true;
+  var search_path = 'search.xml';
+
+  if (!search_path) {
+    search_path = 'search.xml';
+  } else if (/json$/i.test(search_path)) {
+    isXML = false;
+  }
+
+  var path = '/' + search_path;
+  $.ajax({
+    url: path,
+    dataType: isXML ? 'xml' : 'json',
+    async: true,
+    success: function (res) {
+      var datas = isXML ? $('entry', res).map(function () {
+        // 将 XML 转为 JSON
+        return {
+          title: $('title', this).text(),
+          content: $('content', this).text(),
+          url: $('url', this).text()
+        };
+      }).get() : res;
+      var $input = $('.search-input input');
+      var $result = $('.search-results');
+      // 搜索对象（标题、内容）的权重，影响显示顺序
+      var WEIGHT = { title: 100, content: 1 };
+      var searchPost = function () {
+        var searchText = $input.val().toLowerCase().trim();
+        // 根据空白字符分隔关键字
+        var keywords = searchText.split(/[\s]+/);
+        // 搜索结果
+        var matchPosts = [];
+
+        // 有多个关键字时，将原文字整个保存下来
+        if (keywords.length > 1) {
+          keywords.push(searchText);
+        }
+        // 防止未输入字符时搜索
+        if (searchText.length > 0) {
+          datas.forEach(function (data) {
+            var isMatch  = false;
+            // 没有标题的文章使用预设的 i18n 变量代替
+            var title = (data.title && data.title.trim()) || '[ 文章无标题 ]';
+            var titleLower = title && title.toLowerCase();
+            // 删除 HTML 标签 和 所有空白字符
+            var content = data.content && data.content.replace(/<[^>]+>/g, '');
+            var contentLower = content && content.toLowerCase();
+            // 删除重复的 /
+            var postURL = data.url && decodeURI(data.url).replace(/\/{2,}/g, '/');
+            // 标题中匹配到的关键词
+            var titleHitSlice = [];
+            // 内容中匹配到的关键词
+            var contentHitSlice = [];
+
+            keywords.forEach(function (keyword) {
+              /**
+              * 获取匹配的关键词的索引
+              * @param {String} keyword 要匹配的关键字
+              * @param {String} text 原文字
+              * @param {Boolean} caseSensitive 是否区分大小写
+              * @param {Number} weight 匹配对象的权重。权重大的优先显示
+              * @return {Array}
+              */
+              function getIndexByword (word, text, caseSensitive, weight) {
+                if (!word || !text) {
+                  return [];
+                };
+
+                var startIndex = 0; // 每次匹配的开始索引
+                var index = -1;     // 匹配到的索引值
+                var result = [];    // 匹配结果
+
+                if (!caseSensitive) {
+                  word = word.toLowerCase();
+                  text = text.toLowerCase();
+                }
+
+                while((index = text.indexOf(word, startIndex)) !== -1) {
+                  var hasMatch = false;
+                  // 索引位置相同的关键词，保留长度较长的
+                  titleHitSlice.forEach(function (hit) {
+                    if (hit.index === index && hit.word.length < word.length) {
+                      hit.word = word;
+                      hasMatch = true;
+                    }
+                  });
+                  startIndex = index + word.length;
+                  !hasMatch && result.push({ index: index, word: word, weight: weight });
+                }
+                return result;
+              }
+              titleHitSlice = titleHitSlice.concat(getIndexByword(keyword, titleLower, false, WEIGHT.title));
+              contentHitSlice = contentHitSlice.concat(getIndexByword(keyword, contentLower, false, WEIGHT.content));
+            });
+
+            var hitTitle = titleHitSlice.length;
+            var hitContent = contentHitSlice.length;
+
+            if (hitTitle > 0 || hitContent > 0) {
+              isMatch = true;
+            }
+            if (isMatch) {
+              ;[titleHitSlice, contentHitSlice].forEach(function (hit) {
+                // 按照匹配文字的索引的递增顺序排序
+                hit.sort(function (left, right) {
+                  return left.index - right.index;
+                });
+              });
+              /**
+              * 给文本中匹配到的关键词添加标记，从而进行高亮显示
+              * @param {String} text 原文本
+              * @param {Array} hitSlice 匹配项的索引信息
+              * @param {Number} start 开始索引
+              * @param {Number} end 结束索引
+              * @return {String}
+              */
+              function highlightKeyword (text, hitSlice, start, end) {
+                if (!text || !hitSlice || !hitSlice.length) {
+                  return;
+                }
+
+                var result = '';
+                var startIndex = start;
+                var endIndex = end;
+                hitSlice.forEach(function (hit) {
+                  if (hit.index < startIndex) {
+                    return;
+                  }
+
+                  var hitWordEnd = hit.index + hit.word.length;
+                  result += text.slice(startIndex, hit.index);
+                  result += '<b>' + text.slice(hit.index, hitWordEnd) + '</b>';
+                  startIndex = hitWordEnd;
+                });
+                result += text.slice(startIndex, endIndex);
+                return result;
+              }
+
+              var postData = {};
+              // 文章总的搜索权重
+              var postWeight = titleHitSlice.length * WEIGHT.title + contentHitSlice.length * WEIGHT.content;
+              // 标记匹配关键词后的标题
+              var postTitle = highlightKeyword(title, titleHitSlice, 0, title.length) || title;
+              // 标记匹配关键词后的内容
+              var postContent;
+              // 显示内容的长度
+              var SHOW_WORD_LENGTH = 200;
+              // 命中关键词前的字符显示长度
+              var SHOW_WORD_FRONT_LENGTH = 20;
+              var SHOW_WORD_END_LENGTH = SHOW_WORD_LENGTH - SHOW_WORD_FRONT_LENGTH;
+
+              // 截取匹配的第一个字符，前后共 200 个字符来显示
+              if (contentHitSlice.length > 0) {
+                var firstIndex = contentHitSlice[0].index;
+                var start = firstIndex > SHOW_WORD_FRONT_LENGTH ? firstIndex - SHOW_WORD_FRONT_LENGTH : 0;
+                var end = firstIndex + SHOW_WORD_END_LENGTH;
+                postContent = highlightKeyword(content, contentHitSlice, start, end);
+              } else { // 未匹配到内容，直接截取前 200 个字符来显示
+                postContent = content.slice(0, SHOW_WORD_LENGTH);
+              }
+              postData.title = postTitle;
+              postData.content = postContent;
+              postData.url = postURL;
+              postData.weight = postWeight;
+              matchPosts.push(postData);
+            }
+          });
+        }
+
+        var resultInnerHtml = '';
+        if (matchPosts.length) {
+          // 按权重递增的顺序排序，使权重大的优先显示
+          matchPosts.sort(function (left, right) {
+            return right.weight - left.weight;
+          });
+          resultInnerHtml += '<ul>';
+          matchPosts.forEach(function (post) {
+            resultInnerHtml += '<li><a class="search-results-title" href="' + post.url + '">';
+            resultInnerHtml += post.title;
+            resultInnerHtml += '</a><div class="search-results-content">';
+            resultInnerHtml += post.content;
+            resultInnerHtml += '</div></li>';
+          });
+          resultInnerHtml += '</ul>';
+        } else {
+          resultInnerHtml += '<div class="search-results-none"><i class="far fa-meh"></i></div>';
+        }
+        $result.html(resultInnerHtml);
+      };
+      $input.on('input', searchPost);
+      $input.on('keyup', function (e) {
+        if (e.keyCode === Stun.utils.codeToKeyCode('Enter')) {
+          searchPost();
+        }
+      });
+    }
+  });
+}
+
+function closeSearch () {
+  $('body').css({ overflow: 'auto' });
+  $('.search-popup').css({ display: 'none' });
+  $('.search-mask').css({ display: 'none' });
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+  Stun.utils.pjaxReloadLocalSearch = function () {
+    $('.header-nav-search').on('click', function (e) {
+      e.stopPropagation();
+      $('body').css('overflow', 'hidden');
+      $('.search-popup')
+        .velocity('stop')
+        .velocity('transition.expandIn', {
+          duration: 300,
+          complete: function () {
+            $('.search-popup input').focus();
+          }
+        });
+      $('.search-mask')
+        .velocity('stop')
+        .velocity('transition.fadeIn', {
+          duration: 300
+        });
+
+      initSearch();
+    });
+    $('.search-mask, .search-close').on('click', function () {
+      closeSearch();
+    });
+    $(document).on('keydown', function (e) {
+      // Escape <=> 27
+      if (e.keyCode === Stun.utils.codeToKeyCode('Escape')) {
+        closeSearch();
+      }
+    });
+  };
+
+  Stun.utils.pjaxReloadLocalSearch();
+}, false);</script><script src="/js/utils.js?v=2.1.1"></script><script src="/js/stun-boot.js?v=2.1.1"></script><script src="/js/scroll.js?v=2.1.1"></script><script src="/js/header.js?v=2.1.1"></script><script src="/js/sidebar.js?v=2.1.1"></script><script type="application/json" src="/search.xml"></script></body></html>

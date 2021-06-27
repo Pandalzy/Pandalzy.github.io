@@ -1,0 +1,849 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/assets/avatar_16x16.jpg?v=2.1.1" type="image/png" sizes="16x16"><link rel="icon" href="/assets/avatar_32x32.jpg?v=2.1.1" type="image/png" sizes="32x32"><meta name="description" content="文件读取流程        QueueRunner 基于队列的输入管道从 TensorFLow 图形开头文件中读取数据   Feeding 运行每一步时，Python 代码提供数据   预加载数据 TensorFlow 图中的张量包含的数据（对于小数据集）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TensorFlow数据读取、神经网络">
+<meta property="og:url" content="https://blog.zyuanlee.cn/2020/03/14/TensorFlow%E6%95%B0%E6%8D%AE%E8%AF%BB%E5%8F%96%E3%80%81%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/index.html">
+<meta property="og:site_name" content="Pandalzy&#39;s Blog">
+<meta property="og:description" content="文件读取流程        QueueRunner 基于队列的输入管道从 TensorFLow 图形开头文件中读取数据   Feeding 运行每一步时，Python 代码提供数据   预加载数据 TensorFlow 图中的张量包含的数据（对于小数据集）">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200312214125.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200313180033.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200313184347.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200314180553.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200313190058.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200313193736.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200313193212.png">
+<meta property="article:published_time" content="2020-03-14T10:03:00.000Z">
+<meta property="article:modified_time" content="2021-06-27T00:34:28.403Z">
+<meta property="article:author" content="Pandalzy">
+<meta property="article:tag" content="TensorFlow">
+<meta property="article:tag" content="深度学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200312214125.jpg"><title>TensorFlow数据读取、神经网络 | Pandalzy's Blog</title><link ref="canonical" href="https://blog.zyuanlee.cn/2020/03/14/TensorFlow%E6%95%B0%E6%8D%AE%E8%AF%BB%E5%8F%96%E3%80%81%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.1.1"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":true},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"carbon","highlight":"light","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: undefined,
+  lazyload: false,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.4.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/about/"><span class="header-nav-menu-item__icon"><i class="fas fa-address-card"></i></span><span class="header-nav-menu-item__text">关于</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/friends/"><span class="header-nav-menu-item__icon"><i class="fas fa-user-friends"></i></span><span class="header-nav-menu-item__text">友链</span></a></div></div><div class="header-nav-search"><span class="header-nav-search__icon"><i class="fas fa-search"></i></span><span class="header-nav-search__text">搜索</span></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">Pandalzy's Blog</div><div class="header-banner-info__subtitle">Stay hungry, stay foolish.</div></div><div class="header-banner-arrow"><div class="header-banner-arrow__icon"><i class="fas fa-angle-down"></i></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">TensorFlow数据读取、神经网络</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2020-03-14</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-06-27</span></span></div></header><div class="post-body">
+        <h2 id="文件读取流程"   >
+          <a href="#文件读取流程" class="heading-link"><i class="fas fa-link"></i></a>文件读取流程</h2>
+      <ul>
+<li>QueueRunner<ul>
+<li>基于队列的输入管道从 TensorFLow 图形开头文件中读取数据</li>
+</ul>
+</li>
+<li>Feeding<ul>
+<li>运行每一步时，Python 代码提供数据</li>
+</ul>
+</li>
+<li>预加载数据<ul>
+<li>TensorFlow 图中的张量包含的数据（对于小数据集）</li>
+</ul>
+</li>
+</ul>
+<span id="more"></span>
+
+
+        <h3 id="文件读取流程-1"   >
+          <a href="#文件读取流程-1" class="heading-link"><i class="fas fa-link"></i></a>文件读取流程</h3>
+      <ul>
+<li>第一阶段：构造文件名队列</li>
+<li>第二阶段：读取与解码</li>
+<li>第三阶段：批处理</li>
+</ul>
+
+        <h4 id="构造文件名队列"   >
+          <a href="#构造文件名队列" class="heading-link"><i class="fas fa-link"></i></a>构造文件名队列</h4>
+      <ul>
+<li><code>tf.train.string_input_producer(string_tensor, shuffle=True)</code><ul>
+<li>string_tensor：含有文件名+路径的一阶张量</li>
+<li>num_epochs：过几遍数据，默认无限遍数据</li>
+<li>return：文件队列<code>file_queue</code></li>
+</ul>
+</li>
+</ul>
+
+        <h4 id="读取和解码"   >
+          <a href="#读取和解码" class="heading-link"><i class="fas fa-link"></i></a>读取和解码</h4>
+      <p>从队列当中读取文件内容，并进行解码操作</p>
+
+        <h5 id="读取文件内容"   >
+          <a href="#读取文件内容" class="heading-link"><i class="fas fa-link"></i></a>读取文件内容</h5>
+      <p>默认每次读取一个样本</p>
+<blockquote>
+<p>文本文件默认一次读取一行，图片默认一次读取一张图片，二进制文件一次读取指定字节数（最好一个样本的字节数），TFRecords 默认一次读取一个 example</p>
+</blockquote>
+<ul>
+<li><code>tf.TextLineReader</code><ul>
+<li>阅读文本文件都好分隔符值（CSV）格式，默认按行读取</li>
+<li>return：读取器实例</li>
+</ul>
+</li>
+<li><code>tf.WholeFileReader()</code><ul>
+<li>用于读取图片文件</li>
+<li>return：读取器实例</li>
+</ul>
+</li>
+<li><code>tf.FixedLengthRecordReader(record_bytes)</code><ul>
+<li>二进制文件</li>
+<li>要读取每个记录是固定数量字节的二进制文件</li>
+<li>record_bytes：整数，指定每次读取（一个样本）的字节数</li>
+<li>return：读取器实例</li>
+</ul>
+</li>
+<li><code>tf.TFRecordReader</code><ul>
+<li>读取 TFRecords 文件</li>
+<li>return：读取器实例</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>它们有共同的读取方法：<code>read(file_queue)</code>，并且都会返回一个 Tensor 元组</p>
+<p><code>(key文件名字, value默认的内容（一个文本）)</code></p>
+<p>由于默认只会读取一个样本，所以如果想要进行批处理，需要使用<code>tf.train.batch</code>或<code>tf.train.shuffle_batch</code>进行批处理操作，便于之后指定每批次多个样本的训练</p>
+</blockquote>
+
+        <h5 id="内容解码"   >
+          <a href="#内容解码" class="heading-link"><i class="fas fa-link"></i></a>内容解码</h5>
+      <ul>
+<li>文本<ul>
+<li><code>tf.decode_csv()</code></li>
+</ul>
+</li>
+<li>图片<ul>
+<li><code>tf.image.decode_jpeg(contents)</code><ul>
+<li>将 JPEG 编码的图像解码为 uint8 张量</li>
+<li>return：uint8 张量，3-D 形状[height, width, channels]</li>
+</ul>
+</li>
+<li><code>tf.image.decode_png(contents)</code></li>
+</ul>
+</li>
+<li>二进制<ul>
+<li><code>tf.decode_raw(value, tf.uint8)</code><ul>
+<li>与<code>tf.FixedLengthRecordReader</code>搭配使用，二进制读取为 uint8</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>解码阶段，默认所有的内容都解码成<code>tf.uint8</code>类型，如果需要转换成指定类型，可以使用<code>tf.cast()</code>进行转换</p>
+</blockquote>
+
+        <h4 id="批处理"   >
+          <a href="#批处理" class="heading-link"><i class="fas fa-link"></i></a>批处理</h4>
+      <p>解码之后，可以直接获取默认的一个样本内容，但如果想要获取多个样本，需要加入到新的队列进行批处理</p>
+<ul>
+<li><code>tf.train.batch(tensors, batch_size, num_threads=1, capacity=32, name=None)</code><ul>
+<li>读取指定大小（个数）的张量</li>
+<li>tensors：可以是包含张量的列表，批处理的内容放到列表当中</li>
+<li>batch_size：从队列中读取的批处理大小</li>
+<li>num_threads：进入队列的线程数</li>
+<li>capacity：整数，队列中元素的最大数量</li>
+<li>return：tensors</li>
+</ul>
+</li>
+<li><code>tf.train.shuffle_batch</code></li>
+</ul>
+
+        <h3 id="线程操作"   >
+          <a href="#线程操作" class="heading-link"><i class="fas fa-link"></i></a>线程操作</h3>
+      <p>以上的队列都是<code>tf.train.QueueRunner</code>对象</p>
+<p>每个 QueueRunner 都负责一个阶段，会话中，<code>tf.train.start_queue_runners</code>函数会要求图中的每个 QueueRunner 启动它的运行队列操作的线程，（这些操作需要在会话中开启）</p>
+<ul>
+<li><code>tf.train.start_queue_runners(sess=None, coord=None)</code><ul>
+<li>收集图中所有的队列线程，默认同时启动线程</li>
+<li>sess：所在的会话</li>
+<li>coord：线程协调器</li>
+<li>return：所有线程</li>
+</ul>
+</li>
+<li><code>tf.train.Coordinator()</code><ul>
+<li>线程调度员，对线程进行管理和协调</li>
+<li><code>request_stop()</code>：请求停止</li>
+<li><code>should_stop()</code>：询问是否结束</li>
+<li><code>join(threads=None, stop_grace_period_secs=120)</code>：回收线程</li>
+<li>return：线程协调员实例</li>
+</ul>
+</li>
+</ul>
+
+        <h2 id="图片数据"   >
+          <a href="#图片数据" class="heading-link"><i class="fas fa-link"></i></a>图片数据</h2>
+      
+        <h3 id="图片基本知识"   >
+          <a href="#图片基本知识" class="heading-link"><i class="fas fa-link"></i></a>图片基本知识</h3>
+      <ul>
+<li>特征抽取<ul>
+<li>文本——数值（二维数组<code>shape(n_samples, m_features)</code>）</li>
+<li>字典——数值（二维数组<code>shape(n_samples, m_features)</code>）</li>
+<li>图片——数值（二维数组<code>shape(n_samples, m_features)</code>）</li>
+</ul>
+</li>
+</ul>
+
+        <h4 id="图片三要素"   >
+          <a href="#图片三要素" class="heading-link"><i class="fas fa-link"></i></a>图片三要素</h4>
+      <ul>
+<li>图片长度、图片宽度、图片通道数</li>
+<li>灰度图<ul>
+<li>[长, 宽, 1]</li>
+<li>每一个像素点一个[0, 255]数</li>
+</ul>
+</li>
+<li>彩色图<ul>
+<li>[长, 宽, 3]</li>
+<li>每一个像素点三个[0, 255]数组成</li>
+</ul>
+</li>
+</ul>
+
+        <h4 id="张量形状"   >
+          <a href="#张量形状" class="heading-link"><i class="fas fa-link"></i></a>张量形状</h4>
+      <p><code>Tensor(指令名称, shape, dtype)</code></p>
+<ul>
+<li>一张图片<ul>
+<li><code>shape = (height, width, channels)</code></li>
+</ul>
+</li>
+<li>多张图片<ul>
+<li><code>shape = (batch, height, width, channels)</code></li>
+<li>batch：表示一个批次的张量数量</li>
+</ul>
+</li>
+</ul>
+
+        <h3 id="图片特征值处理"   >
+          <a href="#图片特征值处理" class="heading-link"><i class="fas fa-link"></i></a>图片特征值处理</h3>
+      <ul>
+<li>样本数据量大</li>
+<li>样本大小形状不统一</li>
+<li>解决：把图片缩小到统一大小</li>
+<li><code>tf.image.resize_images(imags, size)</code><ul>
+<li>缩小放大图片</li>
+<li>images：4-D 形状<code>[batch, height, width, channels]</code>或 3-D 形状的张量<code>[height, width, channels]</code>的图片数据</li>
+<li>size：1-D int32 张量：new_height, new_width, 图像的新尺寸</li>
+<li>返回 4-D 格式或者 3-D 格式图片</li>
+</ul>
+</li>
+</ul>
+
+        <h3 id="数据格式"   >
+          <a href="#数据格式" class="heading-link"><i class="fas fa-link"></i></a>数据格式</h3>
+      <ul>
+<li>存储：uint8（节约空间）</li>
+<li>矩阵计算：float32（提高精度）</li>
+</ul>
+
+        <h3 id="案例：狗图片读取"   >
+          <a href="#案例：狗图片读取" class="heading-link"><i class="fas fa-link"></i></a>案例：狗图片读取</h3>
+      
+        <h4 id="构造文件名队列-1"   >
+          <a href="#构造文件名队列-1" class="heading-link"><i class="fas fa-link"></i></a>构造文件名队列</h4>
+      
+        <h4 id="读取与解码"   >
+          <a href="#读取与解码" class="heading-link"><i class="fas fa-link"></i></a>读取与解码</h4>
+      <p>使样本的形状和类型统一</p>
+
+        <h4 id="批处理-1"   >
+          <a href="#批处理-1" class="heading-link"><i class="fas fa-link"></i></a>批处理</h4>
+      <figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pic_read</span>(<span class="params">file_list</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    狗图片读取</span></span><br><span class="line"><span class="string">    :param file_list:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="comment"># 1、构造文件名队列</span></span><br><span class="line">    file_queue = tf.train.string_input_producer(file_list)</span><br><span class="line">    <span class="comment"># 2、读取与解码</span></span><br><span class="line">    reader = tf.WholeFileReader()</span><br><span class="line">    key, value = reader.read(file_queue)</span><br><span class="line">    <span class="comment"># print(key, value)</span></span><br><span class="line">    image = tf.image.decode_jpeg(value)</span><br><span class="line">    <span class="comment"># print(image)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 3、批处理</span></span><br><span class="line">    <span class="comment"># 图片统一</span></span><br><span class="line">    resize_image = tf.image.resize_images(image, [<span class="number">200</span>, <span class="number">200</span>])</span><br><span class="line">    <span class="built_in">print</span>(resize_image)</span><br><span class="line">    <span class="comment"># Tensor(&quot;resize/Squeeze:0&quot;, shape=(200, 200, ?), dtype=float32)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 通道数固定，shape形状确定</span></span><br><span class="line">    <span class="comment"># 也可用动态修改</span></span><br><span class="line">    resize_image.set_shape(shape=[<span class="number">200</span>, <span class="number">200</span>, <span class="number">3</span>])</span><br><span class="line"></span><br><span class="line">    image_batch = tf.train.batch([resize_image], batch_size=<span class="number">100</span>, num_threads=<span class="number">2</span>, capacity=<span class="number">100</span>)</span><br><span class="line">    <span class="built_in">print</span>(image_batch)</span><br><span class="line">    <span class="comment"># Tensor(&quot;batch:0&quot;, shape=(100, 200, 200, 3), dtype=float32)</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">        <span class="comment"># 开启线程</span></span><br><span class="line">        <span class="comment"># 创建线程协调员</span></span><br><span class="line">        coord = tf.train.Coordinator()</span><br><span class="line">        threads = tf.train.start_queue_runners(sess=sess, coord=coord)</span><br><span class="line">        key_new, value_new, image_new = sess.run([key, value, image])</span><br><span class="line">        <span class="built_in">print</span>(key_new)</span><br><span class="line">        <span class="built_in">print</span>(value_new)</span><br><span class="line">        <span class="built_in">print</span>(image_new)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 回收线程</span></span><br><span class="line">        coord.request_stop()</span><br><span class="line">        coord.join(threads=threads)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    <span class="comment"># 构造路径+文件名列表</span></span><br><span class="line">    filename = os.listdir(<span class="string">r&#x27;.\dog&#x27;</span>)</span><br><span class="line">    <span class="comment"># print(filename)</span></span><br><span class="line">    file_list = [os.path.join(<span class="string">r&#x27;.\dog&#x27;</span>, file) <span class="keyword">for</span> file <span class="keyword">in</span> filename]</span><br><span class="line">    <span class="comment"># print(file_list)</span></span><br><span class="line">    pic_read(file_list)</span><br><span class="line"></span><br></pre></td></tr></table></div></figure>
+
+
+        <h2 id="二进制文件"   >
+          <a href="#二进制文件" class="heading-link"><i class="fas fa-link"></i></a>二进制文件</h2>
+      
+        <h3 id="CIFAR10-二进制数据集介绍"   >
+          <a href="#CIFAR10-二进制数据集介绍" class="heading-link"><i class="fas fa-link"></i></a>CIFAR10 二进制数据集介绍</h3>
+      <p>每 3073 个字节是一个样本</p>
+<ul>
+<li>1 个目标值+3072 像素<ul>
+<li>1024 字节，红色通道</li>
+<li>1024 字节，绿色通道</li>
+<li>1024，蓝色通道</li>
+</ul>
+</li>
+</ul>
+
+        <h3 id="流程"   >
+          <a href="#流程" class="heading-link"><i class="fas fa-link"></i></a>流程</h3>
+      
+        <h4 id="构造文件名队列-2"   >
+          <a href="#构造文件名队列-2" class="heading-link"><i class="fas fa-link"></i></a>构造文件名队列</h4>
+      
+        <h4 id="读取与解码-1"   >
+          <a href="#读取与解码-1" class="heading-link"><i class="fas fa-link"></i></a>读取与解码</h4>
+      <figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">reader = tf.FixedLengthRecordReader(<span class="number">3073</span>)</span><br><span class="line">key, value = reader.read(file_queue)</span><br><span class="line">decode = tf.decode_raw(value, tf.uint8)</span><br></pre></td></tr></table></div></figure>
+
+<p>对 tensor 对象切片</p>
+<p>原图片矩阵<br>[[32 * 32 的二维数组],<br>[32 * 32 的二维数组],<br>[32 * 32 的二维数组]]<br>–&gt; [3, 32, 32]</p>
+<p>需转换为 shape：[height, width, channel] -&gt; [32, 32, 3]</p>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tf.transpose(data, [<span class="number">1</span>, <span class="number">2</span>, <span class="number">0</span>])</span><br><span class="line"><span class="comment"># [0, 1, 2] --&gt; [1, 2, 0]，三维数组位置转换，</span></span><br><span class="line"><span class="comment"># 原来1号位置放到0号，2号位置放到1号，0号放到3号</span></span><br></pre></td></tr></table></div></figure>
+
+
+        <h4 id="批处理-2"   >
+          <a href="#批处理-2" class="heading-link"><i class="fas fa-link"></i></a>批处理</h4>
+      <figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BinRead</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 初始化</span></span><br><span class="line">        self.height = <span class="number">32</span></span><br><span class="line">        self.width = <span class="number">32</span></span><br><span class="line">        self.channels = <span class="number">3</span></span><br><span class="line">        <span class="comment"># 字节数</span></span><br><span class="line">        self.image_bytes = self.height * self.width * self.channels</span><br><span class="line">        self.label_bytes = <span class="number">1</span></span><br><span class="line">        self.all_bytes = self.image_bytes + self.label_bytes</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">bin_read</span>(<span class="params">self, file_l</span>):</span></span><br><span class="line">        <span class="comment"># 1、构造文件名队列</span></span><br><span class="line">        file_queue = tf.train.string_input_producer(file_l)</span><br><span class="line">        <span class="comment"># 2、读取与解码</span></span><br><span class="line">        reader = tf.FixedLengthRecordReader(self.all_bytes)</span><br><span class="line">        key, value = reader.read(file_queue)</span><br><span class="line">        <span class="comment"># 解码</span></span><br><span class="line">        value_decode = tf.decode_raw(value, tf.uint8)</span><br><span class="line">        <span class="comment"># 将目标值与特征值切片</span></span><br><span class="line">        label = tf.<span class="built_in">slice</span>(value_decode, [<span class="number">0</span>], [self.label_bytes])</span><br><span class="line">        image = tf.<span class="built_in">slice</span>(value_decode, [<span class="number">1</span>], [self.image_bytes])</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 调整图片形状，动态调整</span></span><br><span class="line">        image_reshape = tf.reshape(image, shape=[self.channels, self.height, self.width])</span><br><span class="line">        <span class="comment"># 图片转置</span></span><br><span class="line">        image_transpose = tf.transpose(image_reshape, [<span class="number">1</span>, <span class="number">2</span>, <span class="number">0</span>])</span><br><span class="line">        <span class="comment"># 调整图片类型</span></span><br><span class="line">        <span class="comment"># image_cast = tf.cast(image_transpose, tf.float32)</span></span><br><span class="line">        <span class="comment"># 3、批处理</span></span><br><span class="line">        <span class="comment"># image_batch = tf.train.batch([image_cast], batch_size=100, num_threads=2, capacity=100)</span></span><br><span class="line">        image_batch = tf.train.batch([image_transpose], batch_size=<span class="number">100</span>, num_threads=<span class="number">2</span>, capacity=<span class="number">100</span>)</span><br><span class="line">        <span class="built_in">print</span>(image_batch)</span><br><span class="line">        <span class="comment"># Tensor(&quot;batch:0&quot;, shape=(100, 32, 32, 3), dtype=float32)</span></span><br><span class="line">        <span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">            <span class="comment"># 开启线程，创建线程协调员</span></span><br><span class="line">            coord = tf.train.Coordinator()</span><br><span class="line">            threads = tf.train.start_queue_runners(sess=sess, coord=coord)</span><br><span class="line"></span><br><span class="line">            key_new, value_new, value_decode_new, image_batch_new = sess.run([key, value, value_decode, image_batch])</span><br><span class="line">            <span class="built_in">print</span>(key_new)</span><br><span class="line">            <span class="built_in">print</span>(value_new)</span><br><span class="line">            <span class="built_in">print</span>(value_decode_new)</span><br><span class="line">            <span class="comment"># [  1  35  27 ... 169 168 168]</span></span><br><span class="line">            <span class="built_in">print</span>(image_batch_new)</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 回收线程</span></span><br><span class="line">            coord.request_stop()</span><br><span class="line">            coord.join(threads=threads)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    <span class="comment"># 构造路径+文件名列表</span></span><br><span class="line">    filename = os.listdir(<span class="string">r&#x27;.\cifar-10-batches-bin&#x27;</span>)</span><br><span class="line">    <span class="comment"># print(filename)</span></span><br><span class="line">    file_list = [os.path.join(<span class="string">r&#x27;.\cifar-10-batches-bin&#x27;</span>, file) <span class="keyword">for</span> file <span class="keyword">in</span> filename <span class="keyword">if</span> file[-<span class="number">3</span>:] == <span class="string">&#x27;bin&#x27;</span>]</span><br><span class="line">    <span class="built_in">print</span>(file_list)</span><br><span class="line">    BinRead().bin_read(file_list)</span><br><span class="line"></span><br></pre></td></tr></table></div></figure>
+
+
+        <h2 id="TFRecords-文件"   >
+          <a href="#TFRecords-文件" class="heading-link"><i class="fas fa-link"></i></a>TFRecords 文件</h2>
+      <p>它其实是一种二进制文件，能够更好的利用内存，更方便复制和移动，并且不需要单独的标签文件</p>
+<p>使用步骤：</p>
+<ol>
+<li>获取数据</li>
+<li>将数据填入到 Example 协议内存块（protocol buffer）</li>
+<li>将协议内存块序列化为字符串，并且通过<code>tf.python_io.TFRecordWriter</code>写入到 TFRecords 文件</li>
+</ol>
+<p>文件格式：*.tfrecords</p>
+
+        <h3 id="结构分析"   >
+          <a href="#结构分析" class="heading-link"><i class="fas fa-link"></i></a>结构分析</h3>
+      <figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">features &#123;</span><br><span class="line">    feature &#123;</span><br><span class="line">        key: &quot;age&quot;</span><br><span class="line">        value &#123; float_list &#123;</span><br><span class="line">            value: 29.0</span><br><span class="line">       &#125;&#125;</span><br><span class="line">     &#125;</span><br><span class="line">    feature &#123;</span><br><span class="line">        key: &quot;movie&quot;</span><br><span class="line">        value &#123; bytes_list &#123;</span><br><span class="line">            value: &quot;The Shawshank Redemption&quot;</span><br><span class="line">            value: &quot;Fight Club&quot;</span><br><span class="line">       &#125;&#125;</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li><code>tf.train.Example</code>协议内存块（协议内存块包含了字段<code>Features</code>）</li>
+<li><code>Features</code>包含了一个<code>Feature</code>字段</li>
+<li><code>Feature</code>包含了要写入的数据、并指明数据类型<ul>
+<li>这是一个样本的结构，批数据需要循环存入这样的结构</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">example = tf.train.Example(features=tf.train.Features(feature=&#123;</span><br><span class="line">    <span class="string">&#x27;image&#x27;</span>: tf.train.Feature(bytes_list=tf.train.BytesList(value=[image])),</span><br><span class="line">    <span class="string">&#x27;label&#x27;</span>: tf.train.Feature(int64_list=tf.train.Int64List(value=[label])),</span><br><span class="line">&#125;))</span><br><span class="line">example.SerializeToString()</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li><code>tf.train.Example(features=None)</code><ul>
+<li>写入 tfrecords 文件</li>
+<li>features：<code>tf.train.Features</code>类型的特征实例</li>
+<li>return：example 格式协议块</li>
+</ul>
+</li>
+<li><code>tf.train.Features(feature=None)</code><ul>
+<li>构建每个样本的信息键值对</li>
+<li>feature：<strong>字典数据</strong>，key 为要保存的名字</li>
+<li>value：<code>tf.train.Feature</code>实例</li>
+<li>return：Features 类型</li>
+</ul>
+</li>
+<li><code>tf.train.Feature(options)</code><ul>
+<li>options<ul>
+<li><code>bytes_list=tf.train.BytesList(value=[Bytes])</code></li>
+<li><code>int64_list=tf.train.Int64List(value=[Value])</code></li>
+<li>等</li>
+</ul>
+</li>
+<li>支持存入的类型如下<ul>
+<li><code>tf.train.BytesList(value=[Bytes])</code></li>
+<li><code>tf.train.Int64List(value=[Value])</code></li>
+<li><code>tf.train.FloatList(value=[Value])</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>这种结构很好的实现了数据和标签（训练的类别标签）或者其他属性数据存储在同一文件中</p>
+</blockquote>
+
+        <h3 id="案例：CIFAR10-数据存入-TFRecords"   >
+          <a href="#案例：CIFAR10-数据存入-TFRecords" class="heading-link"><i class="fas fa-link"></i></a>案例：CIFAR10 数据存入 TFRecords</h3>
+      
+        <h4 id="分析"   >
+          <a href="#分析" class="heading-link"><i class="fas fa-link"></i></a>分析</h4>
+      <ul>
+<li>构造存储实例，<code>tf.python_io.TFRecordWriter(path)</code><ul>
+<li>写入 tfrecord 文件</li>
+<li>path：文件路径</li>
+<li>return：写方法<ul>
+<li><code>.write(record)</code>：写入一个 example</li>
+<li><code>close()</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>循环将数据填入到<code>Example</code>协议内存块</li>
+</ul>
+
+        <h4 id="代码"   >
+          <a href="#代码" class="heading-link"><i class="fas fa-link"></i></a>代码</h4>
+      <figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@staticmethod</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">write_to_tfr</span>(<span class="params">image_batch, label_batch</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    将样本特征值目标值一起写入文件</span></span><br><span class="line"><span class="string">    :param image_batch:</span></span><br><span class="line"><span class="string">    :param label_batch:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">with</span> tf.python_io.TFRecordWriter(<span class="string">&#x27;cifar.tfrecords&#x27;</span>) <span class="keyword">as</span> writer:</span><br><span class="line">        <span class="comment"># 循环构造example对象，并序列化写入</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">100</span>):</span><br><span class="line">            image = image_batch[i].tostring()</span><br><span class="line">            label = label_batch[i][<span class="number">0</span>]</span><br><span class="line">            example = tf.train.Example(features=tf.train.Features(feature=&#123;</span><br><span class="line">                <span class="string">&#x27;image&#x27;</span>: tf.train.Feature(bytes_list=tf.train.BytesList(value=[image])),</span><br><span class="line">                <span class="string">&#x27;label&#x27;</span>: tf.train.Feature(int64_list=tf.train.Int64List(value=[label])),</span><br><span class="line">            &#125;))</span><br><span class="line"></span><br><span class="line">            writer.write(example.SerializeToString())</span><br></pre></td></tr></table></div></figure>
+
+
+        <h3 id="案例：读取-TFRecords"   >
+          <a href="#案例：读取-TFRecords" class="heading-link"><i class="fas fa-link"></i></a>案例：读取 TFRecords</h3>
+      <p>需要有一个解析 Example 过程，可以使用<code>tf.TFRecordReader</code>的<code>tf.parse_single_example</code>解析器，可以将<code>Example</code>协议内存块解析为张量</p>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">feature = tf.parse_single_example(value, features=&#123;</span><br><span class="line">    <span class="string">&#x27;image&#x27;</span>: tf.FixedLenFeature([], tf.string),</span><br><span class="line">    <span class="string">&#x27;label&#x27;</span>: tf.FixedLenFeature([], tf.int64),</span><br><span class="line">&#125;)</span><br><span class="line">image = feature[<span class="string">&#x27;image&#x27;</span>]</span><br><span class="line">label = feature[<span class="string">&#x27;label&#x27;</span>]</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li><code>tf.parse_single_example(serialized, features=None, name=None)</code><ul>
+<li>解析一个单一的 Example 原型</li>
+<li>serialized：标量字符串 Tensor，一个序列化的 Example</li>
+<li>features：dict’字典数据，键为读取的名字，值为 FixedLenFeature</li>
+<li>return：一个 键值对组成的字典，键为读取的名字</li>
+</ul>
+</li>
+<li><code>tf.FixedLenFeature(shape,dtype)</code><ul>
+<li>shape：输入数据的形状，一般不指定，为空列表</li>
+<li>dtype：输入数据类型，与存储进文件的类型要一致</li>
+<li>类型只能是 float32，int64，string</li>
+</ul>
+</li>
+</ul>
+
+        <h4 id="步骤"   >
+          <a href="#步骤" class="heading-link"><i class="fas fa-link"></i></a>步骤</h4>
+      <ol>
+<li>构造文件名队列</li>
+<li>读取与解码<ol>
+<li>读取</li>
+<li>解析 example</li>
+<li>解码<code>tf.decode_raw()</code></li>
+</ol>
+</li>
+<li>构造批处理队列</li>
+</ol>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@staticmethod</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">read_tfrecords</span>():</span></span><br><span class="line">    <span class="comment"># 1、构造文件名队列</span></span><br><span class="line">    file_queue = tf.train.string_input_producer([<span class="string">&#x27;cifar.tfrecords&#x27;</span>])</span><br><span class="line">    <span class="comment"># 2、读取与解码</span></span><br><span class="line">    <span class="comment"># 读取</span></span><br><span class="line">    reader = tf.TFRecordReader()</span><br><span class="line">    key, value = reader.read(file_queue)</span><br><span class="line">    <span class="comment"># 解析example</span></span><br><span class="line">    feature = tf.parse_single_example(value, features=&#123;</span><br><span class="line">        <span class="string">&#x27;image&#x27;</span>: tf.FixedLenFeature([], tf.string),</span><br><span class="line">        <span class="string">&#x27;label&#x27;</span>: tf.FixedLenFeature([], tf.int64),</span><br><span class="line">    &#125;)</span><br><span class="line">    image = feature[<span class="string">&#x27;image&#x27;</span>]</span><br><span class="line">    label = feature[<span class="string">&#x27;label&#x27;</span>]</span><br><span class="line">    <span class="comment"># 解码</span></span><br><span class="line">    image_decoded = tf.decode_raw(image, tf.uint8)</span><br><span class="line">    <span class="comment"># 形状调整</span></span><br><span class="line">    image_reshaped = tf.reshape(image_decoded, [<span class="number">32</span>, <span class="number">32</span>, <span class="number">3</span>])</span><br><span class="line">    <span class="comment"># 3、构造批处理队列</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 开启会话</span></span><br><span class="line">    <span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">        <span class="comment"># 开启线程</span></span><br><span class="line">        <span class="comment"># 创建线程协调员</span></span><br><span class="line">        coord = tf.train.Coordinator()</span><br><span class="line">        threads = tf.train.start_queue_runners(sess=sess, coord=coord)</span><br><span class="line"></span><br><span class="line">        image_new, label_new = sess.run([image_reshaped, label])</span><br><span class="line">        <span class="built_in">print</span>(image_new)</span><br><span class="line">        <span class="built_in">print</span>(label_new)</span><br><span class="line">        <span class="comment"># 回收线程</span></span><br><span class="line">        coord.request_stop()</span><br><span class="line">        coord.join(threads=threads)</span><br><span class="line"></span><br></pre></td></tr></table></div></figure>
+
+
+        <h2 id="神经网络基础"   >
+          <a href="#神经网络基础" class="heading-link"><i class="fas fa-link"></i></a>神经网络基础</h2>
+      
+        <h3 id="神经网络"   >
+          <a href="#神经网络" class="heading-link"><i class="fas fa-link"></i></a>神经网络</h3>
+      <p>由三层构成：输入层，隐藏层，输出层</p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200312214125.jpg"></p>
+<blockquote>
+<p>​ 其中每层圆圈代表一个神经元，隐藏层和输出层的神经元把输入的数据计算后输出，输出层的神经元只是输出</p>
+</blockquote>
+<ul>
+<li>神经网络特点<ul>
+<li>每个连接都有权值</li>
+<li>同一层神经元之间没有连接</li>
+<li>最后的输出结果对应的层也称之为<strong>全连接层</strong></li>
+</ul>
+</li>
+</ul>
+
+        <h4 id="感知机"   >
+          <a href="#感知机" class="heading-link"><i class="fas fa-link"></i></a>感知机</h4>
+      <p>感知机就是模拟大脑神经网络处理数据的过程</p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200313180033.png"></p>
+<blockquote>
+<p>感知机是一种基础分类模型，类似于逻辑回归，不同的是，感知机的激活函数用的书<code>sign</code>，而逻辑回归用的是<code>sigmoid</code>，<strong>感知机也具有连接的权重和偏置</strong></p>
+<p>$$<br>u=\sum_i^n{w_ix_i}+b<br>$$</p>
+<p>$$<br>y=sign(u)=\left{<br>\begin{aligned}<br>+1,&amp; &amp;u&gt;0 \<br>-1,&amp; &amp;u\leq0<br>\end{aligned}\right.<br>$$</p>
+</blockquote>
+<p>可解决问题：或、与、异或</p>
+
+        <h3 id="神经网络基础-1"   >
+          <a href="#神经网络基础-1" class="heading-link"><i class="fas fa-link"></i></a>神经网络基础</h3>
+      <ul>
+<li>损失函数<ul>
+<li>交叉熵损失</li>
+<li>总损失、平均损失</li>
+<li>最小二乘法——线性回归损失——均方误差</li>
+</ul>
+</li>
+<li>优化损失函数</li>
+</ul>
+<p>神经网络主要用于分类，任意事件发生的概率在 0-1 之间，且总有某一个事件发生（概率和为 1）。如果将分类问题中“一个样例属于某个类别”，看成一个概率事件，那么训练数据的正确答案就符合一个概率分布。Softmax 回归就是一个常用的将神经网络前向传播得到的结果也变成概率分布的方法。</p>
+
+        <h4 id="Softmax-回归"   >
+          <a href="#Softmax-回归" class="heading-link"><i class="fas fa-link"></i></a>Softmax 回归</h4>
+      <p>logits 加上 softmax 映射——多分类</p>
+<p>将神经网络输出转换成概率结果</p>
+<p>$$<br>softmax(y)_i=\frac{e^{y_i}}{\sum_{j=1}^n{e^{y_j}}}<br>$$</p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200313184347.png"></p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200314180553.png"></p>
+
+        <h4 id="交叉熵损失公式"   >
+          <a href="#交叉熵损失公式" class="heading-link"><i class="fas fa-link"></i></a>交叉熵损失公式</h4>
+      <p>$$<br>H_{y^\prime}=-\sum_i^ny_{i^\prime}log(y_i)<br>$$</p>
+<p>为了能够衡量距离，目标值需要进行 one-hot 编码，能与概率值一一对应，如下图</p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200313190058.png"></p>
+
+        <h4 id="softmax、交叉熵损失-API"   >
+          <a href="#softmax、交叉熵损失-API" class="heading-link"><i class="fas fa-link"></i></a>softmax、交叉熵损失 API</h4>
+      <ul>
+<li><code>tf.nn.softmax_cross_entropy_with_logits(labels=None, logits=None, name=None)</code><ul>
+<li>计算 logits 和 labels 之间的交叉损失熵</li>
+<li>labels：标签值（真实值）</li>
+<li>logits：样本加权之后的值</li>
+<li>return：损失值列表</li>
+</ul>
+</li>
+<li><code>tf.reduce_mean(input_tensor)</code><ul>
+<li>计算张量的尺寸的元素平均值</li>
+</ul>
+</li>
+</ul>
+
+        <h3 id="案例：Mnist-手写数字识别"   >
+          <a href="#案例：Mnist-手写数字识别" class="heading-link"><i class="fas fa-link"></i></a>案例：Mnist 手写数字识别</h3>
+      
+        <h4 id="数据集"   >
+          <a href="#数据集" class="heading-link"><i class="fas fa-link"></i></a>数据集</h4>
+      <p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200313193736.png"></p>
+<ul>
+<li>特征值<ul>
+<li>28*28=784</li>
+</ul>
+</li>
+<li>目标值<ul>
+<li>分类：one-hot 编码</li>
+<li>可能值：0, 1, 2, …,9</li>
+<li>编码：0, 1, 0, …,0（值为 1）</li>
+</ul>
+</li>
+</ul>
+
+        <h4 id="数据获取-API"   >
+          <a href="#数据获取-API" class="heading-link"><i class="fas fa-link"></i></a>数据获取 API</h4>
+      <ul>
+<li><code>from tensorflow.examples.tutorials.mnist import input_data</code><ul>
+<li><code>mnist = input_data.read_data_sets(path, one_hot=True)</code><ul>
+<li><code>mnist.train.next_batch(100)</code>提供批量获取功能</li>
+<li><code>mnist.train.images</code></li>
+<li><code>mnist.train.labels</code></li>
+<li><code>mnist.test.images</code></li>
+<li><code>mnist.test.labels</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        <h4 id="分析-代码"   >
+          <a href="#分析-代码" class="heading-link"><i class="fas fa-link"></i></a>分析-代码</h4>
+      <ul>
+<li>完善功能<ul>
+<li>增加准确率</li>
+<li>增加变量 tensorboard 显示</li>
+<li>增加模型保存加载</li>
+<li>增加模型预测结果输出</li>
+</ul>
+</li>
+</ul>
+<p>采用只有一层，即最后一个输出层的神经网络，也称为全连接层神经网络</p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200313193212.png"></p>
+
+        <h5 id="全连接"   >
+          <a href="#全连接" class="heading-link"><i class="fas fa-link"></i></a>全连接</h5>
+      <ul>
+<li><code>y = w1x1 + w2x2 + ... + b</code></li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">x[<span class="literal">None</span>, <span class="number">784</span>] * w[<span class="number">784</span>, <span class="number">10</span>] + bias[<span class="number">10</span>] = y_predict[<span class="literal">None</span>, <span class="number">10</span>]</span><br><span class="line">r = tf.nn.softmax_cross_entropy_with_logits(labels=y_true, logits=y_predict, name=<span class="literal">None</span>)</span><br><span class="line">error = tf.reduce_mean(r)</span><br><span class="line"></span><br></pre></td></tr></table></div></figure>
+
+
+        <h5 id="准确率"   >
+          <a href="#准确率" class="heading-link"><i class="fas fa-link"></i></a>准确率</h5>
+      <figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">equal_list = tf.equal(tf.argmax(y_true, axis=<span class="number">1</span>), tf.argmax(y_predict, axis=<span class="number">1</span>))</span><br><span class="line">accuracy = tf.reduce_mean(tf.cast(equal_list, tf.float32))</span><br><span class="line"></span><br></pre></td></tr></table></div></figure>
+
+
+        <h5 id="代码-1"   >
+          <a href="#代码-1" class="heading-link"><i class="fas fa-link"></i></a>代码</h5>
+      <figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">from</span> tensorflow.examples.tutorials.mnist <span class="keyword">import</span> input_data</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">full_connection</span>():</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    用全连接对手写数字进行识别</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="comment"># 1、准备数据</span></span><br><span class="line">    mnist = input_data.read_data_sets(<span class="string">&quot;./mnist_data&quot;</span>, one_hot=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 用占位符定义真实数据</span></span><br><span class="line">    x = tf.placeholder(dtype=tf.float32, shape=[<span class="literal">None</span>, <span class="number">784</span>])</span><br><span class="line">    y_true = tf.placeholder(dtype=tf.float32, shape=[<span class="literal">None</span>, <span class="number">10</span>])</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 2、构造模型 - 全连接</span></span><br><span class="line">    <span class="comment"># [None, 784] * W[784, 10] + Bias = [None, 10]</span></span><br><span class="line">    weights = tf.Variable(initial_value=tf.random_normal(shape=[<span class="number">784</span>, <span class="number">10</span>], stddev=<span class="number">0.01</span>))</span><br><span class="line">    bias = tf.Variable(initial_value=tf.random_normal(shape=[<span class="number">10</span>], stddev=<span class="number">0.1</span>))</span><br><span class="line">    y_predict = tf.matmul(x, weights) + bias</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 3、构造损失函数</span></span><br><span class="line">    loss_list = tf.nn.softmax_cross_entropy_with_logits(logits=y_predict, labels=y_true)</span><br><span class="line">    loss = tf.reduce_mean(loss_list)</span><br><span class="line">    <span class="comment"># 4、优化损失</span></span><br><span class="line">    optimizer = tf.train.GradientDescentOptimizer(learning_rate=<span class="number">0.1</span>).minimize(loss)</span><br><span class="line">    <span class="comment"># optimizer = tf.train.AdamOptimizer(learning_rate=0.1).minimize(loss)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 5、增加准确率计算</span></span><br><span class="line">    equal_list = tf.equal(tf.argmax(y_true, axis=<span class="number">1</span>), tf.argmax(y_predict, axis=<span class="number">1</span>))</span><br><span class="line">    accuracy = tf.reduce_mean(tf.cast(equal_list, tf.float32))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 初始化变量</span></span><br><span class="line">    init = tf.global_variables_initializer()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">        sess.run(init)</span><br><span class="line">        <span class="comment"># 开始训练</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">50000</span>):</span><br><span class="line">            <span class="comment"># 获取真实值</span></span><br><span class="line">            image, label = mnist.train.next_batch(<span class="number">500</span>)</span><br><span class="line"></span><br><span class="line">            _, loss_value, accuracy_value = sess.run([optimizer, loss, accuracy], feed_dict=&#123;x: image, y_true: label&#125;)</span><br><span class="line"></span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;第%d次的损失为%f，准确率为%f&quot;</span> % (i + <span class="number">1</span>, loss_value, accuracy_value))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    full_connection()</span><br><span class="line"></span><br></pre></td></tr></table></div></figure>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://blog.zyuanlee.cn">Pandalzy</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://blog.zyuanlee.cn/2020/03/14/TensorFlow%E6%95%B0%E6%8D%AE%E8%AF%BB%E5%8F%96%E3%80%81%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/">https://blog.zyuanlee.cn/2020/03/14/TensorFlow%E6%95%B0%E6%8D%AE%E8%AF%BB%E5%8F%96%E3%80%81%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://blog.zyuanlee.cn/tags/TensorFlow/">TensorFlow</a></span><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://blog.zyuanlee.cn/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></span></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2020/03/19/TensorFlow%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">TensorFlow卷积神经网络</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2020/03/09/TensorFlow%E6%A1%86%E6%9E%B6%E4%BB%8B%E7%BB%8D/"><span class="paginator-prev__text">TensorFlow框架介绍</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%B5%81%E7%A8%8B"><span class="toc-number">1.</span> <span class="toc-text">
+          文件读取流程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%B5%81%E7%A8%8B-1"><span class="toc-number">1.1.</span> <span class="toc-text">
+          文件读取流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E9%80%A0%E6%96%87%E4%BB%B6%E5%90%8D%E9%98%9F%E5%88%97"><span class="toc-number">1.1.1.</span> <span class="toc-text">
+          构造文件名队列</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AF%BB%E5%8F%96%E5%92%8C%E8%A7%A3%E7%A0%81"><span class="toc-number">1.1.2.</span> <span class="toc-text">
+          读取和解码</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AF%BB%E5%8F%96%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9"><span class="toc-number">1.1.2.1.</span> <span class="toc-text">
+          读取文件内容</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%86%85%E5%AE%B9%E8%A7%A3%E7%A0%81"><span class="toc-number">1.1.2.2.</span> <span class="toc-text">
+          内容解码</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%B9%E5%A4%84%E7%90%86"><span class="toc-number">1.1.3.</span> <span class="toc-text">
+          批处理</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E6%93%8D%E4%BD%9C"><span class="toc-number">1.2.</span> <span class="toc-text">
+          线程操作</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BE%E7%89%87%E6%95%B0%E6%8D%AE"><span class="toc-number">2.</span> <span class="toc-text">
+          图片数据</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%BE%E7%89%87%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86"><span class="toc-number">2.1.</span> <span class="toc-text">
+          图片基本知识</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9B%BE%E7%89%87%E4%B8%89%E8%A6%81%E7%B4%A0"><span class="toc-number">2.1.1.</span> <span class="toc-text">
+          图片三要素</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BC%A0%E9%87%8F%E5%BD%A2%E7%8A%B6"><span class="toc-number">2.1.2.</span> <span class="toc-text">
+          张量形状</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%BE%E7%89%87%E7%89%B9%E5%BE%81%E5%80%BC%E5%A4%84%E7%90%86"><span class="toc-number">2.2.</span> <span class="toc-text">
+          图片特征值处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%A0%BC%E5%BC%8F"><span class="toc-number">2.3.</span> <span class="toc-text">
+          数据格式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A1%88%E4%BE%8B%EF%BC%9A%E7%8B%97%E5%9B%BE%E7%89%87%E8%AF%BB%E5%8F%96"><span class="toc-number">2.4.</span> <span class="toc-text">
+          案例：狗图片读取</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E9%80%A0%E6%96%87%E4%BB%B6%E5%90%8D%E9%98%9F%E5%88%97-1"><span class="toc-number">2.4.1.</span> <span class="toc-text">
+          构造文件名队列</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AF%BB%E5%8F%96%E4%B8%8E%E8%A7%A3%E7%A0%81"><span class="toc-number">2.4.2.</span> <span class="toc-text">
+          读取与解码</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%B9%E5%A4%84%E7%90%86-1"><span class="toc-number">2.4.3.</span> <span class="toc-text">
+          批处理</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%87%E4%BB%B6"><span class="toc-number">3.</span> <span class="toc-text">
+          二进制文件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CIFAR10-%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%95%B0%E6%8D%AE%E9%9B%86%E4%BB%8B%E7%BB%8D"><span class="toc-number">3.1.</span> <span class="toc-text">
+          CIFAR10 二进制数据集介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%81%E7%A8%8B"><span class="toc-number">3.2.</span> <span class="toc-text">
+          流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E9%80%A0%E6%96%87%E4%BB%B6%E5%90%8D%E9%98%9F%E5%88%97-2"><span class="toc-number">3.2.1.</span> <span class="toc-text">
+          构造文件名队列</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AF%BB%E5%8F%96%E4%B8%8E%E8%A7%A3%E7%A0%81-1"><span class="toc-number">3.2.2.</span> <span class="toc-text">
+          读取与解码</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%B9%E5%A4%84%E7%90%86-2"><span class="toc-number">3.2.3.</span> <span class="toc-text">
+          批处理</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TFRecords-%E6%96%87%E4%BB%B6"><span class="toc-number">4.</span> <span class="toc-text">
+          TFRecords 文件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90"><span class="toc-number">4.1.</span> <span class="toc-text">
+          结构分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A1%88%E4%BE%8B%EF%BC%9ACIFAR10-%E6%95%B0%E6%8D%AE%E5%AD%98%E5%85%A5-TFRecords"><span class="toc-number">4.2.</span> <span class="toc-text">
+          案例：CIFAR10 数据存入 TFRecords</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E6%9E%90"><span class="toc-number">4.2.1.</span> <span class="toc-text">
+          分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81"><span class="toc-number">4.2.2.</span> <span class="toc-text">
+          代码</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A1%88%E4%BE%8B%EF%BC%9A%E8%AF%BB%E5%8F%96-TFRecords"><span class="toc-number">4.3.</span> <span class="toc-text">
+          案例：读取 TFRecords</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4"><span class="toc-number">4.3.1.</span> <span class="toc-text">
+          步骤</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80"><span class="toc-number">5.</span> <span class="toc-text">
+          神经网络基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C"><span class="toc-number">5.1.</span> <span class="toc-text">
+          神经网络</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%84%9F%E7%9F%A5%E6%9C%BA"><span class="toc-number">5.1.1.</span> <span class="toc-text">
+          感知机</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80-1"><span class="toc-number">5.2.</span> <span class="toc-text">
+          神经网络基础</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Softmax-%E5%9B%9E%E5%BD%92"><span class="toc-number">5.2.1.</span> <span class="toc-text">
+          Softmax 回归</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%A4%E5%8F%89%E7%86%B5%E6%8D%9F%E5%A4%B1%E5%85%AC%E5%BC%8F"><span class="toc-number">5.2.2.</span> <span class="toc-text">
+          交叉熵损失公式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#softmax%E3%80%81%E4%BA%A4%E5%8F%89%E7%86%B5%E6%8D%9F%E5%A4%B1-API"><span class="toc-number">5.2.3.</span> <span class="toc-text">
+          softmax、交叉熵损失 API</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A1%88%E4%BE%8B%EF%BC%9AMnist-%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB"><span class="toc-number">5.3.</span> <span class="toc-text">
+          案例：Mnist 手写数字识别</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="toc-number">5.3.1.</span> <span class="toc-text">
+          数据集</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96-API"><span class="toc-number">5.3.2.</span> <span class="toc-text">
+          数据获取 API</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E6%9E%90-%E4%BB%A3%E7%A0%81"><span class="toc-number">5.3.3.</span> <span class="toc-text">
+          分析-代码</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%85%A8%E8%BF%9E%E6%8E%A5"><span class="toc-number">5.3.3.1.</span> <span class="toc-text">
+          全连接</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%87%86%E7%A1%AE%E7%8E%87"><span class="toc-number">5.3.3.2.</span> <span class="toc-text">
+          准确率</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81-1"><span class="toc-number">5.3.3.3.</span> <span class="toc-text">
+          代码</span></a></li></ol></li></ol></li></ol></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/assets/avatar.jpg" alt="avatar"></div><p class="sidebar-ov-author__text">Stay hungry, stay foolish.</p></div><div class="sidebar-ov-social"></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">45</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">7</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">31</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2021</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>Pandalzy</span></div><div><span>由 <a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> 强力驱动</span><span> v5.4.0</span><span class="footer__devider">|</span><span>主题 - <a href="https://github.com/liuyib/hexo-theme-stun/" title="Stun" target="_blank" rel="noopener">Stun</a></span><span> v2.1.1</span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><div class="search-mask"></div><div class="search-popup"><span class="search-close"></span><div class="search-input"><input placeholder="搜索文章（支持多关键词，请用空格分隔）"></div><div class="search-results"></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script>function initSearch() {
+  var isXML = true;
+  var search_path = 'search.xml';
+
+  if (!search_path) {
+    search_path = 'search.xml';
+  } else if (/json$/i.test(search_path)) {
+    isXML = false;
+  }
+
+  var path = '/' + search_path;
+  $.ajax({
+    url: path,
+    dataType: isXML ? 'xml' : 'json',
+    async: true,
+    success: function (res) {
+      var datas = isXML ? $('entry', res).map(function () {
+        // 将 XML 转为 JSON
+        return {
+          title: $('title', this).text(),
+          content: $('content', this).text(),
+          url: $('url', this).text()
+        };
+      }).get() : res;
+      var $input = $('.search-input input');
+      var $result = $('.search-results');
+      // 搜索对象（标题、内容）的权重，影响显示顺序
+      var WEIGHT = { title: 100, content: 1 };
+      var searchPost = function () {
+        var searchText = $input.val().toLowerCase().trim();
+        // 根据空白字符分隔关键字
+        var keywords = searchText.split(/[\s]+/);
+        // 搜索结果
+        var matchPosts = [];
+
+        // 有多个关键字时，将原文字整个保存下来
+        if (keywords.length > 1) {
+          keywords.push(searchText);
+        }
+        // 防止未输入字符时搜索
+        if (searchText.length > 0) {
+          datas.forEach(function (data) {
+            var isMatch  = false;
+            // 没有标题的文章使用预设的 i18n 变量代替
+            var title = (data.title && data.title.trim()) || '[ 文章无标题 ]';
+            var titleLower = title && title.toLowerCase();
+            // 删除 HTML 标签 和 所有空白字符
+            var content = data.content && data.content.replace(/<[^>]+>/g, '');
+            var contentLower = content && content.toLowerCase();
+            // 删除重复的 /
+            var postURL = data.url && decodeURI(data.url).replace(/\/{2,}/g, '/');
+            // 标题中匹配到的关键词
+            var titleHitSlice = [];
+            // 内容中匹配到的关键词
+            var contentHitSlice = [];
+
+            keywords.forEach(function (keyword) {
+              /**
+              * 获取匹配的关键词的索引
+              * @param {String} keyword 要匹配的关键字
+              * @param {String} text 原文字
+              * @param {Boolean} caseSensitive 是否区分大小写
+              * @param {Number} weight 匹配对象的权重。权重大的优先显示
+              * @return {Array}
+              */
+              function getIndexByword (word, text, caseSensitive, weight) {
+                if (!word || !text) {
+                  return [];
+                };
+
+                var startIndex = 0; // 每次匹配的开始索引
+                var index = -1;     // 匹配到的索引值
+                var result = [];    // 匹配结果
+
+                if (!caseSensitive) {
+                  word = word.toLowerCase();
+                  text = text.toLowerCase();
+                }
+
+                while((index = text.indexOf(word, startIndex)) !== -1) {
+                  var hasMatch = false;
+                  // 索引位置相同的关键词，保留长度较长的
+                  titleHitSlice.forEach(function (hit) {
+                    if (hit.index === index && hit.word.length < word.length) {
+                      hit.word = word;
+                      hasMatch = true;
+                    }
+                  });
+                  startIndex = index + word.length;
+                  !hasMatch && result.push({ index: index, word: word, weight: weight });
+                }
+                return result;
+              }
+              titleHitSlice = titleHitSlice.concat(getIndexByword(keyword, titleLower, false, WEIGHT.title));
+              contentHitSlice = contentHitSlice.concat(getIndexByword(keyword, contentLower, false, WEIGHT.content));
+            });
+
+            var hitTitle = titleHitSlice.length;
+            var hitContent = contentHitSlice.length;
+
+            if (hitTitle > 0 || hitContent > 0) {
+              isMatch = true;
+            }
+            if (isMatch) {
+              ;[titleHitSlice, contentHitSlice].forEach(function (hit) {
+                // 按照匹配文字的索引的递增顺序排序
+                hit.sort(function (left, right) {
+                  return left.index - right.index;
+                });
+              });
+              /**
+              * 给文本中匹配到的关键词添加标记，从而进行高亮显示
+              * @param {String} text 原文本
+              * @param {Array} hitSlice 匹配项的索引信息
+              * @param {Number} start 开始索引
+              * @param {Number} end 结束索引
+              * @return {String}
+              */
+              function highlightKeyword (text, hitSlice, start, end) {
+                if (!text || !hitSlice || !hitSlice.length) {
+                  return;
+                }
+
+                var result = '';
+                var startIndex = start;
+                var endIndex = end;
+                hitSlice.forEach(function (hit) {
+                  if (hit.index < startIndex) {
+                    return;
+                  }
+
+                  var hitWordEnd = hit.index + hit.word.length;
+                  result += text.slice(startIndex, hit.index);
+                  result += '<b>' + text.slice(hit.index, hitWordEnd) + '</b>';
+                  startIndex = hitWordEnd;
+                });
+                result += text.slice(startIndex, endIndex);
+                return result;
+              }
+
+              var postData = {};
+              // 文章总的搜索权重
+              var postWeight = titleHitSlice.length * WEIGHT.title + contentHitSlice.length * WEIGHT.content;
+              // 标记匹配关键词后的标题
+              var postTitle = highlightKeyword(title, titleHitSlice, 0, title.length) || title;
+              // 标记匹配关键词后的内容
+              var postContent;
+              // 显示内容的长度
+              var SHOW_WORD_LENGTH = 200;
+              // 命中关键词前的字符显示长度
+              var SHOW_WORD_FRONT_LENGTH = 20;
+              var SHOW_WORD_END_LENGTH = SHOW_WORD_LENGTH - SHOW_WORD_FRONT_LENGTH;
+
+              // 截取匹配的第一个字符，前后共 200 个字符来显示
+              if (contentHitSlice.length > 0) {
+                var firstIndex = contentHitSlice[0].index;
+                var start = firstIndex > SHOW_WORD_FRONT_LENGTH ? firstIndex - SHOW_WORD_FRONT_LENGTH : 0;
+                var end = firstIndex + SHOW_WORD_END_LENGTH;
+                postContent = highlightKeyword(content, contentHitSlice, start, end);
+              } else { // 未匹配到内容，直接截取前 200 个字符来显示
+                postContent = content.slice(0, SHOW_WORD_LENGTH);
+              }
+              postData.title = postTitle;
+              postData.content = postContent;
+              postData.url = postURL;
+              postData.weight = postWeight;
+              matchPosts.push(postData);
+            }
+          });
+        }
+
+        var resultInnerHtml = '';
+        if (matchPosts.length) {
+          // 按权重递增的顺序排序，使权重大的优先显示
+          matchPosts.sort(function (left, right) {
+            return right.weight - left.weight;
+          });
+          resultInnerHtml += '<ul>';
+          matchPosts.forEach(function (post) {
+            resultInnerHtml += '<li><a class="search-results-title" href="' + post.url + '">';
+            resultInnerHtml += post.title;
+            resultInnerHtml += '</a><div class="search-results-content">';
+            resultInnerHtml += post.content;
+            resultInnerHtml += '</div></li>';
+          });
+          resultInnerHtml += '</ul>';
+        } else {
+          resultInnerHtml += '<div class="search-results-none"><i class="far fa-meh"></i></div>';
+        }
+        $result.html(resultInnerHtml);
+      };
+      $input.on('input', searchPost);
+      $input.on('keyup', function (e) {
+        if (e.keyCode === Stun.utils.codeToKeyCode('Enter')) {
+          searchPost();
+        }
+      });
+    }
+  });
+}
+
+function closeSearch () {
+  $('body').css({ overflow: 'auto' });
+  $('.search-popup').css({ display: 'none' });
+  $('.search-mask').css({ display: 'none' });
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+  Stun.utils.pjaxReloadLocalSearch = function () {
+    $('.header-nav-search').on('click', function (e) {
+      e.stopPropagation();
+      $('body').css('overflow', 'hidden');
+      $('.search-popup')
+        .velocity('stop')
+        .velocity('transition.expandIn', {
+          duration: 300,
+          complete: function () {
+            $('.search-popup input').focus();
+          }
+        });
+      $('.search-mask')
+        .velocity('stop')
+        .velocity('transition.fadeIn', {
+          duration: 300
+        });
+
+      initSearch();
+    });
+    $('.search-mask, .search-close').on('click', function () {
+      closeSearch();
+    });
+    $(document).on('keydown', function (e) {
+      // Escape <=> 27
+      if (e.keyCode === Stun.utils.codeToKeyCode('Escape')) {
+        closeSearch();
+      }
+    });
+  };
+
+  Stun.utils.pjaxReloadLocalSearch();
+}, false);</script><script src="/js/utils.js?v=2.1.1"></script><script src="/js/stun-boot.js?v=2.1.1"></script><script src="/js/scroll.js?v=2.1.1"></script><script src="/js/header.js?v=2.1.1"></script><script src="/js/sidebar.js?v=2.1.1"></script><script type="application/json" src="/search.xml"></script></body></html>

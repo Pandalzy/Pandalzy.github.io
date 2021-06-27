@@ -1,0 +1,439 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/assets/avatar_16x16.jpg?v=2.1.1" type="image/png" sizes="16x16"><link rel="icon" href="/assets/avatar_32x32.jpg?v=2.1.1" type="image/png" sizes="32x32"><meta name="description" content="实验一                           实验题目：       1．8255 输入、输出实验 2．利用 8255 设计跑马灯（软延时）                     实验目的：       熟悉汇编语言编程环境，掌握 8255 芯片工作原理、电路设计及利用汇编语言编写接口软件。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="微机原理与接口实验">
+<meta property="og:url" content="https://blog.zyuanlee.cn/2019/06/28/%E5%BE%AE%E6%9C%BA%E5%8E%9F%E7%90%86%E4%B8%8E%E6%8E%A5%E5%8F%A3%E5%AE%9E%E9%AA%8C/index.html">
+<meta property="og:site_name" content="Pandalzy&#39;s Blog">
+<meta property="og:description" content="实验一                           实验题目：       1．8255 输入、输出实验 2．利用 8255 设计跑马灯（软延时）                     实验目的：       熟悉汇编语言编程环境，掌握 8255 芯片工作原理、电路设计及利用汇编语言编写接口软件。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213171727.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213171751.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213195443.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213195815.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213195841.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213195920.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213195942.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200004.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200041.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200059.png">
+<meta property="article:published_time" content="2019-06-28T15:41:09.000Z">
+<meta property="article:modified_time" content="2021-06-27T00:34:28.397Z">
+<meta property="article:author" content="Pandalzy">
+<meta property="article:tag" content="微机原理与接口实验">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213171727.png"><title>微机原理与接口实验 | Pandalzy's Blog</title><link ref="canonical" href="https://blog.zyuanlee.cn/2019/06/28/%E5%BE%AE%E6%9C%BA%E5%8E%9F%E7%90%86%E4%B8%8E%E6%8E%A5%E5%8F%A3%E5%AE%9E%E9%AA%8C/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.1.1"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":true},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"carbon","highlight":"light","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: undefined,
+  lazyload: false,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.4.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/about/"><span class="header-nav-menu-item__icon"><i class="fas fa-address-card"></i></span><span class="header-nav-menu-item__text">关于</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/friends/"><span class="header-nav-menu-item__icon"><i class="fas fa-user-friends"></i></span><span class="header-nav-menu-item__text">友链</span></a></div></div><div class="header-nav-search"><span class="header-nav-search__icon"><i class="fas fa-search"></i></span><span class="header-nav-search__text">搜索</span></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">Pandalzy's Blog</div><div class="header-banner-info__subtitle">Stay hungry, stay foolish.</div></div><div class="header-banner-arrow"><div class="header-banner-arrow__icon"><i class="fas fa-angle-down"></i></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">微机原理与接口实验</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2019-06-28</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-06-27</span></span></div></header><div class="post-body">
+        <h2 id="实验一"   >
+          <a href="#实验一" class="heading-link"><i class="fas fa-link"></i></a>实验一</h2>
+      
+        <h3 id="实验题目："   >
+          <a href="#实验题目：" class="heading-link"><i class="fas fa-link"></i></a>实验题目：</h3>
+      <p>1．8255 输入、输出实验</p>
+<p>2．利用 8255 设计跑马灯（软延时）</p>
+
+        <h3 id="实验目的："   >
+          <a href="#实验目的：" class="heading-link"><i class="fas fa-link"></i></a>实验目的：</h3>
+      <p>熟悉汇编语言编程环境，掌握 8255 芯片工作原理、电路设计及利用汇编语言编写接口软件。</p>
+<span id="more"></span>
+
+
+        <h3 id="实验电路图"   >
+          <a href="#实验电路图" class="heading-link"><i class="fas fa-link"></i></a>实验电路图</h3>
+      <p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213171727.png" alt="实验电路图"></p>
+
+        <h3 id="软件设计程序流程图"   >
+          <a href="#软件设计程序流程图" class="heading-link"><i class="fas fa-link"></i></a>软件设计程序流程图</h3>
+      <p><strong>1、LED 灯开关控制</strong></p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213171751.png" alt="LED灯开关控制"></p>
+<p><strong>2、跑马灯软延时</strong></p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213195443.png" alt="跑马灯软延时"></p>
+
+        <h3 id="实验软件代码（加注释）"   >
+          <a href="#实验软件代码（加注释）" class="heading-link"><i class="fas fa-link"></i></a>实验软件代码（加注释）</h3>
+      <p><strong>1、LED 灯开关控制</strong></p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">CODE SEGMENT</span><br><span class="line">ASSUME CS:CODE</span><br><span class="line">START:MOV DX,283H</span><br><span class="line">MOV AL,10000010B;A口输出，B口输入</span><br><span class="line">OUT DX,AL;控制字写入</span><br><span class="line">TEST_IT:MOV DX,281H</span><br><span class="line">IN AL,DX;向B口输入开关状态</span><br><span class="line">MOV DX,280H</span><br><span class="line">OUT DX,AL;输出LED灯显示状态</span><br><span class="line">JMP TEST_IT</span><br><span class="line">CODE ENDS</span><br><span class="line">END START</span><br></pre></td></tr></table></div></figure>
+
+<p><strong>2、跑马灯软延时</strong></p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">CODE SEGMENT</span><br><span class="line">ASSUME CS:CODE</span><br><span class="line">START:MOV DX,283H</span><br><span class="line">MOV AL,10001011B;A口输出，B,C口输入</span><br><span class="line">OUT DX,AL</span><br><span class="line">MOV BL,00000001B;用于LED灯的移位显示</span><br><span class="line">TEST_IT:</span><br><span class="line">;检测开关状态，只有开关打开才能运行跑马灯</span><br><span class="line">TEST1:</span><br><span class="line">MOV DX,281H</span><br><span class="line">IN AL,DX</span><br><span class="line">CMP AL,01H</span><br><span class="line">JNZ TEST1</span><br><span class="line">;LED灯显示</span><br><span class="line">MOV AL,BL</span><br><span class="line">MOV DX,280H</span><br><span class="line">OUT DX,AL;输出LED灯显示</span><br><span class="line">ROL BL,1;不带进位的左移</span><br><span class="line">;软件延时，便于观察LED灯的显示状态</span><br><span class="line">MOV AX,880H</span><br><span class="line">DELAY1:MOV CX,16EAH</span><br><span class="line">DELAY:LOOP DELAY</span><br><span class="line">DEC AX</span><br><span class="line">JNZ DELAY1</span><br><span class="line">JMP TEST_IT</span><br><span class="line">CODE ENDS</span><br><span class="line">END START</span><br></pre></td></tr></table></div></figure>
+
+
+        <h3 id="实验结果"   >
+          <a href="#实验结果" class="heading-link"><i class="fas fa-link"></i></a>实验结果</h3>
+      <p>1、LED 灯开关控制，LED 灯在相应的开关控制下，亮起或者熄灭；</p>
+<p>2、跑马灯软延时，通过设置一个较长的软件延时，打开开关，8 颗 LED 灯相继亮起和熄灭。</p>
+
+        <h3 id="实验小结"   >
+          <a href="#实验小结" class="heading-link"><i class="fas fa-link"></i></a>实验小结</h3>
+      <p>​ 这是我们第一次微机实验课，通过这次实验，我基本掌握了 8086 和 8255 的操作方法，通过自己独自编写汇编代码，完成 LED 灯的控制和跑马灯的实现，增加了我自己的成就感，当然也锻炼了我的汇编编程，理论与实践的结合，使我对所使用的元器件和汇编语言的理解加强。</p>
+
+        <h2 id="实验二"   >
+          <a href="#实验二" class="heading-link"><i class="fas fa-link"></i></a>实验二</h2>
+      
+        <h3 id="实验题目：-1"   >
+          <a href="#实验题目：-1" class="heading-link"><i class="fas fa-link"></i></a>实验题目：</h3>
+      <p>1．8253 定时实验，利用 8253 完成 1 秒的延时。</p>
+<p>2．利用 8253 硬件延时控制跑马灯运行。</p>
+<p>3．选做 8255 键盘显示实验</p>
+
+        <h3 id="实验目的：-1"   >
+          <a href="#实验目的：-1" class="heading-link"><i class="fas fa-link"></i></a>实验目的：</h3>
+      <p>熟悉汇编语言编程环境，掌握 8253 芯片工作原理、电路设计及利用汇编语言编写接口软件。</p>
+
+        <h3 id="实验电路图-1"   >
+          <a href="#实验电路图-1" class="heading-link"><i class="fas fa-link"></i></a>实验电路图</h3>
+      <p><strong>1、跑马灯硬件延时</strong></p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213195815.png" alt="跑马灯硬件延时"></p>
+<p><strong>2、8255 键盘实验</strong></p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213195841.png" alt="8255键盘实验"></p>
+
+        <h3 id="软件设计程序流程图-1"   >
+          <a href="#软件设计程序流程图-1" class="heading-link"><i class="fas fa-link"></i></a>软件设计程序流程图</h3>
+      <p><strong>1、跑马灯硬件延时</strong></p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213195920.png" alt="跑马灯硬件延时"></p>
+<p><strong>2、8255 键盘实验</strong></p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213195942.png" alt="8255键盘实验"></p>
+
+        <h3 id="实验软件代码（加注释）-1"   >
+          <a href="#实验软件代码（加注释）-1" class="heading-link"><i class="fas fa-link"></i></a>实验软件代码（加注释）</h3>
+      <p><strong>1、跑马灯硬件延时</strong></p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">CODE SEGMENT</span><br><span class="line">ASSUME CS:CODE</span><br><span class="line">START:MOV DX,283H</span><br><span class="line">MOV AL,10001011B;A口输出，B，C口输入</span><br><span class="line">OUT DX,AL</span><br><span class="line">MOV BL,00000001B;跑马灯显示位</span><br><span class="line">MOV AL,00110101B;通道0控制字，方式2，BCD计数，进行分频</span><br><span class="line">MOV DX,28BH</span><br><span class="line">OUT DX,AL</span><br><span class="line">MOV AL,00H;低地址</span><br><span class="line">MOV DX,288H</span><br><span class="line">OUT DX,AL</span><br><span class="line">MOV AL,50H;高地址</span><br><span class="line">OUT DX,AL</span><br><span class="line">TEST_IT:</span><br><span class="line">MOV DX,281H</span><br><span class="line">IN AL,DX</span><br><span class="line">TEST AL,01H</span><br><span class="line">JZ TEST_IT</span><br><span class="line">MOV DX,280H</span><br><span class="line">MOV AL,BL</span><br><span class="line">OUT DX,AL</span><br><span class="line">ROL BL,1</span><br><span class="line">MOV AL,01110001B;通道1控制字，方式0，BCD计数，CLK1连OUT0</span><br><span class="line">MOV DX,28BH</span><br><span class="line">OUT DX,AL</span><br><span class="line">MOV AL,00H;低地址</span><br><span class="line">MOV DX,289H</span><br><span class="line">OUT DX,AL</span><br><span class="line">MOV AL,04H;高地址</span><br><span class="line">OUT DX,AL</span><br><span class="line">LOWER:</span><br><span class="line">MOV DX,282H;C口输入OUT1</span><br><span class="line">IN AL,DX</span><br><span class="line">TEST AL,01H;低电平跳转</span><br><span class="line">JZ LOWER</span><br><span class="line">HEIGHT:</span><br><span class="line">MOV DX,282H;C口输入OUT1</span><br><span class="line">IN AL,DX</span><br><span class="line">TEST AL,01H;高电平跳转</span><br><span class="line">JNZ HEIGHT</span><br><span class="line">;检测出上升沿，延时结束</span><br><span class="line">JMP TEST_IT</span><br><span class="line">CODE ENDS</span><br><span class="line">END START</span><br></pre></td></tr></table></div></figure>
+
+<p><strong>2、8255 键盘实验</strong></p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line">;端口地址</span><br><span class="line">PORT_A EQU 280H</span><br><span class="line">PORT_B EQU 281H</span><br><span class="line">PORT_C EQU 282H</span><br><span class="line">PORT_CTL EQU 283H</span><br><span class="line">;数据段</span><br><span class="line">DATA SEGMENT</span><br><span class="line">	;键盘扫描码</span><br><span class="line">TABLE1 DB 77H,7BH,7DH,7EH,0B7H,0BBH,0BDH,0BEH</span><br><span class="line">	DB 0D7H,0DBH,0DDH,0DEH,0E7H,0EBH,0EDH,0EEH</span><br><span class="line">	;七段数码管数据</span><br><span class="line">TABLE2 DB 3FH,06H,5BH,4FH,66H,6DH,7DH,07H</span><br><span class="line">	DB 7FH,6FH,77H,7CH,39H,5EH,79H,71H</span><br><span class="line">DATA ENDS</span><br><span class="line">;堆栈段</span><br><span class="line">STACKS SEGMENT STACK</span><br><span class="line">	DW 50 DUP(0)</span><br><span class="line">TOP_STACK LABEL WORD</span><br><span class="line">STACKS ENDS</span><br><span class="line">;代码段</span><br><span class="line">CODE SEGMENT</span><br><span class="line">	ASSUME CS:CODE,DS:DATA,SS:STACKS</span><br><span class="line">START:MOV AX,STACKS</span><br><span class="line">	MOV SS,AX</span><br><span class="line">	LEA SP,TOP_STACK</span><br><span class="line">	MOV AX,DATA</span><br><span class="line">	MOV DS,AX</span><br><span class="line">;初始化8255，方式0，B口输入，A口输出，C口输出数码管</span><br><span class="line">	MOV DX,PORT_CTL</span><br><span class="line">	MOV AL,10000010B</span><br><span class="line">	OUT DX,AL</span><br><span class="line">;向所有行送0</span><br><span class="line">S:MOV DX,PORT_A</span><br><span class="line">	MOV AL,00H</span><br><span class="line">	OUT DX,AL</span><br><span class="line">;查看所有键是否松开</span><br><span class="line">	MOV DX,PORT_B</span><br><span class="line">WAIT_OPEN:IN AL,DX</span><br><span class="line">	AND AL,0FH</span><br><span class="line">	CMP AL,0FH</span><br><span class="line">	JNE WAIT_OPEN</span><br><span class="line">;各键均松开，查列是否有0</span><br><span class="line">WAIT_PRES:IN AL,DX</span><br><span class="line">	AND AL,0FH;只查低四位</span><br><span class="line">	CMP AL,0FH</span><br><span class="line">	JE WAIT_PRES</span><br><span class="line">;延时20ms，消抖动</span><br><span class="line">	MOV CX,16EAH</span><br><span class="line">DELAY:LOOP DELAY;CX为0，跳出循环</span><br><span class="line">;再查列，看按键是否仍被压着</span><br><span class="line">	IN AL,DX</span><br><span class="line">	AND AL,0FH</span><br><span class="line">	CMP AL,0FH</span><br><span class="line">	JE WAIT_PRES</span><br><span class="line">;键仍被按下，确定哪一个键被按下</span><br><span class="line">	MOV AL,0FEH</span><br><span class="line">	MOV CL,AL</span><br><span class="line">NEXT_ROW:MOV DX,PORT_A;</span><br><span class="line">	OUT DX,AL;向一行输出低电平</span><br><span class="line">	MOV DX,PORT_B</span><br><span class="line">	IN AL,DX;读入B口状态</span><br><span class="line">	AND AL,0FH;只检测低四位，即列值</span><br><span class="line">	CMP AL,0FH;是否均为1，若是，则此行无按键按下</span><br><span class="line">	JNE ENCODE;否，此行有按键按下，转去编码</span><br><span class="line">	ROL CL,1;均为1，转去下行</span><br><span class="line">	MOV AL,CL</span><br><span class="line">	JMP NEXT_ROW;查看下一行</span><br><span class="line">ENCODE:MOV BX,000FH</span><br><span class="line">	IN AL,DX</span><br><span class="line">NEXT_TRY:CMP AL,TABLE1[BX];读入的行列值是否与表中的值相等</span><br><span class="line">	JE DONE;相等，跳至数码管显示</span><br><span class="line">	DEC BX</span><br><span class="line">	JNS NEXT_TRY;非负，继续检查</span><br><span class="line">	MOV AH,01</span><br><span class="line">	JMP EXIT</span><br><span class="line">DONE:</span><br><span class="line">	MOV DX,PORT_C</span><br><span class="line">	MOV AL,TABLE2[BX]</span><br><span class="line">	OUT DX,AL;数码管显示按键</span><br><span class="line">	JMP S;跳回继续检测是否有按键按下</span><br><span class="line">EXIT:HLT</span><br><span class="line">CODE ENDS</span><br><span class="line">	END START</span><br></pre></td></tr></table></div></figure>
+
+
+        <h3 id="实验结果-1"   >
+          <a href="#实验结果-1" class="heading-link"><i class="fas fa-link"></i></a>实验结果</h3>
+      <p>1、跑马灯硬件延时，打开开关，基于 8253 定时 1s ，跑马灯亮一秒，暗一秒交替闪亮。</p>
+<p>2、8255 键盘实验，按下相应的键盘按键，数码管上显示相应的数字</p>
+
+        <h3 id="实验小结-1"   >
+          <a href="#实验小结-1" class="heading-link"><i class="fas fa-link"></i></a>实验小结</h3>
+      <p>​ 通过本次实验，我学会了怎样使用 8253 芯片进行准确的时间控制，由于一个计数器的计数时间有限，所以较长时间的延时就需要多个计数器串联使用。8255 键盘实验极大的考验了我的汇编语言的理解和逻辑思路，这说明了，即使自己会使用汇编语言，但是设计出一个程序仍然需要不断的练习，掌握其中思路流程尤为重要。我还完成了数码管显示的操作，这让我明白了其中的显示原理，当然，通过编写键盘显示实验，我发现自己在汇编语言上的缺陷，这是我所要加强锻炼的地方并且达到熟练运用各种命令。</p>
+
+        <h2 id="实验三"   >
+          <a href="#实验三" class="heading-link"><i class="fas fa-link"></i></a>实验三</h2>
+      
+        <h3 id="实验题目：-2"   >
+          <a href="#实验题目：-2" class="heading-link"><i class="fas fa-link"></i></a>实验题目：</h3>
+      <p>1．利用 0809 完成 1 个通道的模拟量采集，并利用 8255 输出二进制码。</p>
+<p>2．利用 0832 产生锯齿波输出，并在直流电机上观察结果。</p>
+
+        <h3 id="实验目的：-2"   >
+          <a href="#实验目的：-2" class="heading-link"><i class="fas fa-link"></i></a>实验目的：</h3>
+      <p>熟悉汇编语言编程环境，掌握 0809 及 0832 芯片工作原理、电路设计及利用汇编语言编写接口软件。</p>
+
+        <h3 id="实验电路图-2"   >
+          <a href="#实验电路图-2" class="heading-link"><i class="fas fa-link"></i></a>实验电路图</h3>
+      <p><strong>1、模数转换</strong></p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200004.png" alt="模数转换"></p>
+<p><strong>2、数模转换</strong></p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200041.png" alt="数模转换"></p>
+
+        <h3 id="软件设计程序流程图-2"   >
+          <a href="#软件设计程序流程图-2" class="heading-link"><i class="fas fa-link"></i></a>软件设计程序流程图</h3>
+      <p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200213200059.png" alt="软件设计程序流程图"></p>
+
+        <h3 id="实验软件代码（加注释）-2"   >
+          <a href="#实验软件代码（加注释）-2" class="heading-link"><i class="fas fa-link"></i></a>实验软件代码（加注释）</h3>
+      <p><strong>1、通道的模拟量采集</strong></p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">;端口地址</span><br><span class="line">PORT_A EQU 280H</span><br><span class="line">PORT_B EQU 281H</span><br><span class="line">PORT_C EQU 282H</span><br><span class="line">PORT_CTL EQU 283H</span><br><span class="line">PORT_ADC EQU 288H</span><br><span class="line">CODE SEGMENT</span><br><span class="line">    ASSUME CS:CODE</span><br><span class="line">START:</span><br><span class="line">    MOV AL,10011001B;A、C口输入，B口输出</span><br><span class="line">    MOV DX,PORT_CTL</span><br><span class="line">    OUT DX,AL;写入8255A控制字</span><br><span class="line">RE:</span><br><span class="line">    ;MOV DX,PORT_C</span><br><span class="line">    ;IN AL,DX;检测EOC状态</span><br><span class="line">    ;TEST AL,80H</span><br><span class="line">    ;JNZ RE;为1，未开始转换，继续循环</span><br><span class="line">    MOV DX,PORT_ADC;指向0809通道0</span><br><span class="line">    OUT DX,AL;启动转换</span><br><span class="line">    MOV DX,PORT_C</span><br><span class="line">DE_EOC:</span><br><span class="line">    IN AL,DX;读入EOC</span><br><span class="line">    TEST AL,80H</span><br><span class="line">    JZ DE_EOC;为0，未转换完成，继续循环</span><br><span class="line">    MOV DX,PORT_ADC</span><br><span class="line">    IN AL,DX;读取0809数据到AL</span><br><span class="line">    MOV DX,PORT_B;选择B口</span><br><span class="line">    OUT DX,AL;输出到LED灯</span><br><span class="line">    JMP RE</span><br><span class="line">COED ENDS</span><br><span class="line">    END START</span><br></pre></td></tr></table></div></figure>
+
+<p><strong>2、产生锯齿波输出</strong></p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">PORT_DAC EQU 290H;DAC口地址</span><br><span class="line">PORT_A EQU 280H;8255A</span><br><span class="line">PORT_B EQU 281H</span><br><span class="line">PORT_C EQU 282H</span><br><span class="line">PORT_CTL EQU 283H</span><br><span class="line">CLK_0 EQU 288H;8253计数器</span><br><span class="line">CLK_1 EQU 289H</span><br><span class="line">CLK_2 EQU 28AH</span><br><span class="line">CLK_CTL EQU 28BH</span><br><span class="line">CODE SEGMENT</span><br><span class="line">    ASSUME CS:CODE</span><br><span class="line">START:</span><br><span class="line">    MOV DX,PORT_CTL</span><br><span class="line">    MOV AL,10001001B;8255A，A、B输出，C口输入</span><br><span class="line">    OUT DX,AL</span><br><span class="line">    ;产生0.5ms一周期的时钟</span><br><span class="line">    MOV AL,00110111B;通道0，先低后高，方式3，BCD计数</span><br><span class="line">    MOV DX,CLK_CTL</span><br><span class="line">    OUT DX,AL</span><br><span class="line">    MOV DX,CLK_0</span><br><span class="line">    MOV AL,00H</span><br><span class="line">    OUT DX,AL</span><br><span class="line">    MOV AL,10H</span><br><span class="line">    OUT DX,AL</span><br><span class="line">    ;OUT0接CLK1</span><br><span class="line">    MOV AL,01110001B;通道1，先低后高，方式0，BCD计数</span><br><span class="line">    MOV DX,CLK_CTL</span><br><span class="line">    OUT DX,AL</span><br><span class="line">    MOV BL,0FFH;锯齿波上限</span><br><span class="line">AGAIN:</span><br><span class="line">    INC BL</span><br><span class="line">    MOV AL,BL</span><br><span class="line">    MOV DX,PORT_DAC</span><br><span class="line">    OUT DX,AL</span><br><span class="line"></span><br><span class="line">;8253通道0打入初始值，开始计时，延时20ms</span><br><span class="line">    MOV DX,CLK_1</span><br><span class="line">    MOV AL,40H</span><br><span class="line">    OUT DX,AL</span><br><span class="line">    MOV AL,00H</span><br><span class="line">    OUT DX,AL</span><br><span class="line">LOWER:</span><br><span class="line">    MOV DX,PORT_C</span><br><span class="line">    IN AL,DX;C口输入OUT1，检测低电平</span><br><span class="line">    TEST AL,01H</span><br><span class="line">    JNZ LOWER;为低电平，开始计数，不跳转</span><br><span class="line">HEIGHT:</span><br><span class="line">    MOV DX,PORT_C</span><br><span class="line">    IN AL,DX;C口输入OUT1，检测高电平</span><br><span class="line">    TEST AL,01H</span><br><span class="line">    JZ HEIGHT;为高电平，计数结束，不跳转</span><br><span class="line">    ;检测出上升沿，延时结束</span><br><span class="line"></span><br><span class="line">    JMP AGAIN</span><br><span class="line">CODE ENDS</span><br><span class="line">    END START</span><br></pre></td></tr></table></div></figure>
+
+
+        <h3 id="实验结果-2"   >
+          <a href="#实验结果-2" class="heading-link"><i class="fas fa-link"></i></a>实验结果</h3>
+      <p>1、通道的模拟量采集，通过旋转电压调节旋钮，八个 LED 灯，根据电压旋钮方向依次亮起或者依次熄灭；</p>
+<p>2、产生锯齿波输出，通过设计的延时，LED 灯逐渐从暗到亮，电动机开始转动到停止。</p>
+
+        <h3 id="实验小结-2"   >
+          <a href="#实验小结-2" class="heading-link"><i class="fas fa-link"></i></a>实验小结</h3>
+      <p>​ 在微机实验的最后一次实验课中，我完成了利用 0809 采集一个通道模拟量，并通过 8255 输出二进制和利用 0832 和 8253 完成锯齿波波形的输出。实验过程中，因为我将 8253 两个串联定时器的通道选成一样的，导致我一直没有得到正确结果，这说明我对 8253 的理解并不是很透彻，仍需加强练习。8253 我使用了通道 3 改变时钟频率，串联通道 0 计时器，每次都重新打入计数值来进行计数，这样就避免了延时不正确的问题。虽然微机实验课结束了，但是我的学习之路还没有结束，我将继续学习各种芯片的作用，以便扩大我的知识面和增强我的实践能力。</p>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://blog.zyuanlee.cn">Pandalzy</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://blog.zyuanlee.cn/2019/06/28/%E5%BE%AE%E6%9C%BA%E5%8E%9F%E7%90%86%E4%B8%8E%E6%8E%A5%E5%8F%A3%E5%AE%9E%E9%AA%8C/">https://blog.zyuanlee.cn/2019/06/28/%E5%BE%AE%E6%9C%BA%E5%8E%9F%E7%90%86%E4%B8%8E%E6%8E%A5%E5%8F%A3%E5%AE%9E%E9%AA%8C/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://blog.zyuanlee.cn/tags/%E5%BE%AE%E6%9C%BA%E5%8E%9F%E7%90%86%E4%B8%8E%E6%8E%A5%E5%8F%A3%E5%AE%9E%E9%AA%8C/">微机原理与接口实验</a></span></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2019/07/14/Flask%E5%AD%A6%E4%B9%A002-Flask%E4%B8%8EHTTP/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">Flask学习02-Flask与HTTP</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2019/05/27/Flask%E5%AD%A6%E4%B9%A001-%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B/"><span class="paginator-prev__text">Flask学习01 - 快速上手</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E4%B8%80"><span class="toc-number">1.</span> <span class="toc-text">
+          实验一</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E9%A2%98%E7%9B%AE%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">
+          实验题目：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E7%9B%AE%E7%9A%84%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">
+          实验目的：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E7%94%B5%E8%B7%AF%E5%9B%BE"><span class="toc-number">1.3.</span> <span class="toc-text">
+          实验电路图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1%E7%A8%8B%E5%BA%8F%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="toc-number">1.4.</span> <span class="toc-text">
+          软件设计程序流程图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E8%BD%AF%E4%BB%B6%E4%BB%A3%E7%A0%81%EF%BC%88%E5%8A%A0%E6%B3%A8%E9%87%8A%EF%BC%89"><span class="toc-number">1.5.</span> <span class="toc-text">
+          实验软件代码（加注释）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="toc-number">1.6.</span> <span class="toc-text">
+          实验结果</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E5%B0%8F%E7%BB%93"><span class="toc-number">1.7.</span> <span class="toc-text">
+          实验小结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E4%BA%8C"><span class="toc-number">2.</span> <span class="toc-text">
+          实验二</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E9%A2%98%E7%9B%AE%EF%BC%9A-1"><span class="toc-number">2.1.</span> <span class="toc-text">
+          实验题目：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E7%9B%AE%E7%9A%84%EF%BC%9A-1"><span class="toc-number">2.2.</span> <span class="toc-text">
+          实验目的：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E7%94%B5%E8%B7%AF%E5%9B%BE-1"><span class="toc-number">2.3.</span> <span class="toc-text">
+          实验电路图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1%E7%A8%8B%E5%BA%8F%E6%B5%81%E7%A8%8B%E5%9B%BE-1"><span class="toc-number">2.4.</span> <span class="toc-text">
+          软件设计程序流程图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E8%BD%AF%E4%BB%B6%E4%BB%A3%E7%A0%81%EF%BC%88%E5%8A%A0%E6%B3%A8%E9%87%8A%EF%BC%89-1"><span class="toc-number">2.5.</span> <span class="toc-text">
+          实验软件代码（加注释）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C-1"><span class="toc-number">2.6.</span> <span class="toc-text">
+          实验结果</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E5%B0%8F%E7%BB%93-1"><span class="toc-number">2.7.</span> <span class="toc-text">
+          实验小结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E4%B8%89"><span class="toc-number">3.</span> <span class="toc-text">
+          实验三</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E9%A2%98%E7%9B%AE%EF%BC%9A-2"><span class="toc-number">3.1.</span> <span class="toc-text">
+          实验题目：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E7%9B%AE%E7%9A%84%EF%BC%9A-2"><span class="toc-number">3.2.</span> <span class="toc-text">
+          实验目的：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E7%94%B5%E8%B7%AF%E5%9B%BE-2"><span class="toc-number">3.3.</span> <span class="toc-text">
+          实验电路图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1%E7%A8%8B%E5%BA%8F%E6%B5%81%E7%A8%8B%E5%9B%BE-2"><span class="toc-number">3.4.</span> <span class="toc-text">
+          软件设计程序流程图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E8%BD%AF%E4%BB%B6%E4%BB%A3%E7%A0%81%EF%BC%88%E5%8A%A0%E6%B3%A8%E9%87%8A%EF%BC%89-2"><span class="toc-number">3.5.</span> <span class="toc-text">
+          实验软件代码（加注释）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C-2"><span class="toc-number">3.6.</span> <span class="toc-text">
+          实验结果</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E5%B0%8F%E7%BB%93-2"><span class="toc-number">3.7.</span> <span class="toc-text">
+          实验小结</span></a></li></ol></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/assets/avatar.jpg" alt="avatar"></div><p class="sidebar-ov-author__text">Stay hungry, stay foolish.</p></div><div class="sidebar-ov-social"></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">45</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">7</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">31</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2021</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>Pandalzy</span></div><div><span>由 <a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> 强力驱动</span><span> v5.4.0</span><span class="footer__devider">|</span><span>主题 - <a href="https://github.com/liuyib/hexo-theme-stun/" title="Stun" target="_blank" rel="noopener">Stun</a></span><span> v2.1.1</span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><div class="search-mask"></div><div class="search-popup"><span class="search-close"></span><div class="search-input"><input placeholder="搜索文章（支持多关键词，请用空格分隔）"></div><div class="search-results"></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script>function initSearch() {
+  var isXML = true;
+  var search_path = 'search.xml';
+
+  if (!search_path) {
+    search_path = 'search.xml';
+  } else if (/json$/i.test(search_path)) {
+    isXML = false;
+  }
+
+  var path = '/' + search_path;
+  $.ajax({
+    url: path,
+    dataType: isXML ? 'xml' : 'json',
+    async: true,
+    success: function (res) {
+      var datas = isXML ? $('entry', res).map(function () {
+        // 将 XML 转为 JSON
+        return {
+          title: $('title', this).text(),
+          content: $('content', this).text(),
+          url: $('url', this).text()
+        };
+      }).get() : res;
+      var $input = $('.search-input input');
+      var $result = $('.search-results');
+      // 搜索对象（标题、内容）的权重，影响显示顺序
+      var WEIGHT = { title: 100, content: 1 };
+      var searchPost = function () {
+        var searchText = $input.val().toLowerCase().trim();
+        // 根据空白字符分隔关键字
+        var keywords = searchText.split(/[\s]+/);
+        // 搜索结果
+        var matchPosts = [];
+
+        // 有多个关键字时，将原文字整个保存下来
+        if (keywords.length > 1) {
+          keywords.push(searchText);
+        }
+        // 防止未输入字符时搜索
+        if (searchText.length > 0) {
+          datas.forEach(function (data) {
+            var isMatch  = false;
+            // 没有标题的文章使用预设的 i18n 变量代替
+            var title = (data.title && data.title.trim()) || '[ 文章无标题 ]';
+            var titleLower = title && title.toLowerCase();
+            // 删除 HTML 标签 和 所有空白字符
+            var content = data.content && data.content.replace(/<[^>]+>/g, '');
+            var contentLower = content && content.toLowerCase();
+            // 删除重复的 /
+            var postURL = data.url && decodeURI(data.url).replace(/\/{2,}/g, '/');
+            // 标题中匹配到的关键词
+            var titleHitSlice = [];
+            // 内容中匹配到的关键词
+            var contentHitSlice = [];
+
+            keywords.forEach(function (keyword) {
+              /**
+              * 获取匹配的关键词的索引
+              * @param {String} keyword 要匹配的关键字
+              * @param {String} text 原文字
+              * @param {Boolean} caseSensitive 是否区分大小写
+              * @param {Number} weight 匹配对象的权重。权重大的优先显示
+              * @return {Array}
+              */
+              function getIndexByword (word, text, caseSensitive, weight) {
+                if (!word || !text) {
+                  return [];
+                };
+
+                var startIndex = 0; // 每次匹配的开始索引
+                var index = -1;     // 匹配到的索引值
+                var result = [];    // 匹配结果
+
+                if (!caseSensitive) {
+                  word = word.toLowerCase();
+                  text = text.toLowerCase();
+                }
+
+                while((index = text.indexOf(word, startIndex)) !== -1) {
+                  var hasMatch = false;
+                  // 索引位置相同的关键词，保留长度较长的
+                  titleHitSlice.forEach(function (hit) {
+                    if (hit.index === index && hit.word.length < word.length) {
+                      hit.word = word;
+                      hasMatch = true;
+                    }
+                  });
+                  startIndex = index + word.length;
+                  !hasMatch && result.push({ index: index, word: word, weight: weight });
+                }
+                return result;
+              }
+              titleHitSlice = titleHitSlice.concat(getIndexByword(keyword, titleLower, false, WEIGHT.title));
+              contentHitSlice = contentHitSlice.concat(getIndexByword(keyword, contentLower, false, WEIGHT.content));
+            });
+
+            var hitTitle = titleHitSlice.length;
+            var hitContent = contentHitSlice.length;
+
+            if (hitTitle > 0 || hitContent > 0) {
+              isMatch = true;
+            }
+            if (isMatch) {
+              ;[titleHitSlice, contentHitSlice].forEach(function (hit) {
+                // 按照匹配文字的索引的递增顺序排序
+                hit.sort(function (left, right) {
+                  return left.index - right.index;
+                });
+              });
+              /**
+              * 给文本中匹配到的关键词添加标记，从而进行高亮显示
+              * @param {String} text 原文本
+              * @param {Array} hitSlice 匹配项的索引信息
+              * @param {Number} start 开始索引
+              * @param {Number} end 结束索引
+              * @return {String}
+              */
+              function highlightKeyword (text, hitSlice, start, end) {
+                if (!text || !hitSlice || !hitSlice.length) {
+                  return;
+                }
+
+                var result = '';
+                var startIndex = start;
+                var endIndex = end;
+                hitSlice.forEach(function (hit) {
+                  if (hit.index < startIndex) {
+                    return;
+                  }
+
+                  var hitWordEnd = hit.index + hit.word.length;
+                  result += text.slice(startIndex, hit.index);
+                  result += '<b>' + text.slice(hit.index, hitWordEnd) + '</b>';
+                  startIndex = hitWordEnd;
+                });
+                result += text.slice(startIndex, endIndex);
+                return result;
+              }
+
+              var postData = {};
+              // 文章总的搜索权重
+              var postWeight = titleHitSlice.length * WEIGHT.title + contentHitSlice.length * WEIGHT.content;
+              // 标记匹配关键词后的标题
+              var postTitle = highlightKeyword(title, titleHitSlice, 0, title.length) || title;
+              // 标记匹配关键词后的内容
+              var postContent;
+              // 显示内容的长度
+              var SHOW_WORD_LENGTH = 200;
+              // 命中关键词前的字符显示长度
+              var SHOW_WORD_FRONT_LENGTH = 20;
+              var SHOW_WORD_END_LENGTH = SHOW_WORD_LENGTH - SHOW_WORD_FRONT_LENGTH;
+
+              // 截取匹配的第一个字符，前后共 200 个字符来显示
+              if (contentHitSlice.length > 0) {
+                var firstIndex = contentHitSlice[0].index;
+                var start = firstIndex > SHOW_WORD_FRONT_LENGTH ? firstIndex - SHOW_WORD_FRONT_LENGTH : 0;
+                var end = firstIndex + SHOW_WORD_END_LENGTH;
+                postContent = highlightKeyword(content, contentHitSlice, start, end);
+              } else { // 未匹配到内容，直接截取前 200 个字符来显示
+                postContent = content.slice(0, SHOW_WORD_LENGTH);
+              }
+              postData.title = postTitle;
+              postData.content = postContent;
+              postData.url = postURL;
+              postData.weight = postWeight;
+              matchPosts.push(postData);
+            }
+          });
+        }
+
+        var resultInnerHtml = '';
+        if (matchPosts.length) {
+          // 按权重递增的顺序排序，使权重大的优先显示
+          matchPosts.sort(function (left, right) {
+            return right.weight - left.weight;
+          });
+          resultInnerHtml += '<ul>';
+          matchPosts.forEach(function (post) {
+            resultInnerHtml += '<li><a class="search-results-title" href="' + post.url + '">';
+            resultInnerHtml += post.title;
+            resultInnerHtml += '</a><div class="search-results-content">';
+            resultInnerHtml += post.content;
+            resultInnerHtml += '</div></li>';
+          });
+          resultInnerHtml += '</ul>';
+        } else {
+          resultInnerHtml += '<div class="search-results-none"><i class="far fa-meh"></i></div>';
+        }
+        $result.html(resultInnerHtml);
+      };
+      $input.on('input', searchPost);
+      $input.on('keyup', function (e) {
+        if (e.keyCode === Stun.utils.codeToKeyCode('Enter')) {
+          searchPost();
+        }
+      });
+    }
+  });
+}
+
+function closeSearch () {
+  $('body').css({ overflow: 'auto' });
+  $('.search-popup').css({ display: 'none' });
+  $('.search-mask').css({ display: 'none' });
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+  Stun.utils.pjaxReloadLocalSearch = function () {
+    $('.header-nav-search').on('click', function (e) {
+      e.stopPropagation();
+      $('body').css('overflow', 'hidden');
+      $('.search-popup')
+        .velocity('stop')
+        .velocity('transition.expandIn', {
+          duration: 300,
+          complete: function () {
+            $('.search-popup input').focus();
+          }
+        });
+      $('.search-mask')
+        .velocity('stop')
+        .velocity('transition.fadeIn', {
+          duration: 300
+        });
+
+      initSearch();
+    });
+    $('.search-mask, .search-close').on('click', function () {
+      closeSearch();
+    });
+    $(document).on('keydown', function (e) {
+      // Escape <=> 27
+      if (e.keyCode === Stun.utils.codeToKeyCode('Escape')) {
+        closeSearch();
+      }
+    });
+  };
+
+  Stun.utils.pjaxReloadLocalSearch();
+}, false);</script><script src="/js/utils.js?v=2.1.1"></script><script src="/js/stun-boot.js?v=2.1.1"></script><script src="/js/scroll.js?v=2.1.1"></script><script src="/js/header.js?v=2.1.1"></script><script src="/js/sidebar.js?v=2.1.1"></script><script type="application/json" src="/search.xml"></script></body></html>

@@ -1,0 +1,673 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/assets/avatar_16x16.jpg?v=2.1.1" type="image/png" sizes="16x16"><link rel="icon" href="/assets/avatar_32x32.jpg?v=2.1.1" type="image/png" sizes="32x32"><meta name="description" content="卷积神经网络简介                           与传统多层神经网络对比        传统意义上的多层神经网络是只有输入层、隐藏层与输出层。其中隐藏层的层数根据需要而定，没有明确的理论推导来说明到底多少层合适 卷积神经网络 CNN，在原来多层神经网络的基础上，加入了更加有效的特征学习部分，具体操作就是在原来的全连接层前面加入了卷积层与池化层。卷积神经网络">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TensorFlow卷积神经网络">
+<meta property="og:url" content="https://blog.zyuanlee.cn/2020/03/19/TensorFlow%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/index.html">
+<meta property="og:site_name" content="Pandalzy&#39;s Blog">
+<meta property="og:description" content="卷积神经网络简介                           与传统多层神经网络对比        传统意义上的多层神经网络是只有输入层、隐藏层与输出层。其中隐藏层的层数根据需要而定，没有明确的理论推导来说明到底多少层合适 卷积神经网络 CNN，在原来多层神经网络的基础上，加入了更加有效的特征学习部分，具体操作就是在原来的全连接层前面加入了卷积层与池化层。卷积神经网络">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200314195926.png">
+<meta property="article:published_time" content="2020-03-19T11:13:27.000Z">
+<meta property="article:modified_time" content="2021-06-27T00:34:28.403Z">
+<meta property="article:author" content="Pandalzy">
+<meta property="article:tag" content="TensorFlow">
+<meta property="article:tag" content="深度学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200314195926.png"><title>TensorFlow卷积神经网络 | Pandalzy's Blog</title><link ref="canonical" href="https://blog.zyuanlee.cn/2020/03/19/TensorFlow%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.1.1"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":true},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"carbon","highlight":"light","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: undefined,
+  lazyload: false,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.4.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/about/"><span class="header-nav-menu-item__icon"><i class="fas fa-address-card"></i></span><span class="header-nav-menu-item__text">关于</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/friends/"><span class="header-nav-menu-item__icon"><i class="fas fa-user-friends"></i></span><span class="header-nav-menu-item__text">友链</span></a></div></div><div class="header-nav-search"><span class="header-nav-search__icon"><i class="fas fa-search"></i></span><span class="header-nav-search__text">搜索</span></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">Pandalzy's Blog</div><div class="header-banner-info__subtitle">Stay hungry, stay foolish.</div></div><div class="header-banner-arrow"><div class="header-banner-arrow__icon"><i class="fas fa-angle-down"></i></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">TensorFlow卷积神经网络</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2020-03-19</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-06-27</span></span></div></header><div class="post-body">
+        <h2 id="卷积神经网络简介"   >
+          <a href="#卷积神经网络简介" class="heading-link"><i class="fas fa-link"></i></a>卷积神经网络简介</h2>
+      
+        <h3 id="与传统多层神经网络对比"   >
+          <a href="#与传统多层神经网络对比" class="heading-link"><i class="fas fa-link"></i></a>与传统多层神经网络对比</h3>
+      <ul>
+<li>传统意义上的多层神经网络是只有输入层、隐藏层与输出层。其中隐藏层的层数根据需要而定，没有明确的理论推导来说明到底多少层合适</li>
+<li>卷积神经网络 CNN，在原来多层神经网络的基础上，加入了更加有效的特征学习部分，具体操作就是在原来的全连接层前面加入了卷积层与池化层。<strong>卷积神经网络出现，使得神经网络层数得以加深，“深度”学习由此而来</strong><span id="more"></span>
+
+</li>
+</ul>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">输入层</span><br><span class="line">隐藏层</span><br><span class="line">	卷积层</span><br><span class="line">	激活层</span><br><span class="line">	池化层</span><br><span class="line">	全连接层</span><br><span class="line">输出层</span><br></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p>通常所说的深度学习，一般指的是这些 CNN 等新的结构以及一些新的方法（比如新的激活函数 Relu 等），解决了传统多层神经网路的一些难以解决的问题</p>
+</blockquote>
+
+        <h2 id="卷积神经网络原理"   >
+          <a href="#卷积神经网络原理" class="heading-link"><i class="fas fa-link"></i></a>卷积神经网络原理</h2>
+      <p>在隐藏层加入卷积层和池化层，激活层</p>
+
+        <h3 id="结构"   >
+          <a href="#结构" class="heading-link"><i class="fas fa-link"></i></a>结构</h3>
+      <ul>
+<li>卷积层<ul>
+<li>通过在原始图像上平移来提取特征</li>
+</ul>
+</li>
+<li>激活层<ul>
+<li>增加非线性分割能力</li>
+</ul>
+</li>
+<li>池化层<ul>
+<li>减少学习的参数，降低网络的复杂度（最大池化和平均池化）</li>
+</ul>
+</li>
+<li>全连接层<ul>
+<li>为了能够达到分类效果</li>
+</ul>
+</li>
+</ul>
+
+        <h3 id="卷积层（Convolution-Layer）"   >
+          <a href="#卷积层（Convolution-Layer）" class="heading-link"><i class="fas fa-link"></i></a>卷积层（Convolution Layer）</h3>
+      <p>卷积神经网络中每层卷积层由若干卷积单元（卷积核）组成，每个卷积单元的参数都是通过反向传播算法最佳化得到的。</p>
+<p>卷积运算的目的是特征提取，第一层卷积层可能只能提取一些低级的特征如，边缘、线条和角等层级，更多层的网络能从低级特征中迭代提取更复杂的特征</p>
+<p>卷积核、filter、过滤器、模型参数、卷积单元，相同</p>
+
+        <h4 id="卷积核四大要素"   >
+          <a href="#卷积核四大要素" class="heading-link"><i class="fas fa-link"></i></a>卷积核四大要素</h4>
+      <ul>
+<li>个数<ul>
+<li>不同的卷积核带的权重和偏置都不一样，即随机初始化的参数</li>
+</ul>
+</li>
+<li>大小<ul>
+<li><code>1*1 3*3 5*5</code></li>
+</ul>
+</li>
+<li>步长<ul>
+<li>跳几格</li>
+</ul>
+</li>
+<li>零填充大小</li>
+</ul>
+<p>卷积核可以理解为一个观察的人，带着若干权重和一个偏置去观察，进行特征加运算</p>
+<p><img src="https://raw.githubusercontent.com/Pandalzy/cloud_img/master/img/blog20200314195926.png"></p>
+<blockquote>
+<p>上述要加上偏置</p>
+</blockquote>
+
+        <h4 id="输出大小计算公式"   >
+          <a href="#输出大小计算公式" class="heading-link"><i class="fas fa-link"></i></a>输出大小计算公式</h4>
+      <ul>
+<li>输出体积大小<code>H1*W1*D1</code><ul>
+<li>输入图像<code>32*32*1</code></li>
+</ul>
+</li>
+<li>四个超参数<ul>
+<li>filter 数量 K</li>
+<li>filter 大小 F</li>
+<li>步长 S</li>
+<li>零填充大小 P</li>
+</ul>
+</li>
+<li>输出体积大小<code>H2*W2*D2</code><ul>
+<li><code>H2=(H1-F+2P)/S+1</code></li>
+<li><code>W2=(W1-F+2P)/S+1</code></li>
+<li><code>D2=K</code></li>
+</ul>
+</li>
+</ul>
+
+        <h4 id="计算案例"   >
+          <a href="#计算案例" class="heading-link"><i class="fas fa-link"></i></a>计算案例</h4>
+      <ul>
+<li><p>假设已知的条件：输入图像<code>32*32*1</code>，50 个 filter，大小为<code>5*5</code>，移动步长为 1，零填充为 1，请求出输出大小</p>
+<ul>
+<li><code>H2=(H1-F+2P)/S+1=(32-5+2)/1+1=30</code></li>
+<li><code>W2=(H1-F+2P)/S+1=(32-5+2)/1+1=30</code></li>
+<li><code>D2=K=50</code></li>
+<li><code>[30, 30, 50]</code></li>
+</ul>
+</li>
+<li><p>假设已知的条件：输入图像<code>32*32*1</code>，50 个 filter，大小为<code>3*3</code>，移动步长为 1，输出大小<code>32*32</code>，求零填充</p>
+</li>
+</ul>
+
+        <h4 id="多通道图片观察"   >
+          <a href="#多通道图片观察" class="heading-link"><i class="fas fa-link"></i></a>多通道图片观察</h4>
+      
+        <h3 id="卷积网络-API"   >
+          <a href="#卷积网络-API" class="heading-link"><i class="fas fa-link"></i></a>卷积网络 API</h3>
+      <ul>
+<li><code>tf.nn.conv2d(input, filter, strides, padding, name)</code><ul>
+<li>计算给定 4-D input 和 filter 张量的 2 维卷积</li>
+<li>input：给定的输入张量，具有<code>[batch, height, width, channel]</code>，类型为 float32, 64<ul>
+<li>batch：批数量</li>
+</ul>
+</li>
+<li>filter：指定过滤器的权重数量<ul>
+<li><code>[filter_height, filter_width, in_channels, out_channels]</code><ul>
+<li>[卷积核的高度，卷积核的宽度，图像通道数，卷积核个数]</li>
+<li>第三维<code>in_channels</code>，就是参数 input 的第四维</li>
+</ul>
+</li>
+<li>变量，<code>initial_value=random_normal(shape=[F, F, 3/1, K])</code></li>
+</ul>
+</li>
+<li>strides：<code>strides = [1, stride, stride, 1]</code>，步长</li>
+<li>padding：“SAME”，“VAKID”</li>
+</ul>
+</li>
+<li>零填充的两种方式<ul>
+<li>SAME：越过边缘取样，取样的面积和输入图像的像素宽度一致<ul>
+<li>公式：<code>ceil(H/S)</code><ul>
+<li>H 为输入图片的高或者宽，S 为步长</li>
+<li>无论过滤器的大小是多少，零填充的数量由 API 计算</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>VALID：不越过边缘取样，取样的面积小于输入人的图像的像素宽度，不填充</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>在 Tensorflow 中，卷积 API 设置为“SAME”之后，如果步长为 1，输出高度与输入大小一样</p>
+</blockquote>
+
+        <h3 id="激活函数"   >
+          <a href="#激活函数" class="heading-link"><i class="fas fa-link"></i></a>激活函数</h3>
+      
+        <h4 id="Relu"   >
+          <a href="#Relu" class="heading-link"><i class="fas fa-link"></i></a>Relu</h4>
+      <p>$$<br>relu=max(0,x)<br>$$</p>
+<p>x 小于 0，值为 0，大于 0，为其本身</p>
+
+        <h4 id="为什么采用新的激活函数"   >
+          <a href="#为什么采用新的激活函数" class="heading-link"><i class="fas fa-link"></i></a>为什么采用新的激活函数</h4>
+      <ul>
+<li>Relu 优点<ul>
+<li>有效解决梯度消失问题</li>
+<li>计算速度非常快，只需要判断输入是否大于 0，SGD（批梯度下降）的求解速度远快于 sigmoid 和 tanh</li>
+</ul>
+</li>
+<li>sigmoid 缺点<ul>
+<li>计算量相对较大，在深层网络中，sigmoid 函数反向传播时，很容易就会出现梯度消失的情况</li>
+</ul>
+</li>
+</ul>
+
+        <h4 id="激活函数-API"   >
+          <a href="#激活函数-API" class="heading-link"><i class="fas fa-link"></i></a>激活函数 API</h4>
+      <ul>
+<li><code>tf.nn.relu(features, name=None)</code><ul>
+<li>features：卷积后加上偏置的结果</li>
+<li>return：结果</li>
+</ul>
+</li>
+</ul>
+
+        <h3 id="池化层"   >
+          <a href="#池化层" class="heading-link"><i class="fas fa-link"></i></a>池化层</h3>
+      <p>Pooling 层主要的作用是特征提取，通过去掉 Feature Map 中不重要的样本，进一步减少参数的数量。方法有很多，通常采用最大池化</p>
+<ul>
+<li>max_polling：取池化窗口的最大值</li>
+<li>avg_poling：取池化窗口的平均值</li>
+</ul>
+
+        <h4 id="池化层-API"   >
+          <a href="#池化层-API" class="heading-link"><i class="fas fa-link"></i></a>池化层 API</h4>
+      <ul>
+<li><code>tf.nn.max_pool(value, ksize, strides, padding, name)</code><ul>
+<li>输入上执行最大池数</li>
+<li>value：4-D Tensor 形状<code>[batch, height, width, channel]</code></li>
+<li>channel：不是原始图片的通道数，而是多少 filter 观察</li>
+<li>ksize：池化窗口大小，<code>[1, ksize, ksize, 1]</code></li>
+<li>strides：步长大小，<code>[1, strides, strides, 1]</code></li>
+<li>padding：使用填充算法类型，“SAME”，“VAKID”</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>卷积向下取整，池化向上取整</p>
+</blockquote>
+
+        <h2 id="案例：CNN-Mnist-手写数字识别"   >
+          <a href="#案例：CNN-Mnist-手写数字识别" class="heading-link"><i class="fas fa-link"></i></a>案例：CNN-Mnist 手写数字识别</h2>
+      
+        <h3 id="网络设计"   >
+          <a href="#网络设计" class="heading-link"><i class="fas fa-link"></i></a>网络设计</h3>
+      <ul>
+<li>第一个卷积大层<ul>
+<li>卷积层：32 个 filter、大小 5*5、strides=1、padding=’SAME’<ul>
+<li><code>tf.nn.conv2d(input, filter, strides, padding&#39;SAME&#39;)</code></li>
+<li>input<ul>
+<li><code>[None, 28, 28, 1]</code></li>
+</ul>
+</li>
+<li>filter<ul>
+<li><code>weights = tf.Variable(initial_value=tf.random_normal(shape=[5, 5, 1, 32]))</code></li>
+<li><code>bias = tf.Variable(initial_value=tf.random_normal(shape=[32]))</code></li>
+</ul>
+</li>
+<li>strides<ul>
+<li><code>[1, 1, 1, 1]</code></li>
+</ul>
+</li>
+<li>输出形状：<code>[None, 28, 28, 32]</code></li>
+</ul>
+</li>
+<li>激活层：Relu<ul>
+<li><code>tf.nn.relu(features)</code></li>
+</ul>
+</li>
+<li>池化层：大小<code>2*2</code>、strides=2<ul>
+<li><code>tf.nn.max_pool()</code></li>
+<li>输入形状：<code>[None, 28, 28, 32]</code></li>
+<li>输出形状：<code>[None, 14, 14, 32]</code>（公式计算）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>第二个卷积大层<ul>
+<li>卷积层：64 个 filter、大小 5*5、strides=1、padding=’SAME’<ul>
+<li><code>tf.nn.conv2d(input, filter, strides, padding&#39;SAME&#39;)</code></li>
+<li>input<ul>
+<li><code>[None, 14, 14, 32]</code></li>
+</ul>
+</li>
+<li>filter<ul>
+<li><code>weights = tf.Variable(initial_value=tf.random_normal(shape=[5, 5, 32, 64]))</code></li>
+<li><code>bias = tf.Variable(initial_value=tf.random_normal(shape=[64]))</code></li>
+</ul>
+</li>
+<li>strides<ul>
+<li><code>[1, 1, 1, 1]</code></li>
+</ul>
+</li>
+<li>输出形状：<code>[None, 14, 14, 64]</code></li>
+</ul>
+</li>
+<li>激活层：Relu<ul>
+<li><code>tf.nn.relu(features)</code></li>
+</ul>
+</li>
+<li>池化层：大小<code>2*2</code>、strides=2<ul>
+<li>输入形状：<code>[None, 14, 14, 64]</code></li>
+<li>输出形状：<code>[None, 7, 7, 64]</code>（公式计算）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>全连接层<ul>
+<li><code>tf.reshape()</code></li>
+<li><code>[None, 7, 7, 64]-&gt;[None, 7*7*64]</code></li>
+<li><code>[None, 7*7*64] * [7*7*64, 10] = [None, 10]</code></li>
+<li><code>y_predict = tf.matmul(pool2, weights) + bias</code></li>
+</ul>
+</li>
+</ul>
+
+        <h3 id="调参：提高准确率"   >
+          <a href="#调参：提高准确率" class="heading-link"><i class="fas fa-link"></i></a>调参：提高准确率</h3>
+      <ul>
+<li>学习率，一般：0.01</li>
+<li>随机初始化的权重、偏置的值<ul>
+<li><code>tf.Variable(initial_value=tf.random_normal(shape=shape, stddev=0.01))</code></li>
+<li><code>stddev</code></li>
+</ul>
+</li>
+<li>选择优化器<ul>
+<li><code>tf.train.AdamOptimizer(0.01).minimize(loss)</code></li>
+</ul>
+</li>
+<li>调整网络<ul>
+<li>使用<code>batch normalization</code>：批标准化</li>
+<li><code>droupout</code>层：使一些神经元失效</li>
+<li>防止过拟合</li>
+</ul>
+</li>
+</ul>
+
+        <h3 id="改为高级-API"   >
+          <a href="#改为高级-API" class="heading-link"><i class="fas fa-link"></i></a>改为高级 API</h3>
+      
+        <h3 id="主要代码"   >
+          <a href="#主要代码" class="heading-link"><i class="fas fa-link"></i></a>主要代码</h3>
+      <figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">create_model</span>(<span class="params">x</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    实现构建卷积神经网络</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    y_predict = <span class="number">0</span></span><br><span class="line">    <span class="comment"># 第一个卷积大层</span></span><br><span class="line">    <span class="keyword">with</span> tf.variable_scope(<span class="string">&#x27;conv1&#x27;</span>):</span><br><span class="line">        <span class="comment"># 卷积层</span></span><br><span class="line">        input_x = tf.reshape(x, shape=[-<span class="number">1</span>, <span class="number">28</span>, <span class="number">28</span>, <span class="number">1</span>])</span><br><span class="line"></span><br><span class="line">        conv1_weights = create_variable([<span class="number">5</span>, <span class="number">5</span>, <span class="number">1</span>, <span class="number">32</span>])</span><br><span class="line">        conv1_bias = create_variable([<span class="number">32</span>])</span><br><span class="line">        conv1_x = tf.nn.conv2d(input_x, <span class="built_in">filter</span>=conv1_weights, strides=[<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>], padding=<span class="string">&#x27;SAME&#x27;</span>) + conv1_bias</span><br><span class="line">        <span class="comment"># 激活层</span></span><br><span class="line">        relu1_x = tf.nn.relu(conv1_x)</span><br><span class="line">        <span class="comment"># 池化层</span></span><br><span class="line">        pool1_x = tf.nn.max_pool(relu1_x, ksize=[<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">1</span>], strides=[<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">1</span>], padding=<span class="string">&quot;SAME&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 第二个卷积大层</span></span><br><span class="line">    <span class="keyword">with</span> tf.variable_scope(<span class="string">&#x27;conv2&#x27;</span>):</span><br><span class="line">        <span class="comment"># 卷积层</span></span><br><span class="line"></span><br><span class="line">        conv2_weights = create_variable([<span class="number">5</span>, <span class="number">5</span>, <span class="number">32</span>, <span class="number">64</span>])</span><br><span class="line">        conv2_bias = create_variable([<span class="number">64</span>])</span><br><span class="line">        conv2_x = tf.nn.conv2d(pool1_x, <span class="built_in">filter</span>=conv2_weights, strides=[<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>], padding=<span class="string">&#x27;SAME&#x27;</span>) + conv2_bias</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 激活层</span></span><br><span class="line">        relu2_x = tf.nn.relu(conv2_x)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 池化层</span></span><br><span class="line">        pool2_x = tf.nn.max_pool(relu2_x, ksize=[<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">1</span>], strides=[<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">1</span>], padding=<span class="string">&quot;SAME&quot;</span>)</span><br><span class="line">    <span class="comment"># 全连接层</span></span><br><span class="line">    <span class="keyword">with</span> tf.variable_scope(<span class="string">&quot;full_connection&quot;</span>):</span><br><span class="line">        <span class="comment"># [None, 7, 7, 64]-&gt;[None, 7 * 7 * 64]</span></span><br><span class="line">        <span class="comment"># [None, 7 * 7 * 64] * [7 * 7 * 64, 10] = [None, 10]</span></span><br><span class="line">        x_fc = tf.reshape(pool2_x, shape=[-<span class="number">1</span>, <span class="number">7</span> * <span class="number">7</span> * <span class="number">64</span>])</span><br><span class="line">        weights_fc = create_variable(shape=[<span class="number">7</span> * <span class="number">7</span> * <span class="number">64</span>, <span class="number">10</span>])</span><br><span class="line">        bias_fc = create_variable(shape=[<span class="number">10</span>])</span><br><span class="line">        y_predict = tf.matmul(x_fc, weights_fc) + bias_fc</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> y_predict</span><br></pre></td></tr></table></div></figure>
+
+
+        <h2 id="实战：验证码识别"   >
+          <a href="#实战：验证码识别" class="heading-link"><i class="fas fa-link"></i></a>实战：验证码识别</h2>
+      
+        <h3 id="数据集"   >
+          <a href="#数据集" class="heading-link"><i class="fas fa-link"></i></a>数据集</h3>
+      <p>一个图片对应 4 个目标值</p>
+<p><code>NZPP -&gt; [13, 25, 15, 15] -&gt; [[one-hot], [], [], []]</code></p>
+
+        <h3 id="损失衡量"   >
+          <a href="#损失衡量" class="heading-link"><i class="fas fa-link"></i></a>损失衡量</h3>
+      <p>softmax 交叉熵，只适用于类别相互排斥的，一个样本对应一个目标值</p>
+<p><code>[4, 26] -&gt; [4*26]</code></p>
+<p>使用 sigmoid 交叉熵</p>
+<ul>
+<li><p>sigmoid 交叉熵损失函数</p>
+</li>
+<li><p><code>tf.nn.sigmoid_cross_entropy_with_logits(labels=None, logits=None)</code></p>
+<ul>
+<li>labels：真实值，为 one_hot 编码形式，和 logits 一样</li>
+<li>logits：logits 值，输出层的加权计算结果</li>
+</ul>
+</li>
+<li><p>对真实值进行 one_hot 编码</p>
+</li>
+<li><p><code>tf.one_hot(indices, depth, axis=None, name=None)</code></p>
+<ul>
+<li>indices：需要编码的张量</li>
+<li>depth：one_hot 编码的深度，这里 26 个字母，为 26</li>
+<li>axis：填充的维度，默认是-1</li>
+</ul>
+</li>
+</ul>
+
+        <h3 id="流程分析"   >
+          <a href="#流程分析" class="heading-link"><i class="fas fa-link"></i></a>流程分析</h3>
+      <ol>
+<li>读取图片数据<ol>
+<li>filename -&gt; 标签值</li>
+</ol>
+</li>
+<li>解析 csv 文件，将标签值转为<code>[字母序号, 字母序号, 字母序号, 字母序号]</code></li>
+<li>将 filename 与标签值联系起来</li>
+<li>构建卷积神经网络<ol>
+<li>利用手写识别网络</li>
+<li>产生 y_predict</li>
+</ol>
+</li>
+<li>构造损失函数</li>
+<li>优化损失</li>
+<li>计算准确率</li>
+<li>开启会话、开启线程</li>
+</ol>
+
+        <h3 id="代码"   >
+          <a href="#代码" class="heading-link"><i class="fas fa-link"></i></a>代码</h3>
+      <figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">import</span> glob</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">read_pic</span>():</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    读取图片数据</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="comment"># 1、文件队列</span></span><br><span class="line">    file_names = glob.glob(<span class="string">&#x27;./GenPics/*.jpg&#x27;</span>)</span><br><span class="line">    file_queue = tf.train.string_input_producer(file_names)</span><br><span class="line">    <span class="comment"># 2、读取与解码</span></span><br><span class="line">    reader = tf.WholeFileReader()</span><br><span class="line">    file_name, image = reader.read(file_queue)</span><br><span class="line">    decoded = tf.image.decode_jpeg(image)</span><br><span class="line">    <span class="comment"># 更新形状，将图片形状确定下来</span></span><br><span class="line">    decoded.set_shape([<span class="number">20</span>, <span class="number">80</span>, <span class="number">3</span>])</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 修改图片类型</span></span><br><span class="line">    image_cast = tf.cast(decoded, tf.float32)</span><br><span class="line">    <span class="comment"># 3、批处理</span></span><br><span class="line">    filename_batch, image_batch = tf.train.batch([file_name, image_cast], batch_size=<span class="number">100</span>, num_threads=<span class="number">1</span>, capacity=<span class="number">200</span>)</span><br><span class="line">    <span class="keyword">return</span> filename_batch, image_batch</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parse_csv</span>():</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    解析csv文件，建立文件名与标签值表格</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    csv_data = pd.read_csv(<span class="string">&quot;./GenPics/labels.csv&quot;</span>, names=[<span class="string">&quot;file_num&quot;</span>, <span class="string">&quot;chars&quot;</span>], index_col=<span class="string">&quot;file_num&quot;</span>)</span><br><span class="line"></span><br><span class="line">    labels = []</span><br><span class="line">    <span class="keyword">for</span> label <span class="keyword">in</span> csv_data[<span class="string">&quot;chars&quot;</span>]:</span><br><span class="line">        tmp = []</span><br><span class="line">        <span class="keyword">for</span> letter <span class="keyword">in</span> label:</span><br><span class="line">            tmp.append(<span class="built_in">ord</span>(letter) - <span class="built_in">ord</span>(<span class="string">&quot;A&quot;</span>))</span><br><span class="line">        labels.append(tmp)</span><br><span class="line"></span><br><span class="line">    csv_data[<span class="string">&quot;labels&quot;</span>] = labels</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> csv_data</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">filename2label</span>(<span class="params">filenames, csv_data</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    将样本特征值与目标值一一对应</span></span><br><span class="line"><span class="string">    :param filenames:</span></span><br><span class="line"><span class="string">    :param csv_data:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    labels = []</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 将b&#x27;文件名中的数字提取出来并索引相应的标签值</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> file_name <span class="keyword">in</span> filenames:</span><br><span class="line">        digit_str = <span class="string">&quot;&quot;</span>.join(<span class="built_in">list</span>(<span class="built_in">filter</span>(<span class="built_in">str</span>.isdigit, <span class="built_in">str</span>(file_name))))</span><br><span class="line">        label = csv_data.loc[<span class="built_in">int</span>(digit_str), <span class="string">&quot;labels&quot;</span>]</span><br><span class="line">        labels.append(label)</span><br><span class="line">    <span class="keyword">return</span> np.array(labels)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">create_variable</span>(<span class="params">shape</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    创建变量</span></span><br><span class="line"><span class="string">    :param shape:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">return</span> tf.Variable(initial_value=tf.random_normal(shape=shape, stddev=<span class="number">0.01</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">create_model</span>(<span class="params">x</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    实现构建卷积神经网络</span></span><br><span class="line"><span class="string">    :param x:[None, 20, 80, 3]</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="comment"># 第一个卷积大层</span></span><br><span class="line">    <span class="keyword">with</span> tf.variable_scope(<span class="string">&#x27;conv1&#x27;</span>):</span><br><span class="line">        <span class="comment"># 卷积层</span></span><br><span class="line">        conv1_weights = create_variable([<span class="number">5</span>, <span class="number">5</span>, <span class="number">3</span>, <span class="number">32</span>])</span><br><span class="line">        conv1_bias = create_variable([<span class="number">32</span>])</span><br><span class="line">        conv1_x = tf.nn.conv2d(x, <span class="built_in">filter</span>=conv1_weights, strides=[<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>], padding=<span class="string">&#x27;SAME&#x27;</span>) + conv1_bias</span><br><span class="line">        <span class="comment"># 激活层</span></span><br><span class="line">        relu1_x = tf.nn.relu(conv1_x)</span><br><span class="line">        <span class="comment"># 池化层</span></span><br><span class="line">        pool1_x = tf.nn.max_pool(relu1_x, ksize=[<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">1</span>], strides=[<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">1</span>], padding=<span class="string">&quot;SAME&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 第二个卷积大层</span></span><br><span class="line">    <span class="keyword">with</span> tf.variable_scope(<span class="string">&#x27;conv2&#x27;</span>):</span><br><span class="line">        <span class="comment"># [None, 20, 80, 3] --&gt; [None, 10, 40, 32]</span></span><br><span class="line">        <span class="comment"># 卷积层</span></span><br><span class="line">        conv2_weights = create_variable([<span class="number">5</span>, <span class="number">5</span>, <span class="number">32</span>, <span class="number">64</span>])</span><br><span class="line">        conv2_bias = create_variable([<span class="number">64</span>])</span><br><span class="line">        conv2_x = tf.nn.conv2d(pool1_x, <span class="built_in">filter</span>=conv2_weights, strides=[<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>], padding=<span class="string">&#x27;SAME&#x27;</span>) + conv2_bias</span><br><span class="line">        <span class="comment"># 激活层</span></span><br><span class="line">        relu2_x = tf.nn.relu(conv2_x)</span><br><span class="line">        <span class="comment"># 池化层</span></span><br><span class="line">        pool2_x = tf.nn.max_pool(relu2_x, ksize=[<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">1</span>], strides=[<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">1</span>], padding=<span class="string">&quot;SAME&quot;</span>)</span><br><span class="line">    <span class="comment"># 全连接层</span></span><br><span class="line">    <span class="keyword">with</span> tf.variable_scope(<span class="string">&quot;full_connection&quot;</span>):</span><br><span class="line">        <span class="comment"># [None, 10, 40, 32] -&gt; [None, 5, 20, 64]</span></span><br><span class="line">        <span class="comment"># [None, 5, 20, 64] -&gt; [None, 5 * 20 * 64]</span></span><br><span class="line">        <span class="comment"># [None, 5 * 20 * 64] * [5 * 20 * 64, 4 * 26] = [None, 4 * 26]</span></span><br><span class="line">        x_fc = tf.reshape(pool2_x, shape=[-<span class="number">1</span>, <span class="number">5</span> * <span class="number">20</span> * <span class="number">64</span>])</span><br><span class="line">        weights_fc = create_variable(shape=[<span class="number">5</span> * <span class="number">20</span> * <span class="number">64</span>, <span class="number">4</span> * <span class="number">26</span>])</span><br><span class="line">        bias_fc = create_variable(shape=[<span class="number">104</span>])</span><br><span class="line">        y_predict = tf.matmul(x_fc, weights_fc) + bias_fc</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> y_predict</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    filename, image = read_pic()</span><br><span class="line">    csv_data = parse_csv()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 1、准备数据</span></span><br><span class="line">    x = tf.placeholder(dtype=tf.float32, shape=[<span class="literal">None</span>, <span class="number">20</span>, <span class="number">80</span>, <span class="number">3</span>])</span><br><span class="line">    y_true = tf.placeholder(tf.float32, shape=[<span class="literal">None</span>, <span class="number">4</span> * <span class="number">26</span>])</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 2、构建模型</span></span><br><span class="line">    y_predict = create_model(x)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 3、构造损失函数</span></span><br><span class="line">    loss_list = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_true, logits=y_predict)</span><br><span class="line">    loss = tf.reduce_mean(loss_list)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 4、优化损失</span></span><br><span class="line">    optimizer = tf.train.AdamOptimizer(learning_rate=<span class="number">0.001</span>).minimize(loss)</span><br><span class="line">    <span class="comment"># optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001).minimize(loss)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 5、计算准确率</span></span><br><span class="line">    y_predict_argmax = tf.argmax(tf.reshape(y_predict, shape=[-<span class="number">1</span>, <span class="number">4</span>, <span class="number">26</span>]), axis=<span class="number">2</span>)</span><br><span class="line">    y_true_argmax = tf.argmax(tf.reshape(y_true, shape=[-<span class="number">1</span>, <span class="number">4</span>, <span class="number">26</span>]), axis=<span class="number">2</span>)</span><br><span class="line">    equal = tf.equal(y_predict_argmax, y_true_argmax)</span><br><span class="line">    equal_list = tf.reduce_all(equal, axis=<span class="number">1</span>)</span><br><span class="line">    accuracy = tf.reduce_mean(tf.cast(equal_list, tf.float32))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 初始化变量</span></span><br><span class="line">    init = tf.global_variables_initializer()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">        sess.run(init)</span><br><span class="line">        coord = tf.train.Coordinator()</span><br><span class="line">        threads = tf.train.start_queue_runners(sess=sess, coord=coord)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1000</span>):</span><br><span class="line">            filename_value, image_value = sess.run([filename, image])</span><br><span class="line">            labels = filename2label(filename_value, csv_data)</span><br><span class="line">            <span class="comment"># 标签值转换为one-hot</span></span><br><span class="line">            labels_value = tf.reshape(tf.one_hot(labels, depth=<span class="number">26</span>), shape=[-<span class="number">1</span>, <span class="number">4</span> * <span class="number">26</span>]).<span class="built_in">eval</span>()</span><br><span class="line">            _, error, accuracy_value = sess.run([optimizer, loss, accuracy],</span><br><span class="line">                                                feed_dict=&#123;x: image_value, y_true: labels_value&#125;)</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;第%d次训练后损失为%f，准确率为%f&quot;</span> % (i + <span class="number">1</span>, error, accuracy_value))</span><br><span class="line"></span><br><span class="line">        coord.request_stop()</span><br><span class="line">        coord.join(threads)</span><br><span class="line"></span><br></pre></td></tr></table></div></figure>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://blog.zyuanlee.cn">Pandalzy</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://blog.zyuanlee.cn/2020/03/19/TensorFlow%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/">https://blog.zyuanlee.cn/2020/03/19/TensorFlow%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://blog.zyuanlee.cn/tags/TensorFlow/">TensorFlow</a></span><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://blog.zyuanlee.cn/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></span></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2020/05/02/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BDA%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86%E7%82%B9/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">人工智能A理论知识点</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2020/03/14/TensorFlow%E6%95%B0%E6%8D%AE%E8%AF%BB%E5%8F%96%E3%80%81%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"><span class="paginator-prev__text">TensorFlow数据读取、神经网络</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">
+          卷积神经网络简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8E%E4%BC%A0%E7%BB%9F%E5%A4%9A%E5%B1%82%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%AF%B9%E6%AF%94"><span class="toc-number">1.1.</span> <span class="toc-text">
+          与传统多层神经网络对比</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86"><span class="toc-number">2.</span> <span class="toc-text">
+          卷积神经网络原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%93%E6%9E%84"><span class="toc-number">2.1.</span> <span class="toc-text">
+          结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%B7%E7%A7%AF%E5%B1%82%EF%BC%88Convolution-Layer%EF%BC%89"><span class="toc-number">2.2.</span> <span class="toc-text">
+          卷积层（Convolution Layer）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8D%B7%E7%A7%AF%E6%A0%B8%E5%9B%9B%E5%A4%A7%E8%A6%81%E7%B4%A0"><span class="toc-number">2.2.1.</span> <span class="toc-text">
+          卷积核四大要素</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BE%93%E5%87%BA%E5%A4%A7%E5%B0%8F%E8%AE%A1%E7%AE%97%E5%85%AC%E5%BC%8F"><span class="toc-number">2.2.2.</span> <span class="toc-text">
+          输出大小计算公式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%A1%88%E4%BE%8B"><span class="toc-number">2.2.3.</span> <span class="toc-text">
+          计算案例</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%9A%E9%80%9A%E9%81%93%E5%9B%BE%E7%89%87%E8%A7%82%E5%AF%9F"><span class="toc-number">2.2.4.</span> <span class="toc-text">
+          多通道图片观察</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%B7%E7%A7%AF%E7%BD%91%E7%BB%9C-API"><span class="toc-number">2.3.</span> <span class="toc-text">
+          卷积网络 API</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0"><span class="toc-number">2.4.</span> <span class="toc-text">
+          激活函数</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Relu"><span class="toc-number">2.4.1.</span> <span class="toc-text">
+          Relu</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%87%87%E7%94%A8%E6%96%B0%E7%9A%84%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0"><span class="toc-number">2.4.2.</span> <span class="toc-text">
+          为什么采用新的激活函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0-API"><span class="toc-number">2.4.3.</span> <span class="toc-text">
+          激活函数 API</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B1%A0%E5%8C%96%E5%B1%82"><span class="toc-number">2.5.</span> <span class="toc-text">
+          池化层</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B1%A0%E5%8C%96%E5%B1%82-API"><span class="toc-number">2.5.1.</span> <span class="toc-text">
+          池化层 API</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A1%88%E4%BE%8B%EF%BC%9ACNN-Mnist-%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB"><span class="toc-number">3.</span> <span class="toc-text">
+          案例：CNN-Mnist 手写数字识别</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E8%AE%BE%E8%AE%A1"><span class="toc-number">3.1.</span> <span class="toc-text">
+          网络设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B0%83%E5%8F%82%EF%BC%9A%E6%8F%90%E9%AB%98%E5%87%86%E7%A1%AE%E7%8E%87"><span class="toc-number">3.2.</span> <span class="toc-text">
+          调参：提高准确率</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%B9%E4%B8%BA%E9%AB%98%E7%BA%A7-API"><span class="toc-number">3.3.</span> <span class="toc-text">
+          改为高级 API</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BB%E8%A6%81%E4%BB%A3%E7%A0%81"><span class="toc-number">3.4.</span> <span class="toc-text">
+          主要代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E6%88%98%EF%BC%9A%E9%AA%8C%E8%AF%81%E7%A0%81%E8%AF%86%E5%88%AB"><span class="toc-number">4.</span> <span class="toc-text">
+          实战：验证码识别</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="toc-number">4.1.</span> <span class="toc-text">
+          数据集</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8D%9F%E5%A4%B1%E8%A1%A1%E9%87%8F"><span class="toc-number">4.2.</span> <span class="toc-text">
+          损失衡量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90"><span class="toc-number">4.3.</span> <span class="toc-text">
+          流程分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81"><span class="toc-number">4.4.</span> <span class="toc-text">
+          代码</span></a></li></ol></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/assets/avatar.jpg" alt="avatar"></div><p class="sidebar-ov-author__text">Stay hungry, stay foolish.</p></div><div class="sidebar-ov-social"></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">45</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">7</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">31</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2021</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>Pandalzy</span></div><div><span>由 <a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> 强力驱动</span><span> v5.4.0</span><span class="footer__devider">|</span><span>主题 - <a href="https://github.com/liuyib/hexo-theme-stun/" title="Stun" target="_blank" rel="noopener">Stun</a></span><span> v2.1.1</span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><div class="search-mask"></div><div class="search-popup"><span class="search-close"></span><div class="search-input"><input placeholder="搜索文章（支持多关键词，请用空格分隔）"></div><div class="search-results"></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script>function initSearch() {
+  var isXML = true;
+  var search_path = 'search.xml';
+
+  if (!search_path) {
+    search_path = 'search.xml';
+  } else if (/json$/i.test(search_path)) {
+    isXML = false;
+  }
+
+  var path = '/' + search_path;
+  $.ajax({
+    url: path,
+    dataType: isXML ? 'xml' : 'json',
+    async: true,
+    success: function (res) {
+      var datas = isXML ? $('entry', res).map(function () {
+        // 将 XML 转为 JSON
+        return {
+          title: $('title', this).text(),
+          content: $('content', this).text(),
+          url: $('url', this).text()
+        };
+      }).get() : res;
+      var $input = $('.search-input input');
+      var $result = $('.search-results');
+      // 搜索对象（标题、内容）的权重，影响显示顺序
+      var WEIGHT = { title: 100, content: 1 };
+      var searchPost = function () {
+        var searchText = $input.val().toLowerCase().trim();
+        // 根据空白字符分隔关键字
+        var keywords = searchText.split(/[\s]+/);
+        // 搜索结果
+        var matchPosts = [];
+
+        // 有多个关键字时，将原文字整个保存下来
+        if (keywords.length > 1) {
+          keywords.push(searchText);
+        }
+        // 防止未输入字符时搜索
+        if (searchText.length > 0) {
+          datas.forEach(function (data) {
+            var isMatch  = false;
+            // 没有标题的文章使用预设的 i18n 变量代替
+            var title = (data.title && data.title.trim()) || '[ 文章无标题 ]';
+            var titleLower = title && title.toLowerCase();
+            // 删除 HTML 标签 和 所有空白字符
+            var content = data.content && data.content.replace(/<[^>]+>/g, '');
+            var contentLower = content && content.toLowerCase();
+            // 删除重复的 /
+            var postURL = data.url && decodeURI(data.url).replace(/\/{2,}/g, '/');
+            // 标题中匹配到的关键词
+            var titleHitSlice = [];
+            // 内容中匹配到的关键词
+            var contentHitSlice = [];
+
+            keywords.forEach(function (keyword) {
+              /**
+              * 获取匹配的关键词的索引
+              * @param {String} keyword 要匹配的关键字
+              * @param {String} text 原文字
+              * @param {Boolean} caseSensitive 是否区分大小写
+              * @param {Number} weight 匹配对象的权重。权重大的优先显示
+              * @return {Array}
+              */
+              function getIndexByword (word, text, caseSensitive, weight) {
+                if (!word || !text) {
+                  return [];
+                };
+
+                var startIndex = 0; // 每次匹配的开始索引
+                var index = -1;     // 匹配到的索引值
+                var result = [];    // 匹配结果
+
+                if (!caseSensitive) {
+                  word = word.toLowerCase();
+                  text = text.toLowerCase();
+                }
+
+                while((index = text.indexOf(word, startIndex)) !== -1) {
+                  var hasMatch = false;
+                  // 索引位置相同的关键词，保留长度较长的
+                  titleHitSlice.forEach(function (hit) {
+                    if (hit.index === index && hit.word.length < word.length) {
+                      hit.word = word;
+                      hasMatch = true;
+                    }
+                  });
+                  startIndex = index + word.length;
+                  !hasMatch && result.push({ index: index, word: word, weight: weight });
+                }
+                return result;
+              }
+              titleHitSlice = titleHitSlice.concat(getIndexByword(keyword, titleLower, false, WEIGHT.title));
+              contentHitSlice = contentHitSlice.concat(getIndexByword(keyword, contentLower, false, WEIGHT.content));
+            });
+
+            var hitTitle = titleHitSlice.length;
+            var hitContent = contentHitSlice.length;
+
+            if (hitTitle > 0 || hitContent > 0) {
+              isMatch = true;
+            }
+            if (isMatch) {
+              ;[titleHitSlice, contentHitSlice].forEach(function (hit) {
+                // 按照匹配文字的索引的递增顺序排序
+                hit.sort(function (left, right) {
+                  return left.index - right.index;
+                });
+              });
+              /**
+              * 给文本中匹配到的关键词添加标记，从而进行高亮显示
+              * @param {String} text 原文本
+              * @param {Array} hitSlice 匹配项的索引信息
+              * @param {Number} start 开始索引
+              * @param {Number} end 结束索引
+              * @return {String}
+              */
+              function highlightKeyword (text, hitSlice, start, end) {
+                if (!text || !hitSlice || !hitSlice.length) {
+                  return;
+                }
+
+                var result = '';
+                var startIndex = start;
+                var endIndex = end;
+                hitSlice.forEach(function (hit) {
+                  if (hit.index < startIndex) {
+                    return;
+                  }
+
+                  var hitWordEnd = hit.index + hit.word.length;
+                  result += text.slice(startIndex, hit.index);
+                  result += '<b>' + text.slice(hit.index, hitWordEnd) + '</b>';
+                  startIndex = hitWordEnd;
+                });
+                result += text.slice(startIndex, endIndex);
+                return result;
+              }
+
+              var postData = {};
+              // 文章总的搜索权重
+              var postWeight = titleHitSlice.length * WEIGHT.title + contentHitSlice.length * WEIGHT.content;
+              // 标记匹配关键词后的标题
+              var postTitle = highlightKeyword(title, titleHitSlice, 0, title.length) || title;
+              // 标记匹配关键词后的内容
+              var postContent;
+              // 显示内容的长度
+              var SHOW_WORD_LENGTH = 200;
+              // 命中关键词前的字符显示长度
+              var SHOW_WORD_FRONT_LENGTH = 20;
+              var SHOW_WORD_END_LENGTH = SHOW_WORD_LENGTH - SHOW_WORD_FRONT_LENGTH;
+
+              // 截取匹配的第一个字符，前后共 200 个字符来显示
+              if (contentHitSlice.length > 0) {
+                var firstIndex = contentHitSlice[0].index;
+                var start = firstIndex > SHOW_WORD_FRONT_LENGTH ? firstIndex - SHOW_WORD_FRONT_LENGTH : 0;
+                var end = firstIndex + SHOW_WORD_END_LENGTH;
+                postContent = highlightKeyword(content, contentHitSlice, start, end);
+              } else { // 未匹配到内容，直接截取前 200 个字符来显示
+                postContent = content.slice(0, SHOW_WORD_LENGTH);
+              }
+              postData.title = postTitle;
+              postData.content = postContent;
+              postData.url = postURL;
+              postData.weight = postWeight;
+              matchPosts.push(postData);
+            }
+          });
+        }
+
+        var resultInnerHtml = '';
+        if (matchPosts.length) {
+          // 按权重递增的顺序排序，使权重大的优先显示
+          matchPosts.sort(function (left, right) {
+            return right.weight - left.weight;
+          });
+          resultInnerHtml += '<ul>';
+          matchPosts.forEach(function (post) {
+            resultInnerHtml += '<li><a class="search-results-title" href="' + post.url + '">';
+            resultInnerHtml += post.title;
+            resultInnerHtml += '</a><div class="search-results-content">';
+            resultInnerHtml += post.content;
+            resultInnerHtml += '</div></li>';
+          });
+          resultInnerHtml += '</ul>';
+        } else {
+          resultInnerHtml += '<div class="search-results-none"><i class="far fa-meh"></i></div>';
+        }
+        $result.html(resultInnerHtml);
+      };
+      $input.on('input', searchPost);
+      $input.on('keyup', function (e) {
+        if (e.keyCode === Stun.utils.codeToKeyCode('Enter')) {
+          searchPost();
+        }
+      });
+    }
+  });
+}
+
+function closeSearch () {
+  $('body').css({ overflow: 'auto' });
+  $('.search-popup').css({ display: 'none' });
+  $('.search-mask').css({ display: 'none' });
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+  Stun.utils.pjaxReloadLocalSearch = function () {
+    $('.header-nav-search').on('click', function (e) {
+      e.stopPropagation();
+      $('body').css('overflow', 'hidden');
+      $('.search-popup')
+        .velocity('stop')
+        .velocity('transition.expandIn', {
+          duration: 300,
+          complete: function () {
+            $('.search-popup input').focus();
+          }
+        });
+      $('.search-mask')
+        .velocity('stop')
+        .velocity('transition.fadeIn', {
+          duration: 300
+        });
+
+      initSearch();
+    });
+    $('.search-mask, .search-close').on('click', function () {
+      closeSearch();
+    });
+    $(document).on('keydown', function (e) {
+      // Escape <=> 27
+      if (e.keyCode === Stun.utils.codeToKeyCode('Escape')) {
+        closeSearch();
+      }
+    });
+  };
+
+  Stun.utils.pjaxReloadLocalSearch();
+}, false);</script><script src="/js/utils.js?v=2.1.1"></script><script src="/js/stun-boot.js?v=2.1.1"></script><script src="/js/scroll.js?v=2.1.1"></script><script src="/js/header.js?v=2.1.1"></script><script src="/js/sidebar.js?v=2.1.1"></script><script type="application/json" src="/search.xml"></script></body></html>

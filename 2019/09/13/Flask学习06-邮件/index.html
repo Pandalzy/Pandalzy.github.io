@@ -1,0 +1,530 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/assets/avatar_16x16.jpg?v=2.1.1" type="image/png" sizes="16x16"><link rel="icon" href="/assets/avatar_32x32.jpg?v=2.1.1" type="image/png" sizes="32x32"><meta name="description" content="使用 Flask-Mail 发送邮件        扩展 Flask-Mail 包装了 Python 标准库中的smtplib包，简化了在 Flask 程序中发送电子邮件的过程  1pip install flask-mail   实例化 Flask-Mail 提供的 Mail 类并传入程序实例以完成初始化  12345from flask_mail import Maila">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flask学习06-邮件">
+<meta property="og:url" content="https://blog.zyuanlee.cn/2019/09/13/Flask%E5%AD%A6%E4%B9%A006-%E9%82%AE%E4%BB%B6/index.html">
+<meta property="og:site_name" content="Pandalzy&#39;s Blog">
+<meta property="og:description" content="使用 Flask-Mail 发送邮件        扩展 Flask-Mail 包装了 Python 标准库中的smtplib包，简化了在 Flask 程序中发送电子邮件的过程  1pip install flask-mail   实例化 Flask-Mail 提供的 Mail 类并传入程序实例以完成初始化  12345from flask_mail import Maila">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-09-13T14:11:43.000Z">
+<meta property="article:modified_time" content="2021-06-27T00:34:28.399Z">
+<meta property="article:author" content="Pandalzy">
+<meta property="article:tag" content="Python3">
+<meta property="article:tag" content="Flask学习">
+<meta name="twitter:card" content="summary"><title>Flask学习06-邮件 | Pandalzy's Blog</title><link ref="canonical" href="https://blog.zyuanlee.cn/2019/09/13/Flask%E5%AD%A6%E4%B9%A006-%E9%82%AE%E4%BB%B6/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.1.1"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":true},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"carbon","highlight":"light","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: undefined,
+  lazyload: false,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.4.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/about/"><span class="header-nav-menu-item__icon"><i class="fas fa-address-card"></i></span><span class="header-nav-menu-item__text">关于</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/friends/"><span class="header-nav-menu-item__icon"><i class="fas fa-user-friends"></i></span><span class="header-nav-menu-item__text">友链</span></a></div></div><div class="header-nav-search"><span class="header-nav-search__icon"><i class="fas fa-search"></i></span><span class="header-nav-search__text">搜索</span></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">Pandalzy's Blog</div><div class="header-banner-info__subtitle">Stay hungry, stay foolish.</div></div><div class="header-banner-arrow"><div class="header-banner-arrow__icon"><i class="fas fa-angle-down"></i></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">Flask学习06-邮件</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2019-09-13</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-06-27</span></span></div></header><div class="post-body">
+        <h2 id="使用-Flask-Mail-发送邮件"   >
+          <a href="#使用-Flask-Mail-发送邮件" class="heading-link"><i class="fas fa-link"></i></a>使用 Flask-Mail 发送邮件</h2>
+      <ul>
+<li>扩展 Flask-Mail 包装了 Python 标准库中的<strong>smtplib</strong>包，简化了在 Flask 程序中发送电子邮件的过程</li>
+</ul>
+<figure class="highlight shell"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install flask-mail</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>实例化 Flask-Mail 提供的 Mail 类并传入程序实例以完成初始化</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask_mail <span class="keyword">import</span> Mail</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line">...</span><br><span class="line">mail = Mail(app)</span><br></pre></td></tr></table></div></figure>
+
+<span id="more"></span>
+
+
+        <h3 id="配置-Flask-Mail"   >
+          <a href="#配置-Flask-Mail" class="heading-link"><i class="fas fa-link"></i></a>配置 Flask-Mail</h3>
+      <ul>
+<li>Flask-Mail 常用配置</li>
+</ul>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th align="left">配置键</th>
+<th>说明</th>
+<th>默认值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">MAIL_SERVER</td>
+<td>用于发送邮件的 SMTP 服务器</td>
+<td>localhost</td>
+</tr>
+<tr>
+<td align="left">MAIL_PORT</td>
+<td>发送端口</td>
+<td>25</td>
+</tr>
+<tr>
+<td align="left">MAIL_USE_TLS</td>
+<td>是否使用 STARTTLS</td>
+<td>False</td>
+</tr>
+<tr>
+<td align="left">MAIL_USE_SSL</td>
+<td>是否使用 SSL/TLS</td>
+<td>False</td>
+</tr>
+<tr>
+<td align="left">MAIL_USERNAME</td>
+<td>发信服务器的用户名</td>
+<td>None</td>
+</tr>
+<tr>
+<td align="left">MAIL_PASSWORD</td>
+<td>发信服务器的密码</td>
+<td>None</td>
+</tr>
+<tr>
+<td align="left">MAIL_DEFAULT_SENDER</td>
+<td>默认的发信人</td>
+<td>None</td>
+</tr>
+</tbody></table></div>
+<blockquote>
+<p>对发送的邮件进行加密可以避免邮件在发送过程中被第三方截获和篡改。</p>
+<p>SSL（Security Socket Layer，安全套接字层）和 TLS（Transport Layer Security，传输层安全）是两种常用的电子邮件安全协议。TLS 继承了 SSL，并在 SSL 的基础上做了一些改进（换句话说，TLS 是后期版本的 SSL）。所以，在大多数情况下，SSL 和 TLS 可以互换使用。它们通过将 MAIL_USE_SSL 设置为 True 开启。STARTTLS 是另一种加密方式，它会对不安全的连接进行升级（使用 SSL 或 TLS）。</p>
+</blockquote>
+<ul>
+<li>SSL/TLS 加密</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MAIL_USE_SSL = <span class="literal">True</span></span><br><span class="line">MAIL_PORT = <span class="number">465</span></span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>STARTTLS 加密</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MAIL_USE_TLS = <span class="literal">True</span></span><br><span class="line">MAIL_PORT = <span class="number">587</span></span><br></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p>根据加密的方式不同，端口也要相应改变</p>
+<p>当不对邮件进行加密时，邮件服务器的端口使用默认的 25 端口。</p>
+</blockquote>
+<ul>
+<li>常用电子邮箱服务提供商的 SMTP 配置信息</li>
+</ul>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th>提供商</th>
+<th>MAIL_SERVER</th>
+<th>MAIL_<br>USERNAME</th>
+<th>MAIL_<br>PASSWORD</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Gmail</td>
+<td>smtp.gmail.com</td>
+<td>邮箱地址</td>
+<td>邮箱地址</td>
+<td>开启“Allow less secure apps ”，与 VPN</td>
+</tr>
+<tr>
+<td>QQ</td>
+<td>smtp.qq.com</td>
+<td>邮箱地址</td>
+<td>授权码</td>
+<td>开启 SMTP，获取授权码</td>
+</tr>
+<tr>
+<td>新浪</td>
+<td>smtp.sina.com</td>
+<td>邮箱地址</td>
+<td>邮箱密码</td>
+<td>开启 SMTP</td>
+</tr>
+<tr>
+<td>163</td>
+<td>smtp.163.com</td>
+<td>邮箱地址</td>
+<td>授权码</td>
+<td>开启 SMTP，设置授权码</td>
+</tr>
+<tr>
+<td>Outlook/Hotmail</td>
+<td>smtp.live.com<br>smtp.office365.com</td>
+<td>邮箱地址</td>
+<td>邮箱密码</td>
+<td>无</td>
+</tr>
+</tbody></table></div>
+<blockquote>
+<p>163 邮箱的 SMTP 服务器不支持 STARTTLS</p>
+</blockquote>
+<ul>
+<li>邮件服务器配置</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</span><br><span class="line"><span class="keyword">from</span> flask_mail <span class="keyword">import</span> Mail</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line">app.config.update(</span><br><span class="line">    <span class="comment"># ...</span></span><br><span class="line">    MAIL_SERVER = os.getenv(<span class="string">&#x27;MAIL_SERVER&#x27;</span>)</span><br><span class="line">    MAIL_PORT = <span class="number">587</span></span><br><span class="line">    MAIL_USE_TLS = <span class="literal">True</span></span><br><span class="line">    MAIL_USERNAME = os.getenv(<span class="string">&#x27;MAIL_USERNAME&#x27;</span>)</span><br><span class="line">    MAIL_PASSWORD = os.getenv(<span class="string">&#x27;MAIL_PASSWORD&#x27;</span>)</span><br><span class="line">    MAIL_DEFAULT_SENDER = (<span class="string">&#x27;Grey Li&#x27;</span>, os.getenv(<span class="string">&#x27;MAIL_USERNAME&#x27;</span>))</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">mail = Mail(app)</span><br></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p>在实例化 Mail 类时，Flask-Mail 会获取配置以创建一个用于发信的对象，所以确保在实例化 Mail 类之前加载配置</p>
+</blockquote>
+<ul>
+<li>.env 文件环境变量</li>
+</ul>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MAIL_SERVER&#x3D;smtp.example.com</span><br><span class="line">MAIL_USERNAME&#x3D;yourusername@example.com</span><br><span class="line">MAIL_PASSWORD&#x3D;your_password</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>默认发信人由一个两元素元组组成，即（姓名，邮箱地址）</li>
+</ul>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MAIL_DEFAULT_SENDER &#x3D; (&#39;Your Name&#39;, &#39;your_name@example.com&#39;)</span><br><span class="line">MAIL_DEFAULT_SENDER &#x3D; (&#39;Your Name&#39;, os.getenv(&#39;MAIL_USERNAME&#39;))</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>Flask-Mail 会把这个元组转换为标准的发信人格式，即<code>Your Name&lt;your_name@example.com&gt;</code>。</li>
+<li>也可以直接以这种方式指定发信人</li>
+</ul>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MAIL_DEFAULT_SENDER &#x3D; &#39;Your Name &lt;your_name@example.com&gt;&#39;</span><br></pre></td></tr></table></div></figure>
+
+
+        <h3 id="构建邮件数据"   >
+          <a href="#构建邮件数据" class="heading-link"><i class="fas fa-link"></i></a>构建邮件数据</h3>
+      <ul>
+<li>一封邮件至少要包含主题、收件人、正文、发信人这几个元素。</li>
+<li>发信人（sender）在前面已经使用 MAIL_DEFAULT_SENDER 配置变量指定过了，剩下的分别通过 Message 类的构造方法中的 subject、recipients、body 关键字传入参数，其中 recipients 为一个包含电子邮件地址的列表</li>
+</ul>
+<figure class="highlight shell"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash">&gt;&gt; from flask_mail import Message</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">&gt;&gt; from app import mail</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">&gt;&gt; message = Message(subject=<span class="string">&#x27;Hello, World!&#x27;</span>, recipients=[<span class="string">&#x27;Zyuanlee &lt;zyuanlee@example.com&gt;&#x27;</span>], body=<span class="string">&#x27;Hello, this is an email.&#x27;</span>)</span></span><br></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p>和发信人字符串类似，收信人字符串可以为两种形式</p>
+<p><code>&#39;Zorn&lt;zorn@example.com&gt;&#39;</code>或<code>&#39;zorn@example.com&#39;</code>。</p>
+</blockquote>
+
+        <h3 id="发送邮件"   >
+          <a href="#发送邮件" class="heading-link"><i class="fas fa-link"></i></a>发送邮件</h3>
+      <figure class="highlight shell"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash">&gt;&gt; mail.send(message)</span></span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>通用发信函数</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask_mail <span class="keyword">import</span> Mail, Message</span><br><span class="line"><span class="comment"># ...</span></span><br><span class="line">mail = Mail(app)</span><br><span class="line"><span class="comment"># ...</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_mail</span>(<span class="params">subject, to, body</span>):</span></span><br><span class="line">    message = Message(subject, recipients=[to], body=body)</span><br><span class="line">    mail.send(message)</span><br></pre></td></tr></table></div></figure>
+
+
+        <h2 id="使用事务邮件服务-SendGird"   >
+          <a href="#使用事务邮件服务-SendGird" class="heading-link"><i class="fas fa-link"></i></a>使用事务邮件服务 SendGird</h2>
+      
+        <h2 id="邮件进阶"   >
+          <a href="#邮件进阶" class="heading-link"><i class="fas fa-link"></i></a>邮件进阶</h2>
+      
+        <h3 id="提供-HTML-正文"   >
+          <a href="#提供-HTML-正文" class="heading-link"><i class="fas fa-link"></i></a>提供 HTML 正文</h3>
+      <ul>
+<li>使用 Tabel 布局，而不是 Div 布局</li>
+<li>使用行内（inline）样式定义</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">span</span> <span class="attr">style</span>=<span class="string">&quot;font-family:Arial, Helvetica, sans-serif; font-size:12px; color:#000000;&quot;</span>&gt;</span>Hello, Email!<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>尽量使用比较基础的 CSS 属性，避免使用快捷属性（比如 background）和定位属性（比如 float、position）</li>
+<li>邮件正文的宽度不应超过 600px</li>
+<li>避免使用 JavaScript 代码</li>
+<li>避免使用背景图片</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 方法一</span></span><br><span class="line">message = Message(..., body=<span class="string">&#x27;纯文本正文&#x27;</span>, html=<span class="string">&#x27;&lt;h1&gt;HTML正文&lt;/h1&gt;&#x27;</span>)</span><br></pre></td></tr></table></div></figure>
+
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 方法二</span></span><br><span class="line">message = Message(...)</span><br><span class="line">message.body = <span class="string">&#x27;纯文本正文&#x27;</span></span><br><span class="line">message.html = <span class="string">&#x27;&lt;h1&gt;HTML正文&lt;/h1&gt;&#x27;</span></span><br></pre></td></tr></table></div></figure>
+
+
+        <h3 id="使用-Jinja2-模板组织邮件正文"   >
+          <a href="#使用-Jinja2-模板组织邮件正文" class="heading-link"><i class="fas fa-link"></i></a>使用 Jinja2 模板组织邮件正文</h3>
+      <ul>
+<li>大多数情况下，需要动态构建邮件正文。</li>
+<li>比如，在周刊订阅程序中，当用户订阅成功后，发送一封确认邮件。对于不同的用户来说，邮件的内容基本相同，但同时邮件中又包含用户名称的动态部分，使用模板来组织构建邮件正文再合适不过。</li>
+</ul>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">templates&#x2F;emails&#x2F;subscribe.txt：纯文本邮件模板</span><br><span class="line"></span><br><span class="line">Hello &#123;&#123; name &#125;&#125;,</span><br><span class="line"></span><br><span class="line">Thank you for subscribing Flask Weekly!</span><br><span class="line">Enjoy the reading :)</span><br><span class="line"></span><br><span class="line">Visit this link to unsubscribe: &#123;&#123; url_for(&#39;unsubscribe&#39;, _external&#x3D;True) &#125;&#125;</span><br></pre></td></tr></table></div></figure>
+
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--HTML邮件模板--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">&quot;width: 580px; padding: 20px;&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">h3</span>&gt;</span>Hello &#123;&#123; name &#125;&#125;,<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>Thank you for subscribing Flask Weekly!<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>Enjoy the reading :)<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">small</span> <span class="attr">style</span>=<span class="string">&quot;color: #868e96;&quot;</span>&gt;</span></span><br><span class="line">        Click here to</span><br><span class="line">        <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;&#123;&#123; url_for(&#x27;unsubscdribe&#x27;, _external=True)&#125;&#125;&quot;</span>&gt;</span>unsubscribe<span class="tag">&lt;/<span class="name">a</span>&gt;</span>.</span><br><span class="line">    <span class="tag">&lt;/<span class="name">small</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li><p>为了同时支持纯文本格式和 HTML 格式的邮件正文，每一类邮件都需要分别创建 HMTL 和纯文本格式的模板</p>
+</li>
+<li><p>以通过 Flask-Mail 创建的发信函数为例，在发送邮件的函数中使用<code>render_template()</code>函数渲染邮件正文，并传入相应的变量</p>
+</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> render_template</span><br><span class="line"><span class="keyword">from</span> flask_mail <span class="keyword">import</span> Message</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_subscribe_mail</span>(<span class="params">subject, to, **kwargs</span>):</span></span><br><span class="line">    message = Message(subject, recipients=[to], sender=<span class="string">&#x27;Flask Weekly &lt;%s&gt;&#x27;</span> % os.getenv(<span class="string">&#x27;MAIL_USERNAME&#x27;</span>))</span><br><span class="line">    message.body = render_template(<span class="string">&#x27;emails/subscribe.txt&#x27;</span>, **kwargs)</span><br><span class="line">    message.html = render_template(<span class="string">&#x27;emails/subscribe.html&#x27;</span>, **kwargs)</span><br><span class="line">    mail.send(message)</span><br></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p>为了支持在调用函数时传入模板中需要的关键字参数，在<code>send_mail()</code>中接收可变长关键字参数<code>**kwargs</code>并传入<code>render_template()</code>函数</p>
+</blockquote>
+<blockquote>
+<p>当邮件中需要加入 URL 时（比如链接和图片），要生成完整的外部 URL，而不是内部 URL。</p>
+<p>这可以通过在<code>url_for()</code>函数中将关键字参数<code>_external</code>设为<strong>True</strong>实现。</p>
+</blockquote>
+
+        <h3 id="异步发送邮件"   >
+          <a href="#异步发送邮件" class="heading-link"><i class="fas fa-link"></i></a>异步发送邮件</h3>
+      <ul>
+<li>当使用 SMTP 的方式发送电子邮件时，如果手动使用浏览器测试程序的注册功能，在提交注册表单后，浏览器会有几秒钟的不响应。</li>
+<li>因为这时候程序正在发送电子邮件，发信的操作阻断了请求——响应循环，直到发信的<code>send_mail()</code>函数调用结束后，视图函数才会返回响应。这几秒的延迟带来了不好的用户体验，为了避免这个延迟，可以将发信函数放入后台线程异步执行</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> threading <span class="keyword">import</span> Thread</span><br><span class="line"><span class="comment"># ...</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_send_async_mail</span>(<span class="params">app, message</span>):</span></span><br><span class="line">    <span class="keyword">with</span> app.app_context():</span><br><span class="line">        mail.send(message)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_mail</span>(<span class="params">subject, to, body</span>):</span></span><br><span class="line">    message = Message(subject, recipients=[to], body=body)</span><br><span class="line">    thr = Thread(target=_send_async_mail, args=[app, message])</span><br><span class="line">    thr.start()</span><br><span class="line">    <span class="keyword">return</span> thr</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>因为 Flask-Mail 的<code>send()</code>方法内部的调用逻辑中使用了<strong>current_app</strong>变量，而这个变量只在激活的程序上下文中才存在，这里在后台线程调用发信函数，但是后台线程并没有程序上下文存在。为了正常实现发信功能，wr 传入程序实例 app 作为参数，并调用<code>app.app_context()</code>手动激活程序上下文。</li>
+</ul>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://blog.zyuanlee.cn">Pandalzy</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://blog.zyuanlee.cn/2019/09/13/Flask%E5%AD%A6%E4%B9%A006-%E9%82%AE%E4%BB%B6/">https://blog.zyuanlee.cn/2019/09/13/Flask%E5%AD%A6%E4%B9%A006-%E9%82%AE%E4%BB%B6/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://blog.zyuanlee.cn/tags/Python3/">Python3</a></span><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://blog.zyuanlee.cn/tags/Flask%E5%AD%A6%E4%B9%A0/">Flask学习</a></span></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2019/11/05/Nginx%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E4%B8%8E%E9%85%8D%E7%BD%AE/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">Nginx一些常用命令与配置</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2019/08/11/%E4%B8%80%E4%BA%9B%E6%93%8D%E4%BD%9C%E5%91%BD%E4%BB%A4/"><span class="paginator-prev__text">一些操作命令</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8-Flask-Mail-%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6"><span class="toc-number">1.</span> <span class="toc-text">
+          使用 Flask-Mail 发送邮件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE-Flask-Mail"><span class="toc-number">1.1.</span> <span class="toc-text">
+          配置 Flask-Mail</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9E%84%E5%BB%BA%E9%82%AE%E4%BB%B6%E6%95%B0%E6%8D%AE"><span class="toc-number">1.2.</span> <span class="toc-text">
+          构建邮件数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6"><span class="toc-number">1.3.</span> <span class="toc-text">
+          发送邮件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E4%BA%8B%E5%8A%A1%E9%82%AE%E4%BB%B6%E6%9C%8D%E5%8A%A1-SendGird"><span class="toc-number">2.</span> <span class="toc-text">
+          使用事务邮件服务 SendGird</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%82%AE%E4%BB%B6%E8%BF%9B%E9%98%B6"><span class="toc-number">3.</span> <span class="toc-text">
+          邮件进阶</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8F%90%E4%BE%9B-HTML-%E6%AD%A3%E6%96%87"><span class="toc-number">3.1.</span> <span class="toc-text">
+          提供 HTML 正文</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8-Jinja2-%E6%A8%A1%E6%9D%BF%E7%BB%84%E7%BB%87%E9%82%AE%E4%BB%B6%E6%AD%A3%E6%96%87"><span class="toc-number">3.2.</span> <span class="toc-text">
+          使用 Jinja2 模板组织邮件正文</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%82%E6%AD%A5%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6"><span class="toc-number">3.3.</span> <span class="toc-text">
+          异步发送邮件</span></a></li></ol></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/assets/avatar.jpg" alt="avatar"></div><p class="sidebar-ov-author__text">Stay hungry, stay foolish.</p></div><div class="sidebar-ov-social"></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">45</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">7</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">31</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2021</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>Pandalzy</span></div><div><span>由 <a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> 强力驱动</span><span> v5.4.0</span><span class="footer__devider">|</span><span>主题 - <a href="https://github.com/liuyib/hexo-theme-stun/" title="Stun" target="_blank" rel="noopener">Stun</a></span><span> v2.1.1</span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><div class="search-mask"></div><div class="search-popup"><span class="search-close"></span><div class="search-input"><input placeholder="搜索文章（支持多关键词，请用空格分隔）"></div><div class="search-results"></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script>function initSearch() {
+  var isXML = true;
+  var search_path = 'search.xml';
+
+  if (!search_path) {
+    search_path = 'search.xml';
+  } else if (/json$/i.test(search_path)) {
+    isXML = false;
+  }
+
+  var path = '/' + search_path;
+  $.ajax({
+    url: path,
+    dataType: isXML ? 'xml' : 'json',
+    async: true,
+    success: function (res) {
+      var datas = isXML ? $('entry', res).map(function () {
+        // 将 XML 转为 JSON
+        return {
+          title: $('title', this).text(),
+          content: $('content', this).text(),
+          url: $('url', this).text()
+        };
+      }).get() : res;
+      var $input = $('.search-input input');
+      var $result = $('.search-results');
+      // 搜索对象（标题、内容）的权重，影响显示顺序
+      var WEIGHT = { title: 100, content: 1 };
+      var searchPost = function () {
+        var searchText = $input.val().toLowerCase().trim();
+        // 根据空白字符分隔关键字
+        var keywords = searchText.split(/[\s]+/);
+        // 搜索结果
+        var matchPosts = [];
+
+        // 有多个关键字时，将原文字整个保存下来
+        if (keywords.length > 1) {
+          keywords.push(searchText);
+        }
+        // 防止未输入字符时搜索
+        if (searchText.length > 0) {
+          datas.forEach(function (data) {
+            var isMatch  = false;
+            // 没有标题的文章使用预设的 i18n 变量代替
+            var title = (data.title && data.title.trim()) || '[ 文章无标题 ]';
+            var titleLower = title && title.toLowerCase();
+            // 删除 HTML 标签 和 所有空白字符
+            var content = data.content && data.content.replace(/<[^>]+>/g, '');
+            var contentLower = content && content.toLowerCase();
+            // 删除重复的 /
+            var postURL = data.url && decodeURI(data.url).replace(/\/{2,}/g, '/');
+            // 标题中匹配到的关键词
+            var titleHitSlice = [];
+            // 内容中匹配到的关键词
+            var contentHitSlice = [];
+
+            keywords.forEach(function (keyword) {
+              /**
+              * 获取匹配的关键词的索引
+              * @param {String} keyword 要匹配的关键字
+              * @param {String} text 原文字
+              * @param {Boolean} caseSensitive 是否区分大小写
+              * @param {Number} weight 匹配对象的权重。权重大的优先显示
+              * @return {Array}
+              */
+              function getIndexByword (word, text, caseSensitive, weight) {
+                if (!word || !text) {
+                  return [];
+                };
+
+                var startIndex = 0; // 每次匹配的开始索引
+                var index = -1;     // 匹配到的索引值
+                var result = [];    // 匹配结果
+
+                if (!caseSensitive) {
+                  word = word.toLowerCase();
+                  text = text.toLowerCase();
+                }
+
+                while((index = text.indexOf(word, startIndex)) !== -1) {
+                  var hasMatch = false;
+                  // 索引位置相同的关键词，保留长度较长的
+                  titleHitSlice.forEach(function (hit) {
+                    if (hit.index === index && hit.word.length < word.length) {
+                      hit.word = word;
+                      hasMatch = true;
+                    }
+                  });
+                  startIndex = index + word.length;
+                  !hasMatch && result.push({ index: index, word: word, weight: weight });
+                }
+                return result;
+              }
+              titleHitSlice = titleHitSlice.concat(getIndexByword(keyword, titleLower, false, WEIGHT.title));
+              contentHitSlice = contentHitSlice.concat(getIndexByword(keyword, contentLower, false, WEIGHT.content));
+            });
+
+            var hitTitle = titleHitSlice.length;
+            var hitContent = contentHitSlice.length;
+
+            if (hitTitle > 0 || hitContent > 0) {
+              isMatch = true;
+            }
+            if (isMatch) {
+              ;[titleHitSlice, contentHitSlice].forEach(function (hit) {
+                // 按照匹配文字的索引的递增顺序排序
+                hit.sort(function (left, right) {
+                  return left.index - right.index;
+                });
+              });
+              /**
+              * 给文本中匹配到的关键词添加标记，从而进行高亮显示
+              * @param {String} text 原文本
+              * @param {Array} hitSlice 匹配项的索引信息
+              * @param {Number} start 开始索引
+              * @param {Number} end 结束索引
+              * @return {String}
+              */
+              function highlightKeyword (text, hitSlice, start, end) {
+                if (!text || !hitSlice || !hitSlice.length) {
+                  return;
+                }
+
+                var result = '';
+                var startIndex = start;
+                var endIndex = end;
+                hitSlice.forEach(function (hit) {
+                  if (hit.index < startIndex) {
+                    return;
+                  }
+
+                  var hitWordEnd = hit.index + hit.word.length;
+                  result += text.slice(startIndex, hit.index);
+                  result += '<b>' + text.slice(hit.index, hitWordEnd) + '</b>';
+                  startIndex = hitWordEnd;
+                });
+                result += text.slice(startIndex, endIndex);
+                return result;
+              }
+
+              var postData = {};
+              // 文章总的搜索权重
+              var postWeight = titleHitSlice.length * WEIGHT.title + contentHitSlice.length * WEIGHT.content;
+              // 标记匹配关键词后的标题
+              var postTitle = highlightKeyword(title, titleHitSlice, 0, title.length) || title;
+              // 标记匹配关键词后的内容
+              var postContent;
+              // 显示内容的长度
+              var SHOW_WORD_LENGTH = 200;
+              // 命中关键词前的字符显示长度
+              var SHOW_WORD_FRONT_LENGTH = 20;
+              var SHOW_WORD_END_LENGTH = SHOW_WORD_LENGTH - SHOW_WORD_FRONT_LENGTH;
+
+              // 截取匹配的第一个字符，前后共 200 个字符来显示
+              if (contentHitSlice.length > 0) {
+                var firstIndex = contentHitSlice[0].index;
+                var start = firstIndex > SHOW_WORD_FRONT_LENGTH ? firstIndex - SHOW_WORD_FRONT_LENGTH : 0;
+                var end = firstIndex + SHOW_WORD_END_LENGTH;
+                postContent = highlightKeyword(content, contentHitSlice, start, end);
+              } else { // 未匹配到内容，直接截取前 200 个字符来显示
+                postContent = content.slice(0, SHOW_WORD_LENGTH);
+              }
+              postData.title = postTitle;
+              postData.content = postContent;
+              postData.url = postURL;
+              postData.weight = postWeight;
+              matchPosts.push(postData);
+            }
+          });
+        }
+
+        var resultInnerHtml = '';
+        if (matchPosts.length) {
+          // 按权重递增的顺序排序，使权重大的优先显示
+          matchPosts.sort(function (left, right) {
+            return right.weight - left.weight;
+          });
+          resultInnerHtml += '<ul>';
+          matchPosts.forEach(function (post) {
+            resultInnerHtml += '<li><a class="search-results-title" href="' + post.url + '">';
+            resultInnerHtml += post.title;
+            resultInnerHtml += '</a><div class="search-results-content">';
+            resultInnerHtml += post.content;
+            resultInnerHtml += '</div></li>';
+          });
+          resultInnerHtml += '</ul>';
+        } else {
+          resultInnerHtml += '<div class="search-results-none"><i class="far fa-meh"></i></div>';
+        }
+        $result.html(resultInnerHtml);
+      };
+      $input.on('input', searchPost);
+      $input.on('keyup', function (e) {
+        if (e.keyCode === Stun.utils.codeToKeyCode('Enter')) {
+          searchPost();
+        }
+      });
+    }
+  });
+}
+
+function closeSearch () {
+  $('body').css({ overflow: 'auto' });
+  $('.search-popup').css({ display: 'none' });
+  $('.search-mask').css({ display: 'none' });
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+  Stun.utils.pjaxReloadLocalSearch = function () {
+    $('.header-nav-search').on('click', function (e) {
+      e.stopPropagation();
+      $('body').css('overflow', 'hidden');
+      $('.search-popup')
+        .velocity('stop')
+        .velocity('transition.expandIn', {
+          duration: 300,
+          complete: function () {
+            $('.search-popup input').focus();
+          }
+        });
+      $('.search-mask')
+        .velocity('stop')
+        .velocity('transition.fadeIn', {
+          duration: 300
+        });
+
+      initSearch();
+    });
+    $('.search-mask, .search-close').on('click', function () {
+      closeSearch();
+    });
+    $(document).on('keydown', function (e) {
+      // Escape <=> 27
+      if (e.keyCode === Stun.utils.codeToKeyCode('Escape')) {
+        closeSearch();
+      }
+    });
+  };
+
+  Stun.utils.pjaxReloadLocalSearch();
+}, false);</script><script src="/js/utils.js?v=2.1.1"></script><script src="/js/stun-boot.js?v=2.1.1"></script><script src="/js/scroll.js?v=2.1.1"></script><script src="/js/header.js?v=2.1.1"></script><script src="/js/sidebar.js?v=2.1.1"></script><script type="application/json" src="/search.xml"></script></body></html>

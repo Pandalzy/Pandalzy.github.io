@@ -1,0 +1,994 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/assets/avatar_16x16.jpg?v=2.1.1" type="image/png" sizes="16x16"><link rel="icon" href="/assets/avatar_32x32.jpg?v=2.1.1" type="image/png" sizes="32x32"><meta name="description" content="模板基本用法                           创建模板        语句 比如 if 判断、 for 循环等： 1&amp;#123;% ... %&amp;#125;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flask学习03-模板">
+<meta property="og:url" content="https://blog.zyuanlee.cn/2019/07/18/Flask%E5%AD%A6%E4%B9%A003-%E6%A8%A1%E6%9D%BF/index.html">
+<meta property="og:site_name" content="Pandalzy&#39;s Blog">
+<meta property="og:description" content="模板基本用法                           创建模板        语句 比如 if 判断、 for 循环等： 1&amp;#123;% ... %&amp;#125;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-07-18T03:54:22.000Z">
+<meta property="article:modified_time" content="2021-06-27T00:34:28.398Z">
+<meta property="article:author" content="Pandalzy">
+<meta property="article:tag" content="Python3">
+<meta property="article:tag" content="Flask学习">
+<meta name="twitter:card" content="summary"><title>Flask学习03-模板 | Pandalzy's Blog</title><link ref="canonical" href="https://blog.zyuanlee.cn/2019/07/18/Flask%E5%AD%A6%E4%B9%A003-%E6%A8%A1%E6%9D%BF/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.1.1"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":true},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"carbon","highlight":"light","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: undefined,
+  lazyload: false,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 5.4.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/about/"><span class="header-nav-menu-item__icon"><i class="fas fa-address-card"></i></span><span class="header-nav-menu-item__text">关于</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/friends/"><span class="header-nav-menu-item__icon"><i class="fas fa-user-friends"></i></span><span class="header-nav-menu-item__text">友链</span></a></div></div><div class="header-nav-search"><span class="header-nav-search__icon"><i class="fas fa-search"></i></span><span class="header-nav-search__text">搜索</span></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">Pandalzy's Blog</div><div class="header-banner-info__subtitle">Stay hungry, stay foolish.</div></div><div class="header-banner-arrow"><div class="header-banner-arrow__icon"><i class="fas fa-angle-down"></i></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">Flask学习03-模板</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2019-07-18</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2021-06-27</span></span></div></header><div class="post-body">
+        <h2 id="模板基本用法"   >
+          <a href="#模板基本用法" class="heading-link"><i class="fas fa-link"></i></a>模板基本用法</h2>
+      
+        <h3 id="创建模板"   >
+          <a href="#创建模板" class="heading-link"><i class="fas fa-link"></i></a>创建模板</h3>
+      <ul>
+<li><p>语句</p>
+<p>比如 if 判断、 for 循环等：</p>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% ... %&#125;</span><br></pre></td></tr></table></div></figure>
+
+</li>
+</ul>
+<span id="more"></span>
+
+<ul>
+<li><p>表达式</p>
+<p>比如字符串、变量、函数调用等：</p>
+<figure class="highlight plain"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123; ... &#125;&#125;</span><br></pre></td></tr></table></div></figure>
+</li>
+<li><p>注释</p>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;# ... #&#125;</span><br></pre></td></tr></table></div></figure>
+</li>
+<li><p>Jinja2 支持使用**”.”<strong>获取变量的属性，比如 user 字典中的 username 键值通过</strong>“.”<strong>获取，即</strong>user.username<strong>，在效果上等同于</strong>user[‘username’]** 。</p>
+</li>
+</ul>
+
+        <h3 id="模板语法"   >
+          <a href="#模板语法" class="heading-link"><i class="fas fa-link"></i></a>模板语法</h3>
+      <ul>
+<li><p>Jinja2 允许在模板中使用大部分 Python 对象，比如字符串、列表、字典、元组、整型、浮点型、布尔值。它支持基本的运算符号（+、-、*、/等）、比较符号（比如==、！=等）、逻辑符号（and、or、not 和括号）以及 in、is、None 和布尔值（True、False）。</p>
+</li>
+<li><p>Jinja2 提供了多种控制结构来控制模板的输出，其中<strong>for</strong>和<strong>if</strong>是最常用的两种。在 Jinja2 里，语句使用<code>{% ... %}</code>标识，需要注意的是，在语句结束的地方，必须添加结束标签：</p>
+</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;% if user.bio %&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">i</span>&gt;</span>&#123;&#123; user.bio &#125;&#125;<span class="tag">&lt;/<span class="name">i</span>&gt;</span></span><br><span class="line">&#123;% else %&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">i</span>&gt;</span>This user has not provided a bio.<span class="tag">&lt;/<span class="name">i</span>&gt;</span></span><br><span class="line">&#123;% endif %&#125;</span><br></pre></td></tr></table></div></figure>
+
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">    &#123;% for movie in movies %&#125;</span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span>&#123;&#123; movie.name &#125;&#125; - &#123;&#123; movie.year &#125;&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    &#123;% endfor %&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>常用的 Jinja2 for 循环特殊变量</li>
+</ul>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">变量名</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">loop.index</td>
+<td align="center">从 1 迭代</td>
+</tr>
+<tr>
+<td align="center">loop.index0</td>
+<td align="center">从 0 迭代</td>
+</tr>
+<tr>
+<td align="center">loop.reindex</td>
+<td align="center">从 1 反向迭代</td>
+</tr>
+<tr>
+<td align="center">loop.reindex0</td>
+<td align="center">从 0 反向迭代</td>
+</tr>
+<tr>
+<td align="center">loop.first</td>
+<td align="center">如果是第一个元素，则为 True</td>
+</tr>
+<tr>
+<td align="center">loop.last</td>
+<td align="center">如果是最后一个元素，则为 True</td>
+</tr>
+<tr>
+<td align="center">loop.previtem</td>
+<td align="center">上一个迭代的条目</td>
+</tr>
+<tr>
+<td align="center">loop.nextitem</td>
+<td align="center">下一个迭代的条目</td>
+</tr>
+<tr>
+<td align="center">loop.length</td>
+<td align="center">序列包含的元素的数量</td>
+</tr>
+</tbody></table></div>
+
+        <h3 id="渲染模板"   >
+          <a href="#渲染模板" class="heading-link"><i class="fas fa-link"></i></a>渲染模板</h3>
+      <figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--watchlist.html--&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;en&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;utf-8&quot;</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">title</span>&gt;</span>&#123;&#123; user.username &#125;&#125;&#x27;s Watchlist<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;&#123;&#123; url_for(&#x27;index&#x27;) &#125;&#125;&quot;</span>&gt;</span><span class="symbol">&amp;larr;</span> Return<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">h2</span>&gt;</span>&#123;&#123; user.username &#125;&#125;<span class="tag">&lt;/<span class="name">h2</span>&gt;</span></span><br><span class="line">        &#123;% if user.bio %&#125;</span><br><span class="line">        <span class="tag">&lt;<span class="name">i</span>&gt;</span>&#123;&#123; user.bio &#125;&#125;<span class="tag">&lt;/<span class="name">i</span>&gt;</span></span><br><span class="line">        &#123;% else %&#125;</span><br><span class="line">        <span class="tag">&lt;<span class="name">i</span>&gt;</span>This user has not provided a bio.<span class="tag">&lt;/<span class="name">i</span>&gt;</span></span><br><span class="line">        &#123;% endif %&#125; &#123;# 下面是电影清单（这是注释） #&#125;</span><br><span class="line">        <span class="tag">&lt;<span class="name">h5</span>&gt;</span>&#123;&#123; user.username &#125;&#125;&#x27;s Watchlist (&#123;&#123; movies|length &#125;&#125;):<span class="tag">&lt;/<span class="name">h5</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">            &#123;% for movie in movies %&#125;</span><br><span class="line">            <span class="tag">&lt;<span class="name">li</span>&gt;</span>&#123;&#123; movie.name &#125;&#125; - &#123;&#123; movie.year &#125;&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">            &#123;% endfor %&#125;</span><br><span class="line">        <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></div></figure>
+
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># app.py</span></span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, render_template</span><br><span class="line"><span class="comment"># ...</span></span><br><span class="line">user = &#123;</span><br><span class="line">    <span class="string">&#x27;username&#x27;</span>: <span class="string">&#x27;Grey Li&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;bio&#x27;</span>: <span class="string">&#x27;A boy who loves movies and music.&#x27;</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">movies = [</span><br><span class="line">    &#123;<span class="string">&#x27;name&#x27;</span>: <span class="string">&#x27;My Neighbor Totoro&#x27;</span>, <span class="string">&#x27;year&#x27;</span>: <span class="string">&#x27;1988&#x27;</span>&#125;,</span><br><span class="line">    &#123;<span class="string">&#x27;name&#x27;</span>: <span class="string">&#x27;Three Colours trilogy&#x27;</span>, <span class="string">&#x27;year&#x27;</span>: <span class="string">&#x27;1993&#x27;</span>&#125;,</span><br><span class="line">    &#123;<span class="string">&#x27;name&#x27;</span>: <span class="string">&#x27;Forrest Gump&#x27;</span>, <span class="string">&#x27;year&#x27;</span>: <span class="string">&#x27;1994&#x27;</span>&#125;,</span><br><span class="line">    &#123;<span class="string">&#x27;name&#x27;</span>: <span class="string">&#x27;Perfect Blue&#x27;</span>, <span class="string">&#x27;year&#x27;</span>: <span class="string">&#x27;1997&#x27;</span>&#125;,</span><br><span class="line">    &#123;<span class="string">&#x27;name&#x27;</span>: <span class="string">&#x27;The Matrix&#x27;</span>, <span class="string">&#x27;year&#x27;</span>: <span class="string">&#x27;1999&#x27;</span>&#125;,</span><br><span class="line">    &#123;<span class="string">&#x27;name&#x27;</span>: <span class="string">&#x27;Memento&#x27;</span>, <span class="string">&#x27;year&#x27;</span>: <span class="string">&#x27;2000&#x27;</span>&#125;,</span><br><span class="line">    &#123;<span class="string">&#x27;name&#x27;</span>: <span class="string">&#x27;The Bucket list&#x27;</span>, <span class="string">&#x27;year&#x27;</span>: <span class="string">&#x27;2007&#x27;</span>&#125;,</span><br><span class="line">    &#123;<span class="string">&#x27;name&#x27;</span>: <span class="string">&#x27;Black Swan&#x27;</span>, <span class="string">&#x27;year&#x27;</span>: <span class="string">&#x27;2010&#x27;</span>&#125;,</span><br><span class="line">    &#123;<span class="string">&#x27;name&#x27;</span>: <span class="string">&#x27;Gone Girl&#x27;</span>, <span class="string">&#x27;year&#x27;</span>: <span class="string">&#x27;2014&#x27;</span>&#125;,</span><br><span class="line">    &#123;<span class="string">&#x27;name&#x27;</span>: <span class="string">&#x27;CoCo&#x27;</span>, <span class="string">&#x27;year&#x27;</span>: <span class="string">&#x27;2017&#x27;</span>&#125;,</span><br><span class="line">]</span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/watchlist&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">watchlist</span>():</span></span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">&#x27;watchlist.html&#x27;</span>, user=user, movies=movies)</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>在<strong>render_template()**函数中，首先传入模板的文件名作为参数。Flask 会在程序根目录下的</strong>templates<strong>文件夹里寻找模板文件，所以这里传入的文件路径是相对于</strong>templates**根目录的。以关键字参数的形式传入了模板中使用的变量值，以 user 为例：左边的 user 表示传入模板的变量名称，右边的 user 则是要传入的对象。</li>
+</ul>
+<blockquote>
+<p>除了<strong>render_template()**函数，Flask 还提供了一个</strong>render_template_string()**函数用来渲染模板字符串。</p>
+</blockquote>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>这是列表my_list的第一个元素：&#123;&#123; my_list[0] &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>这是元组my_tuple的第一个元素：&#123;&#123; my_tuple[0] &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>这是字典my_dict的键为name的值：&#123;&#123; my_dict[&#x27;name&#x27;] &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>这是函数my_func的返回值：&#123;&#123; my_func() &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>这是对象my_object调用某方法的返回值：&#123;&#123; my_object.name() &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>如果想传入函数在模板中调用，那么需要传入函数对象本身，而不是函数调用（函数的返回值），所以仅写出函数名称即可。当把函数传入模板后，可以像在 Python 脚本中一样通过添加括号的方式调用，而且也可以在括号中传入参数。</li>
+</ul>
+
+        <h2 id="模板辅助工具"   >
+          <a href="#模板辅助工具" class="heading-link"><i class="fas fa-link"></i></a>模板辅助工具</h2>
+      
+        <h3 id="上下文"   >
+          <a href="#上下文" class="heading-link"><i class="fas fa-link"></i></a>上下文</h3>
+      <ul>
+<li>除了渲染时传入变量，也可以在模板中定义变量，使用 set 标签：</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% set navigation = [(&#x27;/&#x27;, &#x27;Home&#x27;), (&#x27;/about&#x27;, &#x27;About&#x27;)] %&#125;</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>也可以将一部分模板数据定义为变量，使用<strong>set</strong>和<strong>endset</strong>标签声明开始和结束：</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;% set navigation %&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;/&quot;</span>&gt;</span>Home<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;/about&quot;</span>&gt;</span>About<span class="tag">&lt;/<span class="name">a</span>&gt;</span> &#123;% endset %&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br></pre></td></tr></table></div></figure>
+
+
+        <h4 id="内置上下文变量"   >
+          <a href="#内置上下文变量" class="heading-link"><i class="fas fa-link"></i></a>内置上下文变量</h4>
+      <ul>
+<li>Flask 在模板上下文中提供了一些内置变量，可以在模板中直接使用，如下表所示：</li>
+</ul>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">变量</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">config</td>
+<td align="center">当前的配置对象</td>
+</tr>
+<tr>
+<td align="center">request</td>
+<td align="center">当前的请求对象，已激活环境可用</td>
+</tr>
+<tr>
+<td align="center">session</td>
+<td align="center">当前的会话对象，已激活环境可用</td>
+</tr>
+<tr>
+<td align="center">g</td>
+<td align="center">与请求绑定的全局变量，已激活环境可用</td>
+</tr>
+</tbody></table></div>
+
+        <h4 id="自定义上下文"   >
+          <a href="#自定义上下文" class="heading-link"><i class="fas fa-link"></i></a>自定义上下文</h4>
+      <ul>
+<li>如果多个模板都需要使用同一变量，那么比起在多个视图函数中重复传入，更好的方法是能够设置一个模板全局变量。Flask 提供了一个<strong>app.context_processor</strong>装饰器，可以用来注册模板上下文处理函数，它可以完成统一传入变量的工作。模板上下文处理函数需要返回一个包含变量键值对的字典。</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@app.context_processor</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inject_foo</span>():</span></span><br><span class="line">    foo = <span class="string">&#x27;I am foo.&#x27;</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">dict</span>(foo=foo)  <span class="comment"># 等同于return &#123;&#x27;foo&#x27;: foo&#125;</span></span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li><p>当调用<strong>render_template()**函数渲染任意一个模板时，所有使用</strong>app.context_processor**装饰器注册的模板上下文处理函数（包括 Flask 内置的上下文处理函数）都会被执行，这些函数的返回值会被添加到模板中，因此可以在模板中直接使用 foo 变量。</p>
+</li>
+<li><p>除了使用<strong>app.context_processor</strong>装饰器，也可以直接将其作为方法调用，传入模板上下文处理函数：</p>
+</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inject_foo</span>():</span></span><br><span class="line">    foo = <span class="string">&#x27;I am foo.&#x27;</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">dict</span>(foo=foo)</span><br><span class="line"></span><br><span class="line">app.context_processor(inject_foo)</span><br></pre></td></tr></table></div></figure>
+
+
+        <h3 id="全局对象"   >
+          <a href="#全局对象" class="heading-link"><i class="fas fa-link"></i></a>全局对象</h3>
+      
+        <h4 id="内置全局函数"   >
+          <a href="#内置全局函数" class="heading-link"><i class="fas fa-link"></i></a>内置全局函数</h4>
+      <ul>
+<li>Jinja2 在模板中默认提供了一些全局函数</li>
+</ul>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">函数</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">range([start, ]stop[, step])</td>
+<td align="center">与 Python 中 range() 用法相同</td>
+</tr>
+<tr>
+<td align="center">lipsum(n=5, html=True, min=20, max=100)</td>
+<td align="center">生成随机文本，测试时用来填充页面。默认生成 5 段 HTML 文本，每段包含 20~100 个单词</td>
+</tr>
+<tr>
+<td align="center">dict(**items)</td>
+<td align="center">和 Python 中的 dict() 用法相同</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>Flask 在模板中内置了两个全局函数</li>
+</ul>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">函数</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">url_for()</td>
+<td align="center">用于生成 URL 的函数</td>
+</tr>
+<tr>
+<td align="center">get_flashed_messages()</td>
+<td align="center">用于获取 flash 消息的函数</td>
+</tr>
+</tbody></table></div>
+<blockquote>
+<p>Flask 除了把<strong>g、session、config、request</strong>对象注册为上下文变量，也将它们设为全局变量，因此可以全局使用</p>
+</blockquote>
+<ul>
+<li>url_for() 生成返回的 URL</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;&#123;&#123; url_for(&#x27;index&#x27;) &#125;&#125;&quot;</span>&gt;</span>Return<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></div></figure>
+
+
+        <h4 id="自定义全局函数"   >
+          <a href="#自定义全局函数" class="heading-link"><i class="fas fa-link"></i></a>自定义全局函数</h4>
+      <ul>
+<li>把 bar() 函数注册为模板全局函数</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@app.template_global()</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bar</span>():</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;I am bar.&#x27;</span></span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>默认使用函数的原名称传入模板，在<strong>app.template_global()**装饰器中使用 name 参数可以指定一个自定义名称。</strong>app.template_global()**仅能用于注册全局函数</li>
+</ul>
+<blockquote>
+<p>可以直接使用<strong>app.add_template_global()**方法注册自定义全局函数，传入函数对象和可选的自定义名称（name），比如</strong>app.add_template_global(your_global_function)** 。</p>
+</blockquote>
+
+        <h3 id="过滤器"   >
+          <a href="#过滤器" class="heading-link"><i class="fas fa-link"></i></a>过滤器</h3>
+      <ul>
+<li>在 Jinja2 中，过滤器（filter）是一些可以用来修改和过滤变量值的特殊函数，过滤器和变量用一个**’|’**隔开，需要参数的过滤器可以像函数一样使用括号传递。下面是一个对 name 变量使用 title 过滤器的例子：</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123; name|title &#125;&#125;</span><br><span class="line"><span class="comment"># 这会将name变量的值标题化，相当于在Python里调用name.title()</span></span><br><span class="line">&#123;&#123; movies|length &#125;&#125;</span><br><span class="line"><span class="comment"># 使用length获取movies列表的长度，类似于在Python中调用len(movies)</span></span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>另一种用法是将过滤器作用于一部分模板数据，使用<strong>filter</strong>标签和<strong>endfilter</strong>标签声明开始和结束。比如，下面使用<strong>upper</strong>过滤器将一段文字转换为大写：</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% filter upper %&#125; This text becomes uppercase. &#123;% endfilter %&#125;</span><br></pre></td></tr></table></div></figure>
+
+
+        <h4 id="内置过滤器"   >
+          <a href="#内置过滤器" class="heading-link"><i class="fas fa-link"></i></a>内置过滤器</h4>
+      <ul>
+<li>Jinja2 提供了许多内置过滤器，常用的过滤器如下：</li>
+</ul>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">过滤器</th>
+<th align="center">说 明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">default (value, default_ value-u”, boolean False)</td>
+<td align="center">设置默认值，默认值作为参数传人，别名为 d</td>
+</tr>
+<tr>
+<td align="center">escape(s)</td>
+<td align="center">转义 HTML 文本，别名为 e</td>
+</tr>
+<tr>
+<td align="center">first(seq)</td>
+<td align="center">返回序列的第一个元素</td>
+</tr>
+<tr>
+<td align="center">last(seq)</td>
+<td align="center">返回序列的最后一个元素</td>
+</tr>
+<tr>
+<td align="center">length(object)</td>
+<td align="center">返回变量的长度</td>
+</tr>
+<tr>
+<td align="center">random(seq)</td>
+<td align="center">返回序列中的随机元素</td>
+</tr>
+<tr>
+<td align="center">safe(value)</td>
+<td align="center">将变量值标记为安全，避免转义</td>
+</tr>
+<tr>
+<td align="center">trim(value)</td>
+<td align="center">清除变量值前后的空格</td>
+</tr>
+<tr>
+<td align="center">max(value, case_ sensitive=False, attribute=None)</td>
+<td align="center">返回序列中的最大值</td>
+</tr>
+<tr>
+<td align="center">min( value, case_ sensitive=False, attribute=None)</td>
+<td align="center">返回序列中的最小值</td>
+</tr>
+<tr>
+<td align="center">unique(value, case_ sensitive -False, attribute=None)</td>
+<td align="center">返回序列中的不重复的值</td>
+</tr>
+<tr>
+<td align="center">striptags(value)</td>
+<td align="center">清除变量值内的 HTML 标签</td>
+</tr>
+<tr>
+<td align="center">urlize (value, trim<em>url</em> limit=None, nofollow=False, target= None, rel=None)</td>
+<td align="center">将 URL 文本转换为可单击的 HTML 链接</td>
+</tr>
+<tr>
+<td align="center">wordcount(s)</td>
+<td align="center">计算单词数量</td>
+</tr>
+<tr>
+<td align="center">tojson(value, indent=None)</td>
+<td align="center">将变量值转换为 JSON 格式</td>
+</tr>
+<tr>
+<td align="center">truncate(s, length=255, killwords=False,end=’…’, leeway=None)</td>
+<td align="center">截断字符串，常用于显示文章摘要，length 参数设置截断的长度，killwords 参数设置是否截断单词，end 参数设置结尾的符号</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>在使用过滤器时，列表中过滤器函数的第一个参数表示被过滤的变量值（value）或字符串（s），即竖线符号左侧的值，其他的参数可以通过添加括号传入。</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--过滤器叠加使用--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>Hello, &#123;&#123; name|default(&#x27;陌生人&#x27;) &#125;&#125;!<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li><p>默认的自动开启转义仅针对**.html<strong>、</strong>.htm<strong>、</strong>.xml<strong>以及</strong>.xhtml<strong>后缀的文件，用于渲染模板字符串的</strong>render_template_string()**函数也会对所有传入的字符串进行转义。</p>
+</li>
+<li><p>在确保变量值安全的情况下，这通常意味着已经对用户输入的内容进行了“消毒”处理。这时如果想避免转义，将变量作为 HTML 解析，可以对变量使用 safe 过滤器：</p>
+</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123; sanitized_text|safe &#125;&#125;</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>另一种将文本标记为安全的方法是在渲染前将变量转换为 Markup 对象：</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Markup</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/hello&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span>():</span></span><br><span class="line">    text = Markup(<span class="string">&#x27;&lt;h1&gt;Hello, Flask!&lt;/h1&gt;&#x27;</span>)</span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">&#x27;index.html&#x27;</span>, text=text)</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>这时在模板中可以直接使用{{ text }}</li>
+</ul>
+<blockquote>
+<p>绝对不要直接对用户输入的内容使用 safe 过滤器，否则容易被植入恶意代码，导致 XSS 攻击。</p>
+</blockquote>
+
+        <h4 id="自定义过滤器"   >
+          <a href="#自定义过滤器" class="heading-link"><i class="fas fa-link"></i></a>自定义过滤器</h4>
+      <ul>
+<li>注册自定义过滤器</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Markup</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.template_filter()</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">musical</span>(<span class="params">s</span>):</span></span><br><span class="line">    <span class="keyword">return</span> s + Markup(<span class="string">&#x27; &amp;#9835;&#x27;</span>)</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>和注册全局函数类似，可以在<strong>app.template_filter()**中使用</strong>name**关键字设置过滤器的名称，默认会使用函数名称。过滤器函数需要接收被处理的值作为输入，返回处理后的值。过滤器函数接收 s 作为被过滤的变量值，返回处理后的值。</li>
+<li>创建的<strong>musical</strong>过滤器会在被过滤的变量字符后面添加一个音符（single bar note）图标，因为音符通过 HTML 实体&amp;#9835；表示，使用 Markup 类将它标记为安全字符。在使用时和其他过滤器用法相同：</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123; name|musical &#125;&#125;</span><br></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p>可以直接使用<strong>app.add_template_filter()**方法注册自定义过滤器，传入函数对象和可选的自定义名称（name），比如</strong>app.add_template_filter(your_filter_function)**</p>
+</blockquote>
+
+        <h3 id="测试器"   >
+          <a href="#测试器" class="heading-link"><i class="fas fa-link"></i></a>测试器</h3>
+      <ul>
+<li>在 Jinja2 中，测试器（Test）是一些用来测试变量或表达式，返回布尔值（True 或 False）的特殊函数。比如，number 测试器用来判断一个变量或表达式是否是数字，我们使用 is 连接变量和测试器：</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;% <span class="keyword">if</span> age <span class="keyword">is</span> number %&#125;</span><br><span class="line">　　&#123;&#123; age * <span class="number">365</span> &#125;&#125;</span><br><span class="line">&#123;% <span class="keyword">else</span> %&#125;</span><br><span class="line">　　无效的数字。</span><br><span class="line">&#123;% endif %&#125;</span><br></pre></td></tr></table></div></figure>
+
+
+        <h4 id="内置测试器"   >
+          <a href="#内置测试器" class="heading-link"><i class="fas fa-link"></i></a>内置测试器</h4>
+      <ul>
+<li>Jinja2 内置了许多测试器，常用的测试器</li>
+</ul>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th align="center">测试器</th>
+<th align="center"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">callable(object)</td>
+<td align="center">判断对象是否可被调用</td>
+</tr>
+<tr>
+<td align="center">defined(value)</td>
+<td align="center">判断变量是否已定义</td>
+</tr>
+<tr>
+<td align="center">undefined(value)</td>
+<td align="center">判断变量是否未定义</td>
+</tr>
+<tr>
+<td align="center">none(value)</td>
+<td align="center">判断变量是否为 None</td>
+</tr>
+<tr>
+<td align="center">number(value)</td>
+<td align="center">判断变量是否是数字</td>
+</tr>
+<tr>
+<td align="center">string(value)</td>
+<td align="center">判断变量是否是字符串</td>
+</tr>
+<tr>
+<td align="center">sequence(value)</td>
+<td align="center">判断变量是否是序列，比如字符串、列表、元组</td>
+</tr>
+<tr>
+<td align="center">iterable(value)</td>
+<td align="center">判断变量是否可迭代</td>
+</tr>
+<tr>
+<td align="center">mapping(value)</td>
+<td align="center">判断变量是否是匹配对象，比如字典</td>
+</tr>
+<tr>
+<td align="center">sameas( value, other)</td>
+<td align="center">判断变量与 other 是否指向相同的内存地址</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>在使用测试器时，is 的左侧是测试器函数的第一个参数（value），其他参数可以添加括号传入，也可以在右侧使用空格连接，以 sameas 为例：</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% if foo is sameas(bar) %&#125;...</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>等同于：</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% if foo is sameas bar %&#125;...</span><br></pre></td></tr></table></div></figure>
+
+
+        <h4 id="自定义测试器"   >
+          <a href="#自定义测试器" class="heading-link"><i class="fas fa-link"></i></a>自定义测试器</h4>
+      <ul>
+<li>用 Flask 提供的**app.template_test()**装饰器来注册一个自定义测试器。</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@app.template_test()</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">baz</span>(<span class="params">n</span>):</span></span><br><span class="line">    <span class="keyword">if</span> n == <span class="string">&#x27;baz&#x27;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>测试器的名称默认为函数名称，可以在**app.template_test()**中使用 name 关键字指定自定义名称</li>
+</ul>
+
+        <h3 id="模板环境对象"   >
+          <a href="#模板环境对象" class="heading-link"><i class="fas fa-link"></i></a>模板环境对象</h3>
+      
+        <h4 id="添加自定义全局对象"   >
+          <a href="#添加自定义全局对象" class="heading-link"><i class="fas fa-link"></i></a>添加自定义全局对象</h4>
+      <ul>
+<li>和<strong>app.template_global()**装饰器不同，直接操作</strong>globals<strong>字典允许传入任意 Python 对象，而不仅仅是函数，类似于上下文处理函数的作用。下面的代码使用</strong>app.jinja_env.globals**分别向模板中添加全局函数 bar 和全局变量 foo：</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bar</span>():</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;I am bar.&#x27;</span></span><br><span class="line">foo = <span class="string">&#x27;I am foo.&#x27;</span></span><br><span class="line"></span><br><span class="line">app.jinja_env.<span class="built_in">globals</span>[<span class="string">&#x27;bar&#x27;</span>] = bar</span><br><span class="line">app.jinja_env.<span class="built_in">globals</span>[<span class="string">&#x27;foo&#x27;</span>] = foo</span><br></pre></td></tr></table></div></figure>
+
+
+        <h4 id="添加自定义过滤器"   >
+          <a href="#添加自定义过滤器" class="heading-link"><i class="fas fa-link"></i></a>添加自定义过滤器</h4>
+      <ul>
+<li>下面的代码使用<strong>app.jinja_env.filters</strong>向模板中添加自定义过滤器 smilingXXX：</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">smiling</span>(<span class="params">s</span>):</span></span><br><span class="line">    <span class="keyword">return</span> s + <span class="string">&#x27; :)&#x27;</span></span><br><span class="line"></span><br><span class="line">app.jinja_env.filters[<span class="string">&#x27;smiling&#x27;</span>] = smiling</span><br></pre></td></tr></table></div></figure>
+
+
+        <h4 id="添加自定义测试器"   >
+          <a href="#添加自定义测试器" class="heading-link"><i class="fas fa-link"></i></a>添加自定义测试器</h4>
+      <ul>
+<li>下面的代码使用<strong>app.jinja_env.tests</strong>向模板中添加自定义测试器 baz：</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">baz</span>(<span class="params">n</span>):</span></span><br><span class="line">    <span class="keyword">if</span> n == <span class="string">&#x27;baz&#x27;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line"></span><br><span class="line">app.jinja_env.tests[<span class="string">&#x27;baz&#x27;</span>] = baz</span><br></pre></td></tr></table></div></figure>
+
+
+        <h2 id="模板结构组织"   >
+          <a href="#模板结构组织" class="heading-link"><i class="fas fa-link"></i></a>模板结构组织</h2>
+      
+        <h3 id="局部模板"   >
+          <a href="#局部模板" class="heading-link"><i class="fas fa-link"></i></a>局部模板</h3>
+      <ul>
+<li>使用<strong>include</strong>标签来插入一个局部模板，这会把局部模板的全部内容插在使用<strong>include</strong>标签的位置。比如，在其他模板中，可以在任意位置使用下面的代码插入<strong>_banner.html</strong>的内容：</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% include &#x27;_banner.html&#x27; %&#125;</span><br></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p>为了和普通模板区分开，局部模板的命名通常以一个下划线开始。</p>
+</blockquote>
+
+        <h3 id="宏"   >
+          <a href="#宏" class="heading-link"><i class="fas fa-link"></i></a>宏</h3>
+      <ul>
+<li><p>宏（macro）是 Jinja2 提供的一个非常有用的特性，它类似 Python 中的函数。使用宏可以把一部分模板代码封装到宏里，使用传递的参数来构建内容，最后返回构建后的内容。在功能上，它和局部模板类似，都是为了方便代码块的重用。</p>
+</li>
+<li><p>为了便于管理，可以把宏存储在单独的文件中，这个文件通常命名为<strong>macros.html 或_macors.html</strong>。在创建宏时，使用<strong>macro</strong>和<strong>endmacro</strong>标签声明宏的开始和结束。在开始标签中定义宏的名称和接收的参数，下面是一个简单的示例：</p>
+</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% macro qux(amount=1) %&#125; &#123;% if amount == 1 %&#125; I am qux. &#123;% elif amount &gt; 1 %&#125; We are quxs. &#123;% endif %&#125; &#123;% endmacro %&#125;</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>使用时，需要像从 Python 模块中导入函数一样使用 import 语句导入它，然后作为函数调用，传入必要的参数，如下所示：</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% from &#x27;macros.html&#x27; import qux %&#125; ... &#123;&#123; qux(amount=5) &#125;&#125;</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li><p>另外，在使用宏时需要注意上下文问题。在 Jinja2 中，出于性能的考虑，并且为了让这一切保持显式，默认情况下包含（include）一个局部模板会传递当前上下文到局部模板中，但导入（import）却不会。具体来说，当我们使用**render_template()**函数渲染一个 foo.html 模板时，</p>
+</li>
+<li><p>这个 foo.html 的模板上下文中包含下列对象：</p>
+<ul>
+<li><p>Flask 使用内置的模板上下文处理函数提供的<strong>g、session、config、request</strong>。</p>
+</li>
+<li><p>扩展使用内置的模板上下文处理函数提供的变量。</p>
+</li>
+<li><p>自定义模板上下文处理器传入的变量。</p>
+</li>
+<li><p>使用 render_template()函数传入的变量。</p>
+</li>
+<li><p>Jinja2 和 Flask 内置及自定义全局对象。</p>
+</li>
+<li><p>Jinja2 内置及自定义过滤器。</p>
+</li>
+<li><p>Jinja2 内置及自定义测试器。</p>
+</li>
+</ul>
+</li>
+<li><p>使用 include 标签插入的局部模板（比如_banner.html）同样可以使用上述上下文中的变量和函数。而导入另一个并非被直接渲染的模板（比如 macros.html）时，这个模板仅包含下列这些对象：</p>
+<ul>
+<li><p>Jinja2 和 Flask 内置的全局函数和自定义全局函数。</p>
+</li>
+<li><p>Jinja2 内置及自定义过滤器。</p>
+</li>
+<li><p>Jinja2 内置及自定义测试器。</p>
+</li>
+</ul>
+</li>
+<li><p>因此，如果我们想在导入的宏中使用第一个列表中的 2、3、4 项，就需要在导入时显式地使用<strong>with context</strong>声明传入当前模板的上下文：</p>
+</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% from &quot;macros.html&quot; import foo with context %&#125;</span><br></pre></td></tr></table></div></figure>
+
+
+        <h3 id="模板继承"   >
+          <a href="#模板继承" class="heading-link"><i class="fas fa-link"></i></a>模板继承</h3>
+      
+        <h4 id="编写基模板"   >
+          <a href="#编写基模板" class="heading-link"><i class="fas fa-link"></i></a>编写基模板</h4>
+      <ul>
+<li>基模板存储了程序页面的固定部分，通常被命名为<strong>base.html</strong>或<strong>layout.html</strong></li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">        &#123;% block head %&#125;</span><br><span class="line">        <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;utf-8&quot;</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">title</span>&gt;</span>&#123;% block title %&#125;Template - HelloFlask&#123;% endblock %&#125;<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">        &#123;% block styles %&#125;&#123;% endblock %&#125; &#123;% endblock %&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">nav</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;&#123;&#123; url_for(&#x27;index&#x27;) &#125;&#125;&quot;</span>&gt;</span>Home<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">nav</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">main</span>&gt;</span></span><br><span class="line">            &#123;% block content %&#125;&#123;% endblock %&#125;</span><br><span class="line">        <span class="tag">&lt;/<span class="name">main</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">footer</span>&gt;</span></span><br><span class="line">            &#123;% block footer %&#125; ... &#123;% endblock %&#125;</span><br><span class="line">        <span class="tag">&lt;/<span class="name">footer</span>&gt;</span></span><br><span class="line">        &#123;% block scripts %&#125;&#123;% endblock %&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>为了避免块的混乱，块的结束标签可以指明块名，同时要确保前后名称一致。比如：</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% block body %&#125; ... &#123;% endblock body %&#125;</span><br></pre></td></tr></table></div></figure>
+
+
+        <h4 id="编写子模板"   >
+          <a href="#编写子模板" class="heading-link"><i class="fas fa-link"></i></a>编写子模板</h4>
+      <figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;% extends &#x27;base.html&#x27; %&#125; &#123;% from &#x27;macros.html&#x27; import qux %&#125; &#123;% block content %&#125; &#123;% set name=&#x27;baz&#x27; %&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>Template<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;&#123;&#123; url_for(&#x27;watchlist&#x27;) &#125;&#125;&quot;</span>&gt;</span>Watchlist<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span>Filter: &#123;&#123; foo|musical &#125;&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span>Global: &#123;&#123; bar() &#125;&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span>Test: &#123;% if name is baz %&#125;I am baz.&#123;% endif %&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span>Macro: &#123;&#123; qux(amount=5) &#125;&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line">&#123;% endblock %&#125;</span><br></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p>extends 必须是子模板的第一个标签。</p>
+</blockquote>
+<ul>
+<li><p>覆盖内容</p>
+</li>
+<li><p>追加内容</p>
+</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;% block styles %&#125; &#123;&#123; super() &#125;&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span></span><br><span class="line">    .foo &#123;</span><br><span class="line"><span class="css">        <span class="attribute">color</span>: red;</span></span><br><span class="line">    &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line">&#123;% endblock %&#125;</span><br></pre></td></tr></table></div></figure>
+
+
+        <h2 id="模板进阶实践"   >
+          <a href="#模板进阶实践" class="heading-link"><i class="fas fa-link"></i></a>模板进阶实践</h2>
+      
+        <h3 id="空白控制"   >
+          <a href="#空白控制" class="heading-link"><i class="fas fa-link"></i></a>空白控制</h3>
+      <ul>
+<li><p>在渲染时自动去掉空行，可以在定界符内侧添加减号。比如，**{%- endfor %}**会移除该语句前的空白，同理，在右边的定界符内侧添加减号将移除该语句后的空白</p>
+</li>
+<li><p>使用模板环境对象提供的<strong>trim_blocks</strong>和<strong>lstrip_blocks</strong>属性设置</p>
+</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 用来删除Jinja2语句后的第一个空行</span></span><br><span class="line">app.jinja_env.trim_blocks = <span class="literal">True</span></span><br><span class="line"><span class="comment"># 用来删除Jinja2语句所在行之前的空格和制表符（tabs）</span></span><br><span class="line">app.jinja_env.lstrip_blocks = <span class="literal">True</span></span><br></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p>trim_blocks 中的 block 指的是使用{% ... %}定界符的代码块，与模板继承中的块无关</p>
+</blockquote>
+
+        <h3 id="加载静态文件"   >
+          <a href="#加载静态文件" class="heading-link"><i class="fas fa-link"></i></a>加载静态文件</h3>
+      <ul>
+<li><p>一个 Web 项目不仅需要 HTML 模板，还需要许多静态文件，比如 CSS、JavaScript 文件、图片以及音频等。在 Flask 程序中，默认需要将静态文件存储在与主脚本（包含程序实例的脚本）同级目录的 static 文件夹中。</p>
+</li>
+<li><p>为了在 HTML 文件中引用静态文件，需要使用<strong>url_for()**函数获取静态文件的 URL。Flask 内置了用于获取静态文件的视图函数，端点值为 static，它的默认 URL 规则为</strong>/static/&lt;path：filename&gt;**，URL 变量 filename 是相对于 static 文件夹根目录的文件路径。</p>
+</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;&#123;&#123; url_for(&#x27;static&#x27;, filename=&#x27;avatar.jpg&#x27;) &#125;&#125;&quot;</span> <span class="attr">width</span>=<span class="string">&quot;50&quot;</span> /&gt;</span> <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">&quot;stylesheet&quot;</span> <span class="attr">type</span>=<span class="string">&quot;text/css&quot;</span> <span class="attr">href</span>=<span class="string">&quot;&#123;&#123; url_for(&#x27;static&#x27;, filename= &#x27;styles.css&#x27; ) &#125;&#125;&quot;</span> /&gt;</span></span><br></pre></td></tr></table></div></figure>
+
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--添加Favicon--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">&quot;icon&quot;</span> <span class="attr">type</span>=<span class="string">&quot;image/x-icon&quot;</span> <span class="attr">href</span>=<span class="string">&quot;&#123;&#123; url_for(&#x27;static&#x27;, filename=&#x27;favicon.ico&#x27;) &#125;&#125;&quot;</span> /&gt;</span></span><br></pre></td></tr></table></div></figure>
+
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--使用CSS框架--&gt;</span></span><br><span class="line">... &#123;% block styles %&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">&quot;stylesheet&quot;</span> <span class="attr">href</span>=<span class="string">&quot;&#123;&#123; url_for(&#x27;static&#x27;, filename=&#x27;css/bootstrap.min.css&#x27;) &#125;&#125;&quot;</span> /&gt;</span></span><br><span class="line">&#123;% endblock %&#125; ... &#123;% block scripts %&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;&#123;&#123; url_for(&#x27;static&#x27;, filename=&#x27;js/jquery.min.js&#x27;) &#125;&#125;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;&#123;&#123; url_for(&#x27;static&#x27;, filename=&#x27;js/popper.min.js&#x27;) &#125;&#125;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;&#123;&#123; url_for(&#x27;static&#x27;, filename=&#x27;js/bootstrap.min.js&#x27;) &#125;&#125;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">&#123;% endblock %&#125; ...</span><br></pre></td></tr></table></div></figure>
+
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--使用宏加载静态资源--&gt;</span></span><br><span class="line">&#123;% macro static_file(type, filename_or_url, local=True) %&#125; &#123;% if local %&#125; &#123;% set filename_or_url = url_for(&#x27;static&#x27;, filename=filename_or_url) %&#125; &#123;% endif %&#125; &#123;% if type == &#x27;css&#x27; %&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">&quot;stylesheet&quot;</span> <span class="attr">href</span>=<span class="string">&quot;&#123;&#123; filename_or_url &#125;&#125;&quot;</span> <span class="attr">type</span>=<span class="string">&quot;text/css&quot;</span> /&gt;</span></span><br><span class="line">&#123;% elif type == &#x27;js&#x27; %&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span> <span class="attr">src</span>=<span class="string">&quot;&#123;&#123; filename_or_url &#125;&#125;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">&#123;% elif type == &#x27;icon&#x27; %&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">&quot;icon&quot;</span> <span class="attr">href</span>=<span class="string">&quot;&#123;&#123; filename_or_url &#125;&#125;&quot;</span> /&gt;</span></span><br><span class="line">&#123;% endif %&#125; &#123;% endmacro %&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--使用方法--&gt;</span></span><br><span class="line">static_file(&#x27;css&#x27;, &#x27;css/bootstrap.min.css&#x27;) static_file(&#x27;css&#x27;, &#x27;https://maxcdn.../css/bootstrap.min.css&#x27;, local=False)</span><br></pre></td></tr></table></div></figure>
+
+
+        <h3 id="消息闪现"   >
+          <a href="#消息闪现" class="heading-link"><i class="fas fa-link"></i></a>消息闪现</h3>
+      <ul>
+<li>Flask 提供了一个非常有用的<strong>flash()**函数，它可以用来“闪现”需要显示给用户的消息，比如当用户登录成功后显示“欢迎回来！”。在视图函数调用</strong>flash()<strong>函数，传入消息内容即可“闪现”一条消息。使用功能</strong>flash()<strong>函数发送的消息会存储在</strong>session<strong>中，需要在模板中使用全局函数</strong>get_flashed_messages()**获取消息并将其显示出来。</li>
+</ul>
+<blockquote>
+<p>通过<strong>flash()**函数发送的消息会存储在</strong>session<strong>对象中，所以需要为程序设置密钥，可以通过</strong>app.secret_key<strong>属性或配置变量</strong>SECRET_KEY**设置</p>
+</blockquote>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, render_template, flash</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line">app.secret_key = <span class="string">&#x27;secret string&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/flash&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">just_flash</span>():</span></span><br><span class="line">    flash(<span class="string">&#x27;I am flash, who is looking for me?&#x27;</span>)</span><br><span class="line">    <span class="keyword">return</span> redirect(url_for(<span class="string">&#x27;index&#x27;</span>))</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>渲染 flash 消息</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">main</span>&gt;</span></span><br><span class="line">    &#123;% for message in get_flashed_messages() %&#125;</span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;alert&quot;</span>&gt;</span>&#123;&#123; message &#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    &#123;% endfor %&#125; &#123;% block content %&#125;&#123;% endblock %&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">main</span>&gt;</span></span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>当<strong>get_flashed_message()**函数被调用时，</strong>session**中存储的所有消息都会被移除。</li>
+</ul>
+
+        <h3 id="自定义错误页面"   >
+          <a href="#自定义错误页面" class="heading-link"><i class="fas fa-link"></i></a>自定义错误页面</h3>
+      <ul>
+<li>404 页面模板</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;% extends &#x27;base.html&#x27; %&#125; &#123;% block title %&#125;404 - Page Not Found&#123;% endblock %&#125; &#123;% block content %&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>Page Not Found<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>You are lost...<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">&#123;% endblock %&#125;</span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>404 错误处理器</li>
+</ul>
+<figure class="highlight python"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, render_template</span><br><span class="line">...</span><br><span class="line"><span class="meta">@app.errorhandler(<span class="params"><span class="number">404</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">page_not_found</span>(<span class="params">e</span>):</span></span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">&#x27;errors/404.html&#x27;</span>), <span class="number">404</span></span><br></pre></td></tr></table></div></figure>
+
+<blockquote>
+<p>可以使用<strong>app.errorhandler()**装饰器为其他异常注册处理函数，并返回自定义响应，只需要在</strong>app.errorhandler()<strong>装饰器中传入对应的异常类即可。比如，使用</strong>app.errorhandler(NameError)<strong>可以注册处理</strong>NameError**异常的函数。</p>
+</blockquote>
+
+        <h3 id="JavaScript-和-CSS-中的-Jinja2"   >
+          <a href="#JavaScript-和-CSS-中的-Jinja2" class="heading-link"><i class="fas fa-link"></i></a>JavaScript 和 CSS 中的 Jinja2</h3>
+      
+        <h4 id="行内-嵌入式-JavaScript-CSS"   >
+          <a href="#行内-嵌入式-JavaScript-CSS" class="heading-link"><i class="fas fa-link"></i></a>行内/嵌入式 JavaScript/CSS</h4>
+      <ul>
+<li><p>如果要在 JavaScript 和 CSS 文件中使用 Jinja2 代码，那么就在 HTML 中使用<code>&lt;style&gt;</code>和<code>&lt;script&gt;</code>标签定义这部分 CSS 和 JavaScript 代码。</p>
+</li>
+<li><p>在这部分 CSS 和 JavaScript 代码中加入 Jinja2 时，不用考虑编写时的语法错误，比如引号错误，因为 Jinja2 会在渲染后被替换掉，所以只需要确保渲染后的代码正确即可。</p>
+</li>
+<li><p>不过并不推荐使用这种方式，尤其是行内 JavaScript/CSS 会让维护变得困难。避免把大量 JavaScript 代码留在 HTML 中的办法就是尽量将要使用的 Jinja2 变量值在 HTML 模板中定义为 JavaScript 变量。</p>
+</li>
+</ul>
+
+        <h4 id="定义为-JavaScript-CSS-变量"   >
+          <a href="#定义为-JavaScript-CSS-变量" class="heading-link"><i class="fas fa-link"></i></a>定义为 JavaScript/CSS 变量</h4>
+      <ul>
+<li>对于想要在 JavaScript 中获取的数据，如果是元素特定的数据，比如某个文章条目对应的 id 值，可以通过 HTML 元素的<strong>data-*</strong>属性存储。可以自定义横线后的名称，作为元素上的自定义数据变量，比如 data-id，data-username 等，比如：</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">span</span> <span class="attr">data-id</span>=<span class="string">&quot;&#123;&#123; user.id &#125;&#125;&quot;</span> <span class="attr">data-username</span>=<span class="string">&quot;&#123;&#123; user.username &#125;&#125;&quot;</span>&gt;</span>&#123;&#123; user.username &#125;&#125;<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>在 JavaScript 中，可以使用 DOM 元素的 dataset 属性获取<strong>data-*</strong>属性值，比如<strong>element.dataset.username</strong>，或是使用<strong>getAttribute()**方法，比如</strong>element.getAttribute(‘data-username’)**；</li>
+<li>使用 jQuery 时，可以直接对 jQuery 对象调用 data 方法获取，比如**$element.data(‘username’)**。</li>
+<li>对于需要全局使用的数据，则可以在页面中使用嵌入式 JavaScript 定义变量，如果没法定义为 JavaScript 变量，那就考虑定义为函数，比如：</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span>&gt;</span></span><br><span class="line"><span class="handlebars"><span class="xml">    var foo = &quot;</span><span class="template-variable">&#123;&#123; <span class="name">foo_variable</span> &#125;&#125;</span><span class="xml">&quot;;</span></span></span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>CSS 同理，有些时候需要将 Jinja2 变量值传入 CSS 文件，比如希望将用户设置的主题颜色设置到对应的 CSS 规则中，或是需要将 static 目录下某个图片的 URL 传入 CSS 来设置为背景图片，除了将这部分 CSS 定义直接写到 HTML 中外，可以将这些值定义为 CSS 变量，如下所示：</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="css">    <span class="selector-pseudo">:root</span> &#123;</span></span><br><span class="line"><span class="css">        --theme-<span class="attribute">color</span>: &#123;&#123; theme_color &#125;&#125;;</span></span><br><span class="line"><span class="css">        --<span class="attribute">background</span>-url: &#123;&#123; <span class="built_in">url_for</span>(<span class="string">&#x27;static&#x27;</span>, filename=<span class="string">&#x27;background.jpg&#x27;</span>) &#125;&#125;</span></span><br><span class="line">    &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>在 CSS 文件中，使用**var()**函数并传入变量名即可获取对应的变量值：</li>
+</ul>
+<figure class="highlight html"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#foo &#123; color: var(--theme-color); &#125; #bar &#123; background: var(--background-url); &#125;</span><br></pre></td></tr></table></div></figure>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://blog.zyuanlee.cn">Pandalzy</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://blog.zyuanlee.cn/2019/07/18/Flask%E5%AD%A6%E4%B9%A003-%E6%A8%A1%E6%9D%BF/">https://blog.zyuanlee.cn/2019/07/18/Flask%E5%AD%A6%E4%B9%A003-%E6%A8%A1%E6%9D%BF/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://blog.zyuanlee.cn/tags/Python3/">Python3</a></span><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://blog.zyuanlee.cn/tags/Flask%E5%AD%A6%E4%B9%A0/">Flask学习</a></span></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2019/07/28/Flask%E5%AD%A6%E4%B9%A004-%E8%A1%A8%E5%8D%95/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">Flask学习04-表单</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2019/07/14/Flask%E5%AD%A6%E4%B9%A002-Flask%E4%B8%8EHTTP/"><span class="paginator-prev__text">Flask学习02-Flask与HTTP</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95"><span class="toc-number">1.</span> <span class="toc-text">
+          模板基本用法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E6%A8%A1%E6%9D%BF"><span class="toc-number">1.1.</span> <span class="toc-text">
+          创建模板</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF%E8%AF%AD%E6%B3%95"><span class="toc-number">1.2.</span> <span class="toc-text">
+          模板语法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B8%B2%E6%9F%93%E6%A8%A1%E6%9D%BF"><span class="toc-number">1.3.</span> <span class="toc-text">
+          渲染模板</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF%E8%BE%85%E5%8A%A9%E5%B7%A5%E5%85%B7"><span class="toc-number">2.</span> <span class="toc-text">
+          模板辅助工具</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="toc-number">2.1.</span> <span class="toc-text">
+          上下文</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E7%BD%AE%E4%B8%8A%E4%B8%8B%E6%96%87%E5%8F%98%E9%87%8F"><span class="toc-number">2.1.1.</span> <span class="toc-text">
+          内置上下文变量</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="toc-number">2.1.2.</span> <span class="toc-text">
+          自定义上下文</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%A8%E5%B1%80%E5%AF%B9%E8%B1%A1"><span class="toc-number">2.2.</span> <span class="toc-text">
+          全局对象</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E7%BD%AE%E5%85%A8%E5%B1%80%E5%87%BD%E6%95%B0"><span class="toc-number">2.2.1.</span> <span class="toc-text">
+          内置全局函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E5%85%A8%E5%B1%80%E5%87%BD%E6%95%B0"><span class="toc-number">2.2.2.</span> <span class="toc-text">
+          自定义全局函数</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="toc-number">2.3.</span> <span class="toc-text">
+          过滤器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E7%BD%AE%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="toc-number">2.3.1.</span> <span class="toc-text">
+          内置过滤器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="toc-number">2.3.2.</span> <span class="toc-text">
+          自定义过滤器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E5%99%A8"><span class="toc-number">2.4.</span> <span class="toc-text">
+          测试器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E7%BD%AE%E6%B5%8B%E8%AF%95%E5%99%A8"><span class="toc-number">2.4.1.</span> <span class="toc-text">
+          内置测试器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B5%8B%E8%AF%95%E5%99%A8"><span class="toc-number">2.4.2.</span> <span class="toc-text">
+          自定义测试器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF%E7%8E%AF%E5%A2%83%E5%AF%B9%E8%B1%A1"><span class="toc-number">2.5.</span> <span class="toc-text">
+          模板环境对象</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E5%85%A8%E5%B1%80%E5%AF%B9%E8%B1%A1"><span class="toc-number">2.5.1.</span> <span class="toc-text">
+          添加自定义全局对象</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="toc-number">2.5.2.</span> <span class="toc-text">
+          添加自定义过滤器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B5%8B%E8%AF%95%E5%99%A8"><span class="toc-number">2.5.3.</span> <span class="toc-text">
+          添加自定义测试器</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF%E7%BB%93%E6%9E%84%E7%BB%84%E7%BB%87"><span class="toc-number">3.</span> <span class="toc-text">
+          模板结构组织</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B1%80%E9%83%A8%E6%A8%A1%E6%9D%BF"><span class="toc-number">3.1.</span> <span class="toc-text">
+          局部模板</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%8F"><span class="toc-number">3.2.</span> <span class="toc-text">
+          宏</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF%E7%BB%A7%E6%89%BF"><span class="toc-number">3.3.</span> <span class="toc-text">
+          模板继承</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%96%E5%86%99%E5%9F%BA%E6%A8%A1%E6%9D%BF"><span class="toc-number">3.3.1.</span> <span class="toc-text">
+          编写基模板</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%96%E5%86%99%E5%AD%90%E6%A8%A1%E6%9D%BF"><span class="toc-number">3.3.2.</span> <span class="toc-text">
+          编写子模板</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF%E8%BF%9B%E9%98%B6%E5%AE%9E%E8%B7%B5"><span class="toc-number">4.</span> <span class="toc-text">
+          模板进阶实践</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A9%BA%E7%99%BD%E6%8E%A7%E5%88%B6"><span class="toc-number">4.1.</span> <span class="toc-text">
+          空白控制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A0%E8%BD%BD%E9%9D%99%E6%80%81%E6%96%87%E4%BB%B6"><span class="toc-number">4.2.</span> <span class="toc-text">
+          加载静态文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E9%97%AA%E7%8E%B0"><span class="toc-number">4.3.</span> <span class="toc-text">
+          消息闪现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E9%94%99%E8%AF%AF%E9%A1%B5%E9%9D%A2"><span class="toc-number">4.4.</span> <span class="toc-text">
+          自定义错误页面</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JavaScript-%E5%92%8C-CSS-%E4%B8%AD%E7%9A%84-Jinja2"><span class="toc-number">4.5.</span> <span class="toc-text">
+          JavaScript 和 CSS 中的 Jinja2</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A1%8C%E5%86%85-%E5%B5%8C%E5%85%A5%E5%BC%8F-JavaScript-CSS"><span class="toc-number">4.5.1.</span> <span class="toc-text">
+          行内&#x2F;嵌入式 JavaScript&#x2F;CSS</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9A%E4%B9%89%E4%B8%BA-JavaScript-CSS-%E5%8F%98%E9%87%8F"><span class="toc-number">4.5.2.</span> <span class="toc-text">
+          定义为 JavaScript&#x2F;CSS 变量</span></a></li></ol></li></ol></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/assets/avatar.jpg" alt="avatar"></div><p class="sidebar-ov-author__text">Stay hungry, stay foolish.</p></div><div class="sidebar-ov-social"></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">45</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">7</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">31</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2021</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>Pandalzy</span></div><div><span>由 <a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> 强力驱动</span><span> v5.4.0</span><span class="footer__devider">|</span><span>主题 - <a href="https://github.com/liuyib/hexo-theme-stun/" title="Stun" target="_blank" rel="noopener">Stun</a></span><span> v2.1.1</span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><div class="search-mask"></div><div class="search-popup"><span class="search-close"></span><div class="search-input"><input placeholder="搜索文章（支持多关键词，请用空格分隔）"></div><div class="search-results"></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script>function initSearch() {
+  var isXML = true;
+  var search_path = 'search.xml';
+
+  if (!search_path) {
+    search_path = 'search.xml';
+  } else if (/json$/i.test(search_path)) {
+    isXML = false;
+  }
+
+  var path = '/' + search_path;
+  $.ajax({
+    url: path,
+    dataType: isXML ? 'xml' : 'json',
+    async: true,
+    success: function (res) {
+      var datas = isXML ? $('entry', res).map(function () {
+        // 将 XML 转为 JSON
+        return {
+          title: $('title', this).text(),
+          content: $('content', this).text(),
+          url: $('url', this).text()
+        };
+      }).get() : res;
+      var $input = $('.search-input input');
+      var $result = $('.search-results');
+      // 搜索对象（标题、内容）的权重，影响显示顺序
+      var WEIGHT = { title: 100, content: 1 };
+      var searchPost = function () {
+        var searchText = $input.val().toLowerCase().trim();
+        // 根据空白字符分隔关键字
+        var keywords = searchText.split(/[\s]+/);
+        // 搜索结果
+        var matchPosts = [];
+
+        // 有多个关键字时，将原文字整个保存下来
+        if (keywords.length > 1) {
+          keywords.push(searchText);
+        }
+        // 防止未输入字符时搜索
+        if (searchText.length > 0) {
+          datas.forEach(function (data) {
+            var isMatch  = false;
+            // 没有标题的文章使用预设的 i18n 变量代替
+            var title = (data.title && data.title.trim()) || '[ 文章无标题 ]';
+            var titleLower = title && title.toLowerCase();
+            // 删除 HTML 标签 和 所有空白字符
+            var content = data.content && data.content.replace(/<[^>]+>/g, '');
+            var contentLower = content && content.toLowerCase();
+            // 删除重复的 /
+            var postURL = data.url && decodeURI(data.url).replace(/\/{2,}/g, '/');
+            // 标题中匹配到的关键词
+            var titleHitSlice = [];
+            // 内容中匹配到的关键词
+            var contentHitSlice = [];
+
+            keywords.forEach(function (keyword) {
+              /**
+              * 获取匹配的关键词的索引
+              * @param {String} keyword 要匹配的关键字
+              * @param {String} text 原文字
+              * @param {Boolean} caseSensitive 是否区分大小写
+              * @param {Number} weight 匹配对象的权重。权重大的优先显示
+              * @return {Array}
+              */
+              function getIndexByword (word, text, caseSensitive, weight) {
+                if (!word || !text) {
+                  return [];
+                };
+
+                var startIndex = 0; // 每次匹配的开始索引
+                var index = -1;     // 匹配到的索引值
+                var result = [];    // 匹配结果
+
+                if (!caseSensitive) {
+                  word = word.toLowerCase();
+                  text = text.toLowerCase();
+                }
+
+                while((index = text.indexOf(word, startIndex)) !== -1) {
+                  var hasMatch = false;
+                  // 索引位置相同的关键词，保留长度较长的
+                  titleHitSlice.forEach(function (hit) {
+                    if (hit.index === index && hit.word.length < word.length) {
+                      hit.word = word;
+                      hasMatch = true;
+                    }
+                  });
+                  startIndex = index + word.length;
+                  !hasMatch && result.push({ index: index, word: word, weight: weight });
+                }
+                return result;
+              }
+              titleHitSlice = titleHitSlice.concat(getIndexByword(keyword, titleLower, false, WEIGHT.title));
+              contentHitSlice = contentHitSlice.concat(getIndexByword(keyword, contentLower, false, WEIGHT.content));
+            });
+
+            var hitTitle = titleHitSlice.length;
+            var hitContent = contentHitSlice.length;
+
+            if (hitTitle > 0 || hitContent > 0) {
+              isMatch = true;
+            }
+            if (isMatch) {
+              ;[titleHitSlice, contentHitSlice].forEach(function (hit) {
+                // 按照匹配文字的索引的递增顺序排序
+                hit.sort(function (left, right) {
+                  return left.index - right.index;
+                });
+              });
+              /**
+              * 给文本中匹配到的关键词添加标记，从而进行高亮显示
+              * @param {String} text 原文本
+              * @param {Array} hitSlice 匹配项的索引信息
+              * @param {Number} start 开始索引
+              * @param {Number} end 结束索引
+              * @return {String}
+              */
+              function highlightKeyword (text, hitSlice, start, end) {
+                if (!text || !hitSlice || !hitSlice.length) {
+                  return;
+                }
+
+                var result = '';
+                var startIndex = start;
+                var endIndex = end;
+                hitSlice.forEach(function (hit) {
+                  if (hit.index < startIndex) {
+                    return;
+                  }
+
+                  var hitWordEnd = hit.index + hit.word.length;
+                  result += text.slice(startIndex, hit.index);
+                  result += '<b>' + text.slice(hit.index, hitWordEnd) + '</b>';
+                  startIndex = hitWordEnd;
+                });
+                result += text.slice(startIndex, endIndex);
+                return result;
+              }
+
+              var postData = {};
+              // 文章总的搜索权重
+              var postWeight = titleHitSlice.length * WEIGHT.title + contentHitSlice.length * WEIGHT.content;
+              // 标记匹配关键词后的标题
+              var postTitle = highlightKeyword(title, titleHitSlice, 0, title.length) || title;
+              // 标记匹配关键词后的内容
+              var postContent;
+              // 显示内容的长度
+              var SHOW_WORD_LENGTH = 200;
+              // 命中关键词前的字符显示长度
+              var SHOW_WORD_FRONT_LENGTH = 20;
+              var SHOW_WORD_END_LENGTH = SHOW_WORD_LENGTH - SHOW_WORD_FRONT_LENGTH;
+
+              // 截取匹配的第一个字符，前后共 200 个字符来显示
+              if (contentHitSlice.length > 0) {
+                var firstIndex = contentHitSlice[0].index;
+                var start = firstIndex > SHOW_WORD_FRONT_LENGTH ? firstIndex - SHOW_WORD_FRONT_LENGTH : 0;
+                var end = firstIndex + SHOW_WORD_END_LENGTH;
+                postContent = highlightKeyword(content, contentHitSlice, start, end);
+              } else { // 未匹配到内容，直接截取前 200 个字符来显示
+                postContent = content.slice(0, SHOW_WORD_LENGTH);
+              }
+              postData.title = postTitle;
+              postData.content = postContent;
+              postData.url = postURL;
+              postData.weight = postWeight;
+              matchPosts.push(postData);
+            }
+          });
+        }
+
+        var resultInnerHtml = '';
+        if (matchPosts.length) {
+          // 按权重递增的顺序排序，使权重大的优先显示
+          matchPosts.sort(function (left, right) {
+            return right.weight - left.weight;
+          });
+          resultInnerHtml += '<ul>';
+          matchPosts.forEach(function (post) {
+            resultInnerHtml += '<li><a class="search-results-title" href="' + post.url + '">';
+            resultInnerHtml += post.title;
+            resultInnerHtml += '</a><div class="search-results-content">';
+            resultInnerHtml += post.content;
+            resultInnerHtml += '</div></li>';
+          });
+          resultInnerHtml += '</ul>';
+        } else {
+          resultInnerHtml += '<div class="search-results-none"><i class="far fa-meh"></i></div>';
+        }
+        $result.html(resultInnerHtml);
+      };
+      $input.on('input', searchPost);
+      $input.on('keyup', function (e) {
+        if (e.keyCode === Stun.utils.codeToKeyCode('Enter')) {
+          searchPost();
+        }
+      });
+    }
+  });
+}
+
+function closeSearch () {
+  $('body').css({ overflow: 'auto' });
+  $('.search-popup').css({ display: 'none' });
+  $('.search-mask').css({ display: 'none' });
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+  Stun.utils.pjaxReloadLocalSearch = function () {
+    $('.header-nav-search').on('click', function (e) {
+      e.stopPropagation();
+      $('body').css('overflow', 'hidden');
+      $('.search-popup')
+        .velocity('stop')
+        .velocity('transition.expandIn', {
+          duration: 300,
+          complete: function () {
+            $('.search-popup input').focus();
+          }
+        });
+      $('.search-mask')
+        .velocity('stop')
+        .velocity('transition.fadeIn', {
+          duration: 300
+        });
+
+      initSearch();
+    });
+    $('.search-mask, .search-close').on('click', function () {
+      closeSearch();
+    });
+    $(document).on('keydown', function (e) {
+      // Escape <=> 27
+      if (e.keyCode === Stun.utils.codeToKeyCode('Escape')) {
+        closeSearch();
+      }
+    });
+  };
+
+  Stun.utils.pjaxReloadLocalSearch();
+}, false);</script><script src="/js/utils.js?v=2.1.1"></script><script src="/js/stun-boot.js?v=2.1.1"></script><script src="/js/scroll.js?v=2.1.1"></script><script src="/js/header.js?v=2.1.1"></script><script src="/js/sidebar.js?v=2.1.1"></script><script type="application/json" src="/search.xml"></script></body></html>
